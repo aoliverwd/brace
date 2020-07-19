@@ -1,0 +1,68 @@
+/*
+    Brace
+    Version 1.0.0 Spec/Usage
+*/
+
+
+/* each statements */
+
+{{each item->items}}
+    <p>{{item_title}}</p>
+{{end}}
+
+
+/* conditional statements */
+
+{{if first_name !== "test" || first_name !! null && first_name == "alex"}}
+    May first name is {{first_name}}
+{{elseif first_name === "test"}}
+    your first name is test
+{{else}}
+    please enter your first name 
+{{end}}
+
+
+/* shorthand conditional statements */
+
+{{first_name !== "test" ? first_name : "is test"}}
+
+{{first_name EXISTS ? first_name : "is test"}}
+
+{{first_name EXISTS ? "my first name is __first_name__"}}
+
+
+/* conditions */
+
+===
+>=
+<=
+<
+>
+!!
+!==
+EXISTS
+
+
+STRING_MATCH
+COUNT()
+CALC()
+
+
+/* variables */
+
+{{firstname}}
+
+{{firstname || "No first name found"}}
+
+{{firstname || fname || "No first name found"}}
+
+
+/* nested variables */
+
+{{website->title}}
+
+
+/* includes */
+[@include footer]
+
+[@include sections/footer]
