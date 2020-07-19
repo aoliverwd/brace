@@ -8,10 +8,10 @@
     $brace->template_path = __DIR__.'/templates/';
     $brace->process('main, footer', [
         'page_title' => 'Hello',
-        'firstname' => 'Alex',
-        'lastname' => 'Oliver',
+        'firstname' => 'John',
+        'lastname' => 'Smith',
         'about' => [
-            'age' => 39,
+            'age' => 26,
             'profession' => 'Web Developer'
         ]
     ], false);
