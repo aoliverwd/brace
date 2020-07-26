@@ -11,6 +11,11 @@
 {{end}}
 
 
+{{each item->items as item}}
+    <p>{{item}}</p>
+{{end}}
+
+
 /* conditional statements */
 
 {{if first_name !== "test" || first_name !! null && first_name == "alex"}}
@@ -19,6 +24,11 @@
     your first name is test
 {{else}}
     please enter your first name 
+{{end}}
+
+
+{{if first_name EXISTS}}
+    Hello {{first_name}}
 {{end}}
 
 
