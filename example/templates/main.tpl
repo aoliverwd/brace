@@ -1,4 +1,3 @@
-
 [@include header]
 
 My name is {{firstname || fname || "no first name found"}} {{lastname}}
@@ -7,3 +6,22 @@ My name is {{firstname || fname || "no first name found"}} {{lastname}}
 
 Profession: {{about->profession}}
 
+{{if jobs EXISTS}}
+    has jobs
+
+    {{each jobs as job}}
+        {{job}}
+    {{end}}
+{{else}}
+    There are no jobs
+
+    damn it
+{{end}}
+
+foo
+
+{{each jobs as job}}
+    {{job}}
+{{end}}
+
+[@include footer]
