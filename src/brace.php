@@ -415,8 +415,15 @@
                     return (intval($data) <= intval($expected) ? true : false);
                     break;
                 }
+            } elseif(count($condition) > 1){
+                switch($condition[1]){
                 case '!EXISTS':
+                    return true;
+                    break;
+                }
             }
+
+            return false;
         }
     }
 ?>
