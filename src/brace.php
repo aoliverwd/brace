@@ -22,12 +22,14 @@
     class core{
 
         /** Public variables */
-        public $template_ext = 'tpl';
-        public $compress_output = false;
+        public $remove_comment_blocks = true;
         public $template_path = __DIR__.'/';
+        public $compress_output = false;
+        public $template_ext = 'tpl';
 
         /** Internal variables */
         private $export_string = '';
+        private $is_comment_block;
         private $block_condition;
         private $block_content;
         private $block_spaces;
@@ -40,7 +42,7 @@
          * @param  bool|boolean $render    [description]
          * @return [type]                  [description]
          */
-        public function process(string $templates, array $dataset, bool $render = true){
+        public function process(string $templates, array $dataset, bool $render = true): void{
     
             /** Process individual template files */
             foreach(explode(',', trim($templates)) as $template_file){
@@ -56,9 +58,9 @@
          * @param  bool   $render       [description]
          * @return [type]               [description]
          */
-        public function process_input_string(string $input_string, array $dataset, bool $render){
+        public function process_input_string(string $input_string, array $dataset, bool $render): object{
             foreach(explode("\n", $input_string) as $this_line){
-                $this->process_line($this_line, $dataset, $render);
+                $this->process_line($this_line."\n", $dataset, $render);
             }
 
             return $this;
@@ -68,7 +70,7 @@
          * Return processed template string
          * @return [type] [description]
          */
-        public function return(){
+        public function return(): string{
             return $this->export_string;
         }
 
@@ -78,7 +80,7 @@
          * @param  string $template_name [description]
          * @return [type]                [description]
          */
-        private function process_template_file(string $template_name, array $dataset, bool $render){
+        private function process_template_file(string $template_name, array $dataset, bool $render): void{
             if(file_exists($this->template_path.$template_name)){
                 
                 /** Open template file */
@@ -112,7 +114,7 @@
          * @param  bool   $render      [description]
          * @return [type]              [description]
          */
-        private function process_line(string $this_line, array $dataset, bool $render){
+        private function process_line(string $this_line, array $dataset, bool $render): void{
 
             /** process included templates */
             if(preg_match_all('/(\[@include )(.*?)(])/', $this_line, $include_templates, PREG_SET_ORDER)){
@@ -162,8 +164,14 @@
             } elseif($this->is_block && rtrim($this_line) === str_pad('{{end}}', (strlen('{{end}}') + $this->block_spaces), ' ', STR_PAD_LEFT)){
 
                 /** Process block */
-                $this->process_block($this->block_content, $dataset, $render);
-                
+                $this_line = $this->process_block($this->block_content, $this->block_condition, $dataset);
+
+                /** Clear block variables */
+                $this->block_condition = [];
+                $this->block_content = '';
+                $this->is_block = false;
+                $this->block_spaces = 0;
+
             } elseif($this->is_block){
 
                 /** Add current line to block content */
@@ -173,8 +181,12 @@
                 $this_line = '';
             }
 
+
             /** Process variables and in-line conditions */
             $this_line = $this->process_variables($this_line, $dataset);
+
+            /** Remove trailing rouge line break */
+            //$this_line = (preg_match('/$\n/', $this_line) ? rtrim($this_line)."\n" : $this_line);
 
             /** Output current line */
             if($render){
@@ -190,55 +202,99 @@
          * @param  array  $dataset      [description]
          * @return [type]               [description]
          */
-        private function process_block(string $block_string, array $dataset, bool $render){
+        private function process_block(string $block_string, array $conditions, array $dataset): string{
 
-            /** Set block conditions from internal variable */
-            $block_condition = $this->block_condition;
-            $if_or_each = (isset($this->block_condition[3]) ? $this->block_condition[3] : (isset($this->block_condition[2]) ? $this->block_condition[2] : false));
+            /** Remove phantom line break */
+            $block_string = explode("\n", $block_string);
+            if(strlen($block_string[count($block_string) -1]) === 0){
+                array_pop($block_string);
+            }
 
-            /** Clear block variables */
-            $this->block_condition = [];
-            $this->block_content = '';
-            $this->is_block = false;
-            $this->block_spaces = 0;
+            $block_string = implode("\n", $block_string);
+
+            $process_content = '';
+            
+            /** Set is If or Each statement */
+            $if_or_each = (isset($conditions[3]) ? $conditions[3] : (isset($conditions[2]) ? $conditions[2] : false));
 
             if($if_or_each){
 
-                $process_content = '';
-
                 switch($if_or_each){
                 case 'if':
+
+                    /** new core class instance */
+                    $process_block = new core;
 
                     /** if else content array */
                     $if_else_content = $this->return_else_condition($block_string);
                 
                     /** Process if else content block */
-                    if($this->process_conditions($block_condition[1], $dataset)){
-                        $process_content = $if_else_content[0];
+                    if($this->process_conditions($conditions[1], $dataset)){
+                        $process_block->process_input_string($if_else_content[0], $dataset, false);
+                        $process_content = $process_block->return();
                     } elseif(isset($if_else_content[1])){
-                        $process_content = $if_else_content[1];
+                        $process_block->process_input_string($if_else_content[1], $dataset, false);
+                        $process_content = $process_block->return();
                     }
+
+                     /** unset core class instance */
+                    unset($process_block);
 
                     break;
                 case 'each':
-                    //$process_content = "each test";
-                    //print_r($block_condition);
-                    //die;
+                    $process_content = $this->process_each_statement($conditions[2], $block_string, $dataset);
+                    break;
+                }                
+            }
+
+            return $process_content;
+        }
+
+
+        /**
+         * Process each statement
+         * @param  string $each_statement  [description]
+         * @param  string $block_content [description]
+         * @param  array  $dataset       [description]
+         * @param  bool   $render        [description]
+         * @return [type]                [description]
+         */
+        private function process_each_statement(string $each_statement, string $block_content, array $dataset): string{
+            $each_set = explode(' ', trim($each_statement));
+            $return_string = '';
+
+            if(count($each_set) > 0 && is_array($use_data = (isset($dataset[$each_set[0]]) ? $dataset[$each_set[0]] : false))){
+                
+                /** new core class instance */
+                $process_each_block = new core;
+
+                switch(count($each_set)){
+                case 1:
+                    foreach($use_data as $this_row){
+                        if(is_array($this_row)){
+                            $process_each_block->process_input_string($block_content, $this_row, false);
+                            $return_string .= $process_each_block->return();
+                            $process_each_block->export_string = '';
+                        }
+                    }
+                    break;
+                case 3:
+                    if($each_set[1] === 'as'){
+                        foreach($use_data as $this_row){
+                            $process_each_block->process_input_string($block_content, [$each_set[2] => $this_row], false);
+                            $return_string .= $process_each_block->return();
+                            $process_each_block->export_string = '';
+                        }
+                    }
                     break;
                 }
 
+                 /** unset core class instance */
+                unset($process_each_block);
 
-                /** Process line */
-                if(strlen($process_content) > 0){
-                    /** Remove before and after line breaks */
-                    if(preg_match_all('/[^\[br\]*].*[^[br\]*]/', str_replace("\n", '[br]', $process_content), $matches, PREG_SET_ORDER)){
-                        foreach(explode("[br]", $matches[0][0]) as $this_line){
-                            $break_rule = (strlen(trim($this_line)) === 0 ? "\n\n" : '');
-                            $this->process_line($this_line.$break_rule, $dataset, $render);
-                        }
-                    }
-                }
             }
+
+            return $return_string;
         }
 
 
@@ -247,10 +303,10 @@
          * @param  string $content [description]
          * @return [type]          [description]
          */
-        private function return_else_condition(string $content){
+        private function return_else_condition(string $content): array{
             $else_condition = str_pad('{{else}}', (strlen('{{else}}') + $this->block_spaces), ' ', STR_PAD_LEFT);
             if(preg_match('/'.$else_condition.'/', $content)){
-                return explode($else_condition, $content);
+                return explode("\n".$else_condition."\n", $content);
             }
             return [0 => $content];
         }
@@ -262,7 +318,7 @@
          * @param  array  $dataset         [description]
          * @return [type]                  [description]
          */
-        private function process_variables(string $template_string, array $dataset){
+        private function process_variables(string $template_string, array $dataset): string{
             if(preg_match_all('/({{)(.*?)(}})/i', $template_string, $variables, PREG_SET_ORDER)){
                 foreach($variables as $this_data_variable){
 
@@ -310,7 +366,7 @@
          * @param  array  $dataset      [description]
          * @return [type]               [description]
          */
-        private function process_string(string $input_string, array $dataset){
+        private function process_string(string $input_string, array $dataset): string{
             if(preg_match('/"(.*?)"/i', $input_string, $content)){
                 
                 /** Input string has variables */
@@ -370,7 +426,7 @@
          * @param  array  $dataset   [description]
          * @return [type]            [description]
          */
-        private function process_conditions(string $condition, array $dataset){
+        private function process_conditions(string $condition, array $dataset): bool{
 
             $result = false;
 
