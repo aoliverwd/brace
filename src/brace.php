@@ -125,6 +125,23 @@
                 $this_line = '';
             }
 
+            /** Is comment block */
+            if($this->remove_comment_blocks){
+                if(preg_match_all('/<!--|-->/i', $this_line, $matches, PREG_SET_ORDER) || $this->is_comment_block){
+                    
+                    switch((isset($matches[0]) ? $matches[0][0] : '')){
+                    case '<!--':
+                        $this->is_comment_block = true;
+                        break;
+                    case '-->':
+                        $this->is_comment_block = false;            
+                        break;
+                    }
+
+                    /** Blank line */
+                    $this_line = '';
+                }
+            }
 
             /** Process if condition or each block */
             if(!$this->is_block && preg_match_all('/{{if (.*?)}}|{{each (.*?)}}/i', $this_line, $matches, PREG_SET_ORDER)){
