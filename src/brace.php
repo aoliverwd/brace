@@ -415,6 +415,7 @@
                     return (intval($data) <= intval($expected) ? true : false);
                     break;
                 }
+                case '!EXISTS':
             }
         }
     }
