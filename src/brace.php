@@ -365,13 +365,21 @@
                 /** Or conditions */
                 foreach(explode(' || ', $condition_set) as $alternative_condition){
 
+                    /** Replace spaces in string match */
+                    if(preg_match_all('/"(.*)"/', $alternative_condition, $matches, PREG_SET_ORDER)){
+                        foreach($matches as $this_match){
+                            $replace_spaces = str_replace(' ', '+', $this_match[0]);
+                            $alternative_condition = str_replace($this_match[0], $replace_spaces, $alternative_condition);
+                        }  
+                    }
+
                     $or_result = (!$or_result && $this->process_single_condition(explode(' ', $alternative_condition), $dataset) ? true : $or_result);
                 }
 
                 $result = ($or_result ? true : $or_result);
             }
             
-            return $result;
+            return ($result ? true : false);
         }
 
         /**
@@ -380,18 +388,18 @@
          * @param  array  $dataset   [description]
          * @return [type]            [description]
          */
-        private function process_single_condition(array $condition, array $dataset){
+        private function process_single_condition(array $condition, array $dataset): bool{    
             if(count($condition) > 1 && $data = $this->return_chained_variables(trim($condition[0]), $dataset)){
-
                 $challange = $condition[1];
                 $expected = (isset($condition[2]) ? trim($condition[2]) : true);
+                $expected = str_replace(['"','+'], ['',' '], $expected);
 
                 switch($challange){
                 case 'EXISTS':
                     return true;
                     break;
                 case "===":
-                    ($data === $expected ? true : false);
+                    return ($data === $expected ? true : false);
                     break;
 
                 case "!!":
