@@ -17,9 +17,9 @@
     namespace brace;
 
     /**
-     * Core class
+     * Core parser class
      */
-    class core{
+    class parser{
 
         /** Public variables */
         public $remove_comment_blocks = true;
@@ -119,8 +119,9 @@
             /** process included templates */
             if(preg_match_all('/(\[@include )(.*?)(])/', $this_line, $include_templates, PREG_SET_ORDER)){
                 foreach($include_templates as $to_include){
-                    $process_string = (isset($to_include[2]) ? $to_include[2] : '');
-                    $this->process($process_string, $dataset, $render);
+                    foreach((isset($to_include[2]) ? explode(' ', trim($to_include[2])) : []) as $template){
+                        $this->process($template, $dataset, $render);
+                    }                    
                 }
 
                 /** Blank line */
@@ -222,8 +223,8 @@
                 switch($if_or_each){
                 case 'if':
 
-                    /** new core class instance */
-                    $process_block = new core;
+                    /** new core parser class instance */
+                    $process_block = new parser;
 
                     /** if else content array */
                     $if_else_content = $this->return_else_condition($block_string);
@@ -237,7 +238,7 @@
                         $process_content = $process_block->return();
                     }
 
-                     /** unset core class instance */
+                     /** unset parser core class instance */
                     unset($process_block);
 
                     break;
@@ -265,8 +266,8 @@
 
             if(count($each_set) > 0 && is_array($use_data = (isset($dataset[$each_set[0]]) ? $dataset[$each_set[0]] : false))){
                 
-                /** new core class instance */
-                $process_each_block = new core;
+                /** new core parser class instance */
+                $process_each_block = new parser;
 
                 switch(count($each_set)){
                 case 1:
@@ -289,7 +290,7 @@
                     break;
                 }
 
-                 /** unset core class instance */
+                 /** unset core parser class instance */
                 unset($process_each_block);
 
             }
