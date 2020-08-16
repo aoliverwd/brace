@@ -1,0 +1,36 @@
+Include
+ [x] Include template
+ [x] Include multiple templates
+ [x] Include multiple includes
+
+Variables
+ [x] Variables
+ [x] Or variables
+ [x] Multiple or variable
+ [x] Multiple or variable string
+ [x] Alternate variable
+ [x] Nested variables
+
+Inline Conditions
+ [x] Inline condition
+ [x] Inline else condition
+ [x] Inline or condition
+ [x] Inline and condition
+ [x] Inline and or condition
+
+Block Conditions
+ [x] If block condition
+ [x] If else block condition
+ [x] If and block condition
+
+Conditions
+ [x] Equals
+ [x] More than or equal to
+ [x] Less than or equal to
+ [x] More than
+ [x] Less than
+ [x] Is not
+ [x] Is not equal to
+ [x] Exists
+ [x] Not exists
+
