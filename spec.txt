@@ -4,19 +4,23 @@
 */
 
 
-/* each statements */
+/* each statement blocks */
 
-{{each item->items}}
-    <p>{{item_title}}</p>
+{{each products}}
+    <p>{{title}}</p>
 {{end}}
 
 
-{{each item->items as item}}
-    <p>{{item}}</p>
+{{each products as product}}
+    <p>{{product->title}}</p>
+{{end}}
+
+{{each names as name}}
+    <p>{{name}}</p>
 {{end}}
 
 
-/* conditional statements */
+/* conditional statement blocks */
 
 {{if first_name !== "test" || first_name !! null && first_name == "alex"}}
     May first name is {{first_name}}
@@ -32,11 +36,11 @@
 {{end}}
 
 
-/* shorthand conditional statements */
+/* shorthand/inline conditional statements */
 
-{{first_name !== "test" ? first_name : "is test"}}
+{{first_name !== "test" ? "__first_name__" : "is test"}}
 
-{{first_name EXISTS ? first_name : "is test"}}
+{{first_name EXISTS ? "__first_name__" : "is test"}}
 
 {{first_name EXISTS ? "my first name is __first_name__"}}
 
@@ -51,11 +55,10 @@
 !!
 !==
 EXISTS
+!EXISTS
 
 
-STRING_MATCH
 COUNT()
-CALC()
 
 
 /* variables */
@@ -74,5 +77,7 @@ CALC()
 
 /* includes */
 [@include footer]
+
+[@include header footer]
 
 [@include sections/footer]
