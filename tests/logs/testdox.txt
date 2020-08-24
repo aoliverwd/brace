@@ -34,3 +34,6 @@ Conditions
  [x] Exists
  [x] Not exists
 
+Shortcode
+ [x] Shortcode
+

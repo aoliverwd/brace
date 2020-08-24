@@ -11,6 +11,10 @@
         <testsuite name="conditions">
             <directory>tests/conditions</directory>
         </testsuite>
+
+        <testsuite name="shortcodes">
+            <directory>tests/shortcodes</directory>
+        </testsuite>
     </testsuites>
 
     <logging>
