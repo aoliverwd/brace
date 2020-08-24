@@ -29,6 +29,7 @@
 
         /** Internal variables */
         private $export_string = '';
+        private $shortcode_methods;
         private $is_comment_block;
         private $block_condition;
         private $block_content;
@@ -42,13 +43,14 @@
          * @param  bool|boolean $render    [description]
          * @return [type]                  [description]
          */
-        public function process(string $templates, array $dataset, bool $render = true): void{
+        public function process(string $templates, array $dataset, bool $render = true): object{
     
             /** Process individual template files */
             foreach(explode(',', trim($templates)) as $template_file){
                 $this->process_template_file(trim($template_file).'.'.$this->template_ext, $dataset, $render);
             }
 
+            return $this;
         }
 
         /**
@@ -106,6 +108,51 @@
                 }
             }
         }
+
+        /**
+         * [reg_shortcode description]
+         * @param  string $name      [description]
+         * @param  string $theMethod [description]
+         * @return [type]            [description]
+         */
+        public function reg_shortcode(string $name, string $theMethod): object{
+            
+            $theMethod = (gettype($theMethod) === 'string' && strlen($theMethod) > 0 ? $theMethod : $name);
+
+            if(!isset($this->shortcode_methods[$name]) && gettype($name) === 'string' && strlen($name) > 0){
+                $this->shortcode_methods[$name] = $theMethod;
+            }
+
+            return $this;
+        }
+
+
+        /**
+         * [call_shortcode description]
+         * @param  string $shortcodeSyntax [description]
+         * @return [type]                  [description]
+         */
+        private function call_shortcode(string $shortcodeSyntax, array $dataset): string{
+            $args = explode(' ', str_replace(array('[', ']'), '', str_replace('&quot;', '"', $shortcodeSyntax)));
+            $theArgs = array();
+
+            //check for requstered functions
+            $methodName = (isset($args[0]) && isset($this->shortcode_methods[$args[0]]) && is_callable($GLOBALS[$this->shortcode_methods[$args[0]]]) ? $this->shortcode_methods[$args[0]] : false);
+
+            //function exists
+            if($methodName){
+                array_shift($args);
+                foreach(explode('" ', implode(' ', $args)) as $thisArg){
+                    if(count($newArg = explode('=', str_replace('"', '', $thisArg))) === 2){
+                        $theArgs[trim($newArg[0])] = trim($newArg[1]);
+                    }
+                }
+                return call_user_func_array($GLOBALS[$methodName], [array_merge($theArgs, ["dataset" => $dataset])]);
+            } else {
+                return $shortcodeSyntax;
+            }
+        }
+
 
         /**
          * Process string
@@ -182,6 +229,13 @@
                 $this_line = '';
             }
 
+
+            /** Is shortcode */
+            if(preg_match_all('/\[(.*?)\]/', $this_line, $matches, PREG_SET_ORDER )){
+                foreach($matches as $theShortcode){
+                    $this_line = (function_exists('do_shortcode') ? str_replace($theShortcode[0], do_shortcode($theShortcode[0]), $this_line) : str_replace($theShortcode[0], $this->call_shortcode($theShortcode[0], $dataset), $this_line));
+                }
+            }
 
             /** Process variables and in-line conditions */
             $this_line = $this->process_variables($this_line, $dataset);
