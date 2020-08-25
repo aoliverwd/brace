@@ -34,6 +34,12 @@ Conditions
  [x] Exists
  [x] Not exists
 
+Iterators
+ [x] Nested iteration
+ [x] As nested iteration
+ [x] As iteration
+
 Shortcode
  [x] Shortcode
+ [x] Shortcode include template
 
