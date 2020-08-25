@@ -37,5 +37,22 @@
                 $brace->process_input_string('[foo]', [], false)->return()
             );
         }
+
+
+        /**
+         * [testShortcodeIncludeTemplate description]
+         * @return [type] [description]
+         */
+        public function testShortcodeIncludeTemplate(): void{
+            $brace = new brace\parser;
+            $brace->template_path = __DIR__.'/';
+
+            $brace->reg_shortcode('foo', 'bar');
+
+            $this->assertEquals(
+                "foo bar",
+                $brace->process_input_string('[@include include-file]', [], false)->return()
+            );
+        }
     }
 ?>
