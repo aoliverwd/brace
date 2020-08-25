@@ -19,7 +19,7 @@
         public function testVariables(): void{
             $brace = new brace\parser;
             $this->assertEquals(
-                "Hello Davee\n",
+                "Hello Dave\n",
                 $brace->process_input_string('Hello {{name}}', ['name' => 'Dave'], false)->return()
             );
         }
