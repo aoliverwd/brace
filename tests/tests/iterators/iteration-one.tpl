@@ -1,0 +1,3 @@
+{{each products}}
+{{title}}
+{{end}}
