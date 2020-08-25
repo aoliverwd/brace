@@ -24,7 +24,6 @@
         /** Public variables */
         public $remove_comment_blocks = true;
         public $template_path = __DIR__.'/';
-        public $compress_output = false;
         public $template_ext = 'tpl';
 
         /** Internal variables */
