@@ -5,6 +5,8 @@ pipelines:
     - step:
         name: Brace Unit Tests
         deployment: test
+        caches:
+          - docker
         script:
           - apt update
           - apt install -y wget
