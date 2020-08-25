@@ -1,6 +1,6 @@
 # Introduction
 
-Brace is a simple document templating language written in PHP. Brace uses a handlebar notation syntax, this in-turn enables documents to still keep easily manageable.
+Brace is a simple template language written in PHP. Brace uses a handlebar notation syntax, this in-turn enables documents to still keep easily manageable.
 
 Brace has been designed to be used in web pages that render HTML, however, Brace is not restricted to just use in HTML, it can be used to output to any type of text based file I.E TXT,CSV,JSON etc.
 
@@ -11,43 +11,64 @@ Brace has been designed to be used in web pages that render HTML, however, Brace
 
 ### Variables
 
-```txt
-{{firstname}}
+```html
+<p>{{firstname}}</p>
 ```
 
 #### In-line 'OR' operator
 
-```txt
-{{firstname || "No first name found"}}
+```html
+<p>{{firstname || "No first name found"}}</p>
 ```
 
 #### Multiple In-line 'OR' operators
 
-```txt
-{{firstname || fname || "No first name found"}}
+```html
+<p>{{firstname || fname || "No first name found"}}</p>
 ```
-
-
 
 ### Iterators
 
-
-#### Iterator Blocks
-
-
-```txt
+```html
 {{each products}}
     <p>{{title}}</p>
 {{end}}
 ```
 
-```txt
+```html
+<ul>
 {{each products as product}}
-    <p>{{product->title}}</p>
+    <li>{{product->title}}</li>
+{{end}}
+</ul>
+```
+
+```html
+{{each names as name}}
+    <p>{{name}}</p>
 {{end}}
 ```
 
-```txt
+#### Iterator Blocks
+
+
+```html
+<ul>
+{{each products}}
+    <li>{{title}}</li>
+{{end}}
+</ul>
+```
+
+```html
+<ul>
+{{each products as product}}
+    <li>{{product->title}}</li>
+{{end}}
+</ul>
+```
+
+```html
 {{each names as name}}
     <p>{{name}}</p>
 {{end}}
@@ -74,17 +95,17 @@ Brace has been designed to be used in web pages that render HTML, however, Brace
 #### Condition Blocks
 
 
-```txt
+```html
 {{if first_name EXISTS}}
-    Hello {{first_name}}
+    <p>Hello {{first_name}}</p>
 {{end}}
 ```
 
-```txt
+```html
 {{if first_name !== "test" || first_name !! null && first_name == "alex"}}
-    May first name is {{first_name}}
+    <p>May first name is {{first_name}}</p>
 {{else}}
-    please enter your first name 
+    <p>please enter your first name</p>
 {{end}}
 ```
 
@@ -92,16 +113,16 @@ Brace has been designed to be used in web pages that render HTML, however, Brace
 #### In-line Statements
 
 
-```txt
-{{first_name !== "test" ? "__first_name__" : "is test"}}
+```html
+<p>{{first_name !== "test" ? "__first_name__" : "is test"}}</p>
 ```
 
-```txt
-{{first_name EXISTS ? "__first_name__" : "is test"}}
+```html
+<p>{{first_name EXISTS ? "__first_name__" : "is test"}}</p>
 ```
 
-```txt
-{{first_name EXISTS ? "my first name is __first_name__"}}
+```html
+<p>{{first_name EXISTS ? "my first name is __first_name__"}}</p>
 ```
 
 ### Includeing Templates
@@ -112,4 +133,53 @@ Brace has been designed to be used in web pages that render HTML, however, Brace
 
 ```txt
 [@include header footer]
+```
+
+### Shortcodes
+
+
+#### PHP Implementation Example
+
+```php
+/** New brace parser */
+$brace = new brace\parser;
+
+/**
+ * [$button_function Return HTML button string]
+ * @var     [array]  $attributes  [Array or attributes]
+ * @return  [string]              [Return HTML button string]
+ */
+$button_function = function ($attributes){
+    return '<a href="'.$attributes['url'].'" alt="'.$attributes['alt'].'" target="'.$attributes['target'].'" rel="noreferrer noopener">'.$attributes['title'].'</a>';
+};
+
+/** Register shortcode */
+$brace->reg_shortcode('button', 'button_function');
+
+/** Process content template */
+$brace->process('content', []);
+```
+
+
+#### Content Template
+
+```txt
+<!-- Button shortcode -->
+[button title="Hello world" url="https://hello.world" alt="Hello world button" target="_blank"]
+```
+
+### Comment Blocks
+
+#### In-line Code Block
+
+```html
+<!-- Inline comment block -->
+```
+
+#### Multi-line Code Block
+
+```html
+<!-- 
+    Comment block over multiple lines
+-->
 ```
