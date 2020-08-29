@@ -330,7 +330,9 @@
             $each_set = explode(' ', trim($each_statement));
             $return_string = '';
 
-            if(count($each_set) > 0 && is_array($use_data = (isset($dataset[$each_set[0]]) ? $dataset[$each_set[0]] : false))){
+            $use_data = (count($each_set) > 0 ? $this->return_chained_variables($each_set[0], $dataset) : false);
+
+            if($use_data){
                 
                 /** set global data array */
                 $global_data = (isset($dataset['GLOBAL']) ? $dataset['GLOBAL'] : $dataset);
