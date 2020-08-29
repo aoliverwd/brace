@@ -135,18 +135,25 @@
             $args = explode(' ', str_replace(array('[', ']'), '', str_replace('&quot;', '"', $shortcodeSyntax)));
             $theArgs = array();
 
-            //check for requstered functions
-            $methodName = (isset($args[0]) && isset($this->shortcode_methods[$args[0]]) && is_callable($GLOBALS[$this->shortcode_methods[$args[0]]]) ? $this->shortcode_methods[$args[0]] : false);
-
-            //function exists
-            if($methodName){
+            /** check for registered functions */
+            if($methodName = (isset($args[0]) && isset($this->shortcode_methods[$args[0]]) ? $this->shortcode_methods[$args[0]] : false)){
+                
+                /** Check is a global function */
+                $is_global = (is_callable($methodName) ? false : (isset($GLOBALS[$methodName]) && is_callable($GLOBALS[$methodName]) ? true : false));
+                
+                /** Format arguments */
                 array_shift($args);
                 foreach(explode('" ', implode(' ', $args)) as $thisArg){
                     if(count($newArg = explode('=', str_replace('"', '', $thisArg))) === 2){
                         $theArgs[trim($newArg[0])] = trim($newArg[1]);
                     }
                 }
-                return call_user_func_array($GLOBALS[$methodName], [array_merge($theArgs, ["dataset" => $dataset])]);
+
+                $send_data = [array_merge($theArgs, ["dataset" => $dataset])];
+
+                /** Execute function and return result */
+                return ($is_global ? call_user_func_array($GLOBALS[$methodName], $send_data) : call_user_func_array($methodName, $send_data));
+
             } else {
                 return $shortcodeSyntax;
             }
