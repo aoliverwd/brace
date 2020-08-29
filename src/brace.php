@@ -319,13 +319,23 @@
 
             if(count($each_set) > 0 && is_array($use_data = (isset($dataset[$each_set[0]]) ? $dataset[$each_set[0]] : false))){
                 
+                /** set global data array */
+                $global_data = (isset($dataset['GLOBAL']) ? $dataset['GLOBAL'] : $dataset);
+                
+                /** remove duplicate data from dataset */
+                if(isset($global_data[$each_set[0]])){
+                    unset($global_data[$each_set[0]]);
+                }
+
                 /** new core parser class instance */
                 $process_each_block = new parser;
+                $process_each_block->template_path = $this->template_path;
 
                 switch(count($each_set)){
                 case 1:
                     foreach($use_data as $this_row){
                         if(is_array($this_row)){
+                            $this_row['GLOBAL'] = $global_data;
                             $process_each_block->process_input_string($block_content, $this_row, false);
                             $return_string .= $process_each_block->return();
                             $process_each_block->export_string = '';
@@ -335,7 +345,11 @@
                 case 3:
                     if($each_set[1] === 'as'){
                         foreach($use_data as $this_row){
-                            $process_each_block->process_input_string($block_content, [$each_set[2] => $this_row], false);
+                            $row_data = [
+                                $each_set[2] => $this_row,
+                                'GLOBAL' => $global_data
+                            ];
+                            $process_each_block->process_input_string($block_content, $row_data, false);
                             $return_string .= $process_each_block->return();
                             $process_each_block->export_string = '';
                         }
