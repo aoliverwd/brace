@@ -182,6 +182,9 @@
                         break;
                     }
 
+                    /** Is inline comment */
+                    $this->is_comment_block = ($this->is_comment_block && isset($matches[1][0]) && trim($matches[1][0]) === '-->' ? false : $this->is_comment_block);
+
                     /** Blank line */
                     $this_line = '';
                 }
