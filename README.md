@@ -1,8 +1,8 @@
 # Introduction
 
-Brace is a simple template language written in PHP. Brace uses a handlebar notation syntax, this in-turn enables documents to still keep easily manageable.
+Brace is a simple template language written in PHP. Brace uses a handlebar notation syntax, this in-turn enables documents to still be easily manageable.
 
-Brace has been designed to be used in web pages that render HTML, however, Brace is not restricted to just use in HTML, it can be used to output to any type of text based file I.E TXT,CSV,JSON etc.
+Brace has been designed to be used in web applications that render HTML, however, Brace is not restricted to just use in HTML, it can be used to output to any type of text based file I.E TXT,CSV,JSON etc.
 
 ## Installation/Usage
 
