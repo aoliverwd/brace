@@ -279,6 +279,7 @@
 
                     /** new core parser class instance */
                     $process_block = new parser;
+                    $process_block->template_path = $this->template_path;
 
                     /** if else content array */
                     $if_else_content = $this->return_else_condition($block_string);
