@@ -163,9 +163,10 @@
         private function process_line(string $this_line, array $dataset, bool $render): void{
 
             /** process included templates */
-            if(preg_match_all('/(\[@include )(.*?)(])/', $this_line, $include_templates, PREG_SET_ORDER)){
+            if(!$this->is_block && preg_match_all('/(\[@include )(.*?)(])/', $this_line, $include_templates, PREG_SET_ORDER)){
                 foreach($include_templates as $to_include){
                     foreach((isset($to_include[2]) ? explode(' ', trim($to_include[2])) : []) as $template){
+                        $template = $this->process_variables($template, $dataset);
                         $this->process($template, $dataset, $render);
                     }                    
                 }
