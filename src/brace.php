@@ -169,19 +169,6 @@
          */
         private function process_line(string $this_line, array $dataset, bool $render): void{
 
-            /** process included templates */
-            if(!$this->is_block && preg_match_all('/(\[@include )(.*?)(])/', $this_line, $include_templates, PREG_SET_ORDER)){
-                foreach($include_templates as $to_include){
-                    foreach((isset($to_include[2]) ? explode(' ', trim($to_include[2])) : []) as $template){
-                        $template = $this->process_variables($template, $dataset);
-                        $this->process($template, $dataset, $render);
-                    }                    
-                }
-
-                /** Blank line */
-                $this_line = '';
-            }
-
             /** Is comment block */
             if($this->remove_comment_blocks){
                 if(preg_match_all('/<!--|-->/i', $this_line, $matches, PREG_SET_ORDER) || $this->is_comment_block){
@@ -236,6 +223,19 @@
                 $this_line = '';
             }
 
+            /** process included templates */
+            if(preg_match_all('/(\[@include )(.*?)(])/', $this_line, $include_templates, PREG_SET_ORDER)){
+                foreach($include_templates as $to_include){
+                    foreach((isset($to_include[2]) ? explode(' ', trim($to_include[2])) : []) as $template){
+                        $template = $this->process_variables($template, $dataset);
+                        $this->process($template, $dataset, $render);
+                    }                    
+                }
+
+                /** Blank line */
+                $this_line = '';
+            }
+
 
             /** Is shortcode */
             if(preg_match_all('/\[(.*?)\]/', $this_line, $matches, PREG_SET_ORDER )){
@@ -246,6 +246,7 @@
 
             /** Process variables and in-line conditions */
             $this_line = $this->process_variables($this_line, $dataset);
+
 
             /** Remove trailing rouge line break */
             //$this_line = (preg_match('/$\n/', $this_line) ? rtrim($this_line)."\n" : $this_line);
