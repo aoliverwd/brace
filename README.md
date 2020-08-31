@@ -135,6 +135,10 @@ Brace has been designed to be used in web applications that render HTML, however
 [@include header footer]
 ```
 
+```txt
+[@include {{section}}]
+```
+
 ### Shortcodes
 
 
