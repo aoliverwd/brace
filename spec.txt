@@ -81,3 +81,5 @@ COUNT()
 [@include header footer]
 
 [@include sections/footer]
+
+[@include {{variable}}]
