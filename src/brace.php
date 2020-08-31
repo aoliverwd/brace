@@ -149,7 +149,7 @@
                     }
                 }
 
-                $send_data = [array_merge($theArgs, ["dataset" => $dataset])];
+                $send_data = [array_merge($theArgs, ["GLOBAL" => $dataset])];
 
                 /** Execute function and return result */
                 return ($is_global ? call_user_func_array($GLOBALS[$methodName], $send_data) : call_user_func_array($methodName, $send_data));
