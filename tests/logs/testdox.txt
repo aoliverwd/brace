@@ -42,4 +42,5 @@ Iterators
 Shortcode
  [x] Shortcode
  [x] Shortcode include template
+ [x] Shortcode include template via variable
 
