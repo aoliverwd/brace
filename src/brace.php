@@ -42,7 +42,7 @@
          * @param  bool|boolean $render    [description]
          * @return [type]                  [description]
          */
-        public function process(string $templates, array $dataset, bool $render = true): object{
+        public function parse(string $templates, array $dataset, bool $render = true): object{
     
             /** Process individual template files */
             foreach(explode(',', trim($templates)) as $template_file){
@@ -59,12 +59,24 @@
          * @param  bool   $render       [description]
          * @return [type]               [description]
          */
-        public function process_input_string(string $input_string, array $dataset, bool $render): object{
+        public function parse_input_string(string $input_string, array $dataset, bool $render): object{
             foreach(explode("\n", $input_string) as $this_line){
                 $this->process_line($this_line."\n", $dataset, $render);
             }
 
             return $this;
+        }
+
+        /**
+         * Compile to file
+         * @param  string $templates        [description]
+         * @param  string $compile_filename [description]
+         * @param  array  $dataset          [description]
+         * @return [type]                   [description]
+         */
+        public function compile(string $templates, string $compile_filename, array $dataset): void{
+            $this->parse($templates, $dataset, false);
+            file_put_contents($compile_filename, $this->export_string);
         }
 
         /**
@@ -231,7 +243,7 @@
                 foreach($include_templates as $to_include){
                     foreach((isset($to_include[2]) ? explode(' ', trim($to_include[2])) : []) as $template){
                         $template = $this->process_variables($template, $dataset);
-                        $this->process($template, $dataset, $render);
+                        $this->parse($template, $dataset, $render);
                     }                    
                 }
 
@@ -297,10 +309,10 @@
                 
                     /** Process if else content block */
                     if($this->process_conditions($conditions[1], $dataset)){
-                        $process_block->process_input_string($if_else_content[0], $dataset, false);
+                        $process_block->parse_input_string($if_else_content[0], $dataset, false);
                         $process_content = $process_block->return();
                     } elseif(isset($if_else_content[1])){
-                        $process_block->process_input_string($if_else_content[1], $dataset, false);
+                        $process_block->parse_input_string($if_else_content[1], $dataset, false);
                         $process_content = $process_block->return();
                     }
 
@@ -351,7 +363,7 @@
                     foreach($use_data as $this_row){
                         if(is_array($this_row)){
                             $this_row['GLOBAL'] = $global_data;
-                            $process_each_block->process_input_string($block_content, $this_row, false);
+                            $process_each_block->parse_input_string($block_content, $this_row, false);
                             $return_string .= $process_each_block->return();
                             $process_each_block->export_string = '';
                         }
@@ -364,7 +376,7 @@
                                 $each_set[2] => $this_row,
                                 'GLOBAL' => $global_data
                             ];
-                            $process_each_block->process_input_string($block_content, $row_data, false);
+                            $process_each_block->parse_input_string($block_content, $row_data, false);
                             $return_string .= $process_each_block->return();
                             $process_each_block->export_string = '';
                         }
