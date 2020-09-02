@@ -20,7 +20,7 @@
             $brace = new brace\parser;
             $this->assertEquals(
                 "Hello Dave\n",
-                $brace->process_input_string('Hello {{name}}', ['name' => 'Dave'], false)->return()
+                $brace->parse_input_string('Hello {{name}}', ['name' => 'Dave'], false)->return()
             );
         }
 
@@ -32,7 +32,7 @@
             $brace = new brace\parser;
             $this->assertEquals(
                 "Hello Simon\n",
-                $brace->process_input_string('Hello {{name || "Simon"}}', [], false)->return()
+                $brace->parse_input_string('Hello {{name || "Simon"}}', [], false)->return()
             );
         }
 
@@ -44,7 +44,7 @@
             $brace = new brace\parser;
             $this->assertEquals(
                 "Hello Dave\n",
-                $brace->process_input_string('Hello {{name || fname || "Simon"}}', ['fname' => 'Dave'], false)->return()
+                $brace->parse_input_string('Hello {{name || fname || "Simon"}}', ['fname' => 'Dave'], false)->return()
             );
         }
 
@@ -56,7 +56,7 @@
             $brace = new brace\parser;
             $this->assertEquals(
                 "Hello Simon\n",
-                $brace->process_input_string('Hello {{name || fname || "Simon"}}', [], false)->return()
+                $brace->parse_input_string('Hello {{name || fname || "Simon"}}', [], false)->return()
             );
         }
 
@@ -68,7 +68,7 @@
             $brace = new brace\parser;
             $this->assertEquals(
                 "Hello John\n",
-                $brace->process_input_string('Hello {{name || firstname}}', ['firstname' => "John"], false)->return()
+                $brace->parse_input_string('Hello {{name || firstname}}', ['firstname' => "John"], false)->return()
             );
         }
 
@@ -80,7 +80,7 @@
             $brace = new brace\parser;
             $this->assertEquals(
                 "Hello John Smith\n",
-                $brace->process_input_string('Hello {{name->first}} {{name->last}}', [
+                $brace->parse_input_string('Hello {{name->first}} {{name->last}}', [
                     'name' => [
                         'first' => 'John',
                         'last' => 'Smith'

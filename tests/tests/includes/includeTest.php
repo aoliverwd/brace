@@ -22,7 +22,7 @@
             $brace->template_path = __DIR__.'/';
             $this->assertEquals(
                 "Hello",
-                $brace->process_input_string('[@include include-file]', [], false)->return()
+                $brace->parse_input_string('[@include include-file]', [], false)->return()
             );
         }
 
@@ -35,7 +35,7 @@
             $brace->template_path = __DIR__.'/';
             $this->assertEquals(
                 "Hello ,Welcome",
-                $brace->process_input_string('[@include include-file include-file-two]', [], false)->return()
+                $brace->parse_input_string('[@include include-file include-file-two]', [], false)->return()
             );
         }
 
@@ -48,7 +48,7 @@
             $brace->template_path = __DIR__.'/';
             $this->assertEquals(
                 "Hello ,Welcome",
-                $brace->process_input_string('[@include include-file] [@include include-file-two]', [], false)->return()
+                $brace->parse_input_string('[@include include-file] [@include include-file-two]', [], false)->return()
             );
         }
     }

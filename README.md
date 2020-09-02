@@ -161,7 +161,7 @@ $button_function = function ($attributes){
 $brace->reg_shortcode('button', 'button_function');
 
 /** Process content template */
-$brace->process('content', []);
+$brace->parse('content', []);
 ```
 
 

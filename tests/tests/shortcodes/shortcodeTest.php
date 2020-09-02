@@ -34,7 +34,7 @@
 
             $this->assertEquals(
                 "foo bar\n",
-                $brace->process_input_string('[foo]', [], false)->return()
+                $brace->parse_input_string('[foo]', [], false)->return()
             );
         }
 
@@ -51,7 +51,7 @@
 
             $this->assertEquals(
                 "foo bar",
-                $brace->process_input_string('[@include include-file]', [], false)->return()
+                $brace->parse_input_string('[@include include-file]', [], false)->return()
             );
         }
 
@@ -67,7 +67,7 @@
 
             $this->assertEquals(
                 "foo bar",
-                $brace->process_input_string('[@include {{file}}]', [
+                $brace->parse_input_string('[@include {{file}}]', [
                     'file' => 'include-file'
                 ], false)->return()
             );

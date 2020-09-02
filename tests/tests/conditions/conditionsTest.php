@@ -21,7 +21,7 @@
             $brace = new brace\parser;
             $this->assertEquals(
                 "Dave\n",
-                $brace->process_input_string('{{name === "Dave" ? "__name__"}}', ['name' => 'Dave'], false)->return()
+                $brace->parse_input_string('{{name === "Dave" ? "__name__"}}', ['name' => 'Dave'], false)->return()
             );
         }
 
@@ -33,7 +33,7 @@
             $brace = new brace\parser;
             $this->assertEquals(
                 "25\n",
-                $brace->process_input_string('{{age >= 21 ? "__age__"}}', ['age' => 25], false)->return()
+                $brace->parse_input_string('{{age >= 21 ? "__age__"}}', ['age' => 25], false)->return()
             );
         }
 
@@ -45,7 +45,7 @@
             $brace = new brace\parser;
             $this->assertEquals(
                 "18\n",
-                $brace->process_input_string('{{age <= 21 ? "__age__"}}', ['age' => 18], false)->return()
+                $brace->parse_input_string('{{age <= 21 ? "__age__"}}', ['age' => 18], false)->return()
             );
         }
 
@@ -57,7 +57,7 @@
             $brace = new brace\parser;
             $this->assertEquals(
                 "25\n",
-                $brace->process_input_string('{{age > 18 ? "__age__"}}', ['age' => 25], false)->return()
+                $brace->parse_input_string('{{age > 18 ? "__age__"}}', ['age' => 25], false)->return()
             );
         }
 
@@ -69,7 +69,7 @@
             $brace = new brace\parser;
             $this->assertEquals(
                 "18\n",
-                $brace->process_input_string('{{age < 21 ? "__age__"}}', ['age' => 18], false)->return()
+                $brace->parse_input_string('{{age < 21 ? "__age__"}}', ['age' => 18], false)->return()
             );
         }
 
@@ -77,7 +77,7 @@
             $brace = new brace\parser;
             $this->assertEquals(
                 "18\n",
-                $brace->process_input_string('{{age !! 21 ? "__age__"}}', ['age' => 18], false)->return()
+                $brace->parse_input_string('{{age !! 21 ? "__age__"}}', ['age' => 18], false)->return()
             );
         }
 
@@ -89,7 +89,7 @@
             $brace = new brace\parser;
             $this->assertEquals(
                 "18\n",
-                $brace->process_input_string('{{age !== 21 ? "__age__"}}', ['age' => 18], false)->return()
+                $brace->parse_input_string('{{age !== 21 ? "__age__"}}', ['age' => 18], false)->return()
             );
         }
 
@@ -101,7 +101,7 @@
             $brace = new brace\parser;
             $this->assertEquals(
                 "18\n",
-                $brace->process_input_string('{{age EXISTS ? "__age__"}}', ['age' => 18], false)->return()
+                $brace->parse_input_string('{{age EXISTS ? "__age__"}}', ['age' => 18], false)->return()
             );
         }
 
@@ -113,7 +113,7 @@
             $brace = new brace\parser;
             $this->assertEquals(
                 "No age\n",
-                $brace->process_input_string('{{age !EXISTS ? "No age"}}', [], false)->return()
+                $brace->parse_input_string('{{age !EXISTS ? "No age"}}', [], false)->return()
             );
         }
     }

@@ -18,7 +18,7 @@
             $brace->template_path = __DIR__.'/';
             $this->assertEquals(
                 "Hello John Smith\n",
-                $brace->process_input_string('[@include if-block]', [
+                $brace->parse_input_string('[@include if-block]', [
                     'name' => [
                         'first' => 'John',
                         'last' => 'Smith'
@@ -32,7 +32,7 @@
             $brace->template_path = __DIR__.'/';
             $this->assertEquals(
                 "Name does not exist\n",
-                $brace->process_input_string('[@include if-block]', [], false)->return()
+                $brace->parse_input_string('[@include if-block]', [], false)->return()
             );
         }
 
@@ -42,7 +42,7 @@
             $brace->template_path = __DIR__.'/';
             $this->assertEquals(
                 "Hello John Smith\n",
-                $brace->process_input_string('[@include if-block]', [
+                $brace->parse_input_string('[@include if-block]', [
                     'name' => [
                         'first' => 'John',
                         'last' => 'Smith'

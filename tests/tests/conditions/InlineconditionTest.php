@@ -21,7 +21,7 @@
             $brace = new brace\parser;
             $this->assertEquals(
                 "Hello Dave\n",
-                $brace->process_input_string('{{name EXISTS ? "Hello __name__"}}', ['name' => 'Dave'], false)->return()
+                $brace->parse_input_string('{{name EXISTS ? "Hello __name__"}}', ['name' => 'Dave'], false)->return()
             );
         }
 
@@ -33,7 +33,7 @@
             $brace = new brace\parser;
             $this->assertEquals(
                 "No name\n",
-                $brace->process_input_string('{{name EXISTS ? "Hello __name__" : "No name"}}', [], false)->return()
+                $brace->parse_input_string('{{name EXISTS ? "Hello __name__" : "No name"}}', [], false)->return()
             );
         }
 
@@ -45,7 +45,7 @@
             $brace = new brace\parser;
             $this->assertEquals(
                 "Hello Simon\n",
-                $brace->process_input_string('{{name === "Dave" || name === "Simon"  ? "Hello __name__" : "No name"}}', ['name' => 'Simon'], false)->return()
+                $brace->parse_input_string('{{name === "Dave" || name === "Simon"  ? "Hello __name__" : "No name"}}', ['name' => 'Simon'], false)->return()
             );
         }
 
@@ -57,7 +57,7 @@
             $brace = new brace\parser;
             $this->assertEquals(
                 "My name is Simon and im 21 years old\n",
-                $brace->process_input_string('{{name EXISTS && age >= 21 ? "My name is __name__ and im __age__ years old"}}', ['name' => 'Simon', 'age' => 21], false)->return()
+                $brace->parse_input_string('{{name EXISTS && age >= 21 ? "My name is __name__ and im __age__ years old"}}', ['name' => 'Simon', 'age' => 21], false)->return()
             );
         }
 
@@ -69,7 +69,7 @@
             $brace = new brace\parser;
             $this->assertEquals(
                 "My name is Simon and im older then 21 years old\n",
-                $brace->process_input_string('{{name EXISTS && age === 21 || age > 18 ? "My name is __name__ and im older then 21 years old" : "You are __age__ years old"}}', ['name' => 'Simon', 'age' => 25], false)->return()
+                $brace->parse_input_string('{{name EXISTS && age === 21 || age > 18 ? "My name is __name__ and im older then 21 years old" : "You are __age__ years old"}}', ['name' => 'Simon', 'age' => 25], false)->return()
             );
         }
     }

@@ -21,7 +21,7 @@
                 "Product One\n".
                 "Product Two\n".
                 "Product Three\n",
-                $brace->process_input_string('[@include iteration-one]', [
+                $brace->parse_input_string('[@include iteration-one]', [
                     'products' => [
                         0 => [
                             'title' => 'Product One'
@@ -45,7 +45,7 @@
                 "10.99\n".
                 "5.67\n".
                 "25.00\n",
-                $brace->process_input_string('[@include iteration-two]', [
+                $brace->parse_input_string('[@include iteration-two]', [
                     'products' => [
                         0 => [
                             'price' => '10.99'
@@ -69,7 +69,7 @@
                 "Dave\n".
                 "John\n".
                 "Barry\n",
-                $brace->process_input_string('[@include iteration-three]', [
+                $brace->parse_input_string('[@include iteration-three]', [
                     'names' => ['Dave', 'John', 'Barry']
                 ], false)->return()
             );
