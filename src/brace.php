@@ -97,38 +97,6 @@
 
 
         /**
-         * Process a individual template file
-         * @param  string $template_name [description]
-         * @return [type]                [description]
-         */
-        private function process_template_file(string $template_name, array $dataset, bool $render): void{
-            if(file_exists($this->template_path.$template_name)){
-                
-                /** Open template file */
-                $handle = fopen($this->template_path.$template_name, 'r');
-                
-                /** Run through each line */
-                while (($this_line = fgets($handle, 4096)) !== false){
-
-                    /** Convert tabs to spaces */
-                    $this_line = str_replace("\t", '    ', $this_line);
-
-                    /** Process single line */
-                    $this->process_line($this_line, $dataset, $render);
-                }
-
-                /** Close template file */
-                fclose($handle);
-
-                /** If block has not been closed */
-                if($this->is_block){
-                    trigger_error("IF/EACH block has not been closed");
-                    exit;
-                }
-            }
-        }
-
-        /**
          * [reg_shortcode description]
          * @param  string $name      [description]
          * @param  string $theMethod [description]
@@ -176,6 +144,39 @@
 
             } else {
                 return $shortcodeSyntax;
+            }
+        }
+
+
+        /**
+         * Process a individual template file
+         * @param  string $template_name [description]
+         * @return [type]                [description]
+         */
+        private function process_template_file(string $template_name, array $dataset, bool $render): void{
+            if(file_exists($this->template_path.$template_name)){
+                
+                /** Open template file */
+                $handle = fopen($this->template_path.$template_name, 'r');
+                
+                /** Run through each line */
+                while (($this_line = fgets($handle, 4096)) !== false){
+
+                    /** Convert tabs to spaces */
+                    $this_line = str_replace("\t", '    ', $this_line);
+
+                    /** Process single line */
+                    $this->process_line($this_line, $dataset, $render);
+                }
+
+                /** Close template file */
+                fclose($handle);
+
+                /** If block has not been closed */
+                if($this->is_block){
+                    trigger_error("IF/EACH block has not been closed");
+                    exit;
+                }
             }
         }
 
