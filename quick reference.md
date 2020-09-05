@@ -13,7 +13,7 @@
 
 --
 
-### <a name="each_statement_blocks">1. Each statement blocks</a>
+<h3 id="each_statement_blocks">1. Each statement blocks</h3>
 
 ```html
 {{each products}}
@@ -33,7 +33,7 @@
 {{end}}
 ```
 
-### <a name="conditional_statement_blocks">2. Conditional statement blocks</a>
+<h3 id="conditional_statement_blocks">2. Conditional statement blocks</h3>
 
 ```html
 {{if first_name !== "test" || first_name !! null && first_name == "alex"}}
@@ -51,7 +51,7 @@
 {{end}}
 ```
 
-### <a name="inline_conditional_statements">3. Shorthand/inline conditional statements</a>
+<h3 id="inline_conditional_statements">3. Shorthand/inline conditional statements</h3>
 
 ```html
 {{first_name !== "test" ? "__first_name__" : "is test"}}
@@ -65,7 +65,7 @@
 {{first_name EXISTS ? "my first name is __first_name__"}}
 ```
 
-#### <a name="conditions">3.1 Conditions</a>
+<h4 id="conditions">3.1 Conditions</h3>
 
 | Condition  | Description                              |
 |------------|------------------------------------------|
@@ -87,7 +87,7 @@ __For consideration__
 | COUNT()    | Returns a count of an array              |
 
 
-### <a name="variables">4. Variables</a>
+<h3 id="variables">4. Variables</h3>
 
 
 ```html
@@ -102,13 +102,13 @@ __For consideration__
 ```
 
 
-#### <a name="nested_variables">4.1 Nested variables</a>
+<h4 id="nested_variables">4.1 Nested variables</h4>
 
 ```html
 {{website->title}}
 ```
 
-### <a name="includes">5. Includes</a>
+<h3 id="includes">5. Includes</h3>
 
 ```html
 [@include footer]
