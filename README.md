@@ -194,7 +194,7 @@ $brace->parse('content', []);
 
 It would be beneficial to know if the current iteration is currently the first or last.
 
-```html
+```txt
 <ul>
 {{each products as product}}
     <li {{is_first_item ? "class='is_first'"}}>{{product->title}}</li>
@@ -206,7 +206,7 @@ It would be beneficial to know if the current iteration is currently the first o
 
 Could be beneficial to run conditions based on how many items are in an array of parsed data.
 
-```html
+```txt
 {{if COUNT(products) > 0}}
     Do something
 {{end}}
