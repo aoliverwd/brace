@@ -113,3 +113,9 @@ __For consideration__
 ```html
 [@include {{variable}}]
 ```
+
+### 6. Shortcodes
+
+```html
+[button title="Click me" url="https://example.com" target="_blank"]
+```
