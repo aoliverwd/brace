@@ -187,3 +187,27 @@ $brace->parse('content', []);
     Comment block over multiple lines
 -->
 ```
+
+### Considerations for future development
+
+#### Add first and last item reference to iterators
+
+It would be beneficial to know if the current iteration is currently the first or last.
+
+```html
+<ul>
+{{each products as product}}
+    <li {{is_first_item ? "class='is_first'"}}>{{product->title}}</li>
+{{end}}
+</ul>
+```
+
+#### Add COUNT() condition to IF operators
+
+Could be beneficial to run conditions based on how many items are in an array of parsed data.
+
+```html
+{{if COUNT(products) > 0}}
+    Do something
+{{end}}
+```
