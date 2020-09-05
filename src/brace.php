@@ -36,6 +36,13 @@
         private $is_block;
 
         /**
+         * Class constructor
+         */
+        function __construct(){
+            $this->template_path = getcwd().'/';
+        }
+
+        /**
          * process template files
          * @param  string       $templates [description]
          * @param  array        $dataset   [description]
