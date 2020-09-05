@@ -39,6 +39,7 @@
          * Class constructor
          */
         function __construct(){
+            /** Set template_path to current working path of class instance */
             $this->template_path = getcwd().'/';
         }
 
@@ -122,7 +123,7 @@
                 /** If block has not been closed */
                 if($this->is_block){
                     trigger_error("IF/EACH block has not been closed");
-                    die;
+                    exit;
                 }
             }
         }
