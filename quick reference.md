@@ -1,19 +1,7 @@
 # Brace
 ## Simple Reference
 
-### Index
-
-1. [Each statement blocks](#each_statement_blocks)
-2. [Conditional statement blocks](#conditional_statement_blocks)
-3. [Shorthand/inline conditional statements](#inline_conditional_statements)
-    1. [Conditions](#conditions)
-4. [Variables](#variables)
-    1. [Nested variables](#nested_variables)
-5. [Includes](#includes)
-
---
-
-<h3 id="each_statement_blocks">1. Each statement blocks</h3>
+### 1. Each statement blocks
 
 ```html
 {{each products}}
@@ -33,7 +21,7 @@
 {{end}}
 ```
 
-<h3 id="conditional_statement_blocks">2. Conditional statement blocks</h3>
+### 2. Conditional statement blocks
 
 ```html
 {{if first_name !== "test" || first_name !! null && first_name == "alex"}}
@@ -51,7 +39,7 @@
 {{end}}
 ```
 
-<h3 id="inline_conditional_statements">3. Shorthand/inline conditional statements</h3>
+### 3. Shorthand/inline conditional statements
 
 ```html
 {{first_name !== "test" ? "__first_name__" : "is test"}}
@@ -65,7 +53,7 @@
 {{first_name EXISTS ? "my first name is __first_name__"}}
 ```
 
-<h4 id="conditions">3.1 Conditions</h3>
+#### 3.1 Conditions
 
 | Condition  | Description                              |
 |------------|------------------------------------------|
@@ -87,7 +75,7 @@ __For consideration__
 | COUNT()    | Returns a count of an array              |
 
 
-<h3 id="variables">4. Variables</h3>
+### 4. Variables
 
 
 ```html
@@ -102,13 +90,13 @@ __For consideration__
 ```
 
 
-<h4 id="nested_variables">4.1 Nested variables</h4>
+#### 4.1 Nested variables
 
 ```html
 {{website->title}}
 ```
 
-<h3 id="includes">5. Includes</h3>
+### 5. Includes
 
 ```html
 [@include footer]
