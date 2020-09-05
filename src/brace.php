@@ -270,10 +270,6 @@
             /** Process variables and in-line conditions */
             $this_line = $this->process_variables($this_line, $dataset);
 
-
-            /** Remove trailing rouge line break */
-            //$this_line = (preg_match('/$\n/', $this_line) ? rtrim($this_line)."\n" : $this_line);
-
             /** Output current line */
             if($render){
                 echo $this_line;
