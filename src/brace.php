@@ -481,6 +481,8 @@
 
                 return $content[1];
             }
+
+            return '';
         }
 
         /**
