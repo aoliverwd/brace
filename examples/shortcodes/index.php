@@ -17,6 +17,6 @@
     /** Register shortcode */
     $brace->reg_shortcode('the_date', 'render_the_year');
 
-    /** Process template end echo out */
+    /** Process template and echo out */
     $brace->parse('example',[]);
 ?>

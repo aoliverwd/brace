@@ -5,7 +5,7 @@
     /** New brace instance */
     $brace = new brace\parser;
 
-    /** Process template end echo out */
+    /** Process template and echo out */
     $brace->parse('example',[
         'fullname' => 'Jane Smith',
         'name' => [

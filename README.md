@@ -1,27 +1,92 @@
-# Introduction
+# What is brace?
 
-Brace is a simple template language written in PHP. Brace uses a handlebar notation syntax, this in-turn enables documents to still be easily manageable.
+brace is a simple template language written in PHP. Brace uses a handlebar notation syntax, this in-turn enables documents to still be easily manageable.
 
-Brace has been designed to be used in web applications that render HTML, however, Brace is not restricted to just use in HTML, it can be used to output to any type of text based file I.E TXT,CSV,JSON etc.
+## Installation and usage
 
-## Installation/Usage
+### Including brace, creating a new class instance and setting instance variables.
 
+```php
+    /** Include brace */
+    include __DIR__.'/src/brace.php';
 
-## Reference
+    /** New brace instance */
+    $brace = new brace\parser;
+
+    /** Set instance variables (Optional) */
+    $brace->remove_comment_blocks = false;
+    $brace->template_path = __DIR__.'/';
+    $brace->template_ext = 'tpl';
+```
+
+### Echoing out templates
+
+```php
+    /** Process template and echo out */
+    $brace->parse('example',[
+        'name' => [
+            'first' => 'John',
+            'last' => 'Doe'
+        ]
+    ]);
+```
+
+### Returning processes templates as a string
+
+```php
+    /** Process template and return string */
+    $template_string = $brace->parse('example',[
+        'name' => [
+            'first' => 'John',
+            'last' => 'Doe'
+        ]
+    ], false)->return();
+```
+
+### Instance variables
+
+| Variable                     | Description                                    | Default value                       |
+|------------------------------|------------------------------------------------|-------------------------------------|
+| ```remove_comment_blocks```  | Keep or remove comment blocks from templates   | [Boolean] ```true```                |
+| ```template_path```          | Set directory to load template files from      | [String] Current working directory  |
+| ```template_ext```           | Template file extension                        | [String] ```tpl```                  |
+
+## Template Reference
 
 ### Variables
+
+```php
+    /** Process template and echo out */
+    $brace->parse('example',[
+        'firstname' => 'John Doe'
+    ]);
+```
 
 ```html
 <p>{{firstname}}</p>
 ```
 
-#### In-line 'OR' operator
+#### In-line ```or``` operator
+
+```php
+    /** Process template and echo out */
+    $brace->parse('example',[
+        'fname' => 'John Doe'
+    ]);
+```
 
 ```html
 <p>{{firstname || "No first name found"}}</p>
 ```
 
-#### Multiple In-line 'OR' operators
+#### Multiple In-line ```or``` operators
+
+```php
+    /** Process template and echo out */
+    $brace->parse('example',[
+        'fname' => 'John Doe'
+    ]);
+```
 
 ```html
 <p>{{firstname || fname || "No first name found"}}</p>
@@ -29,28 +94,31 @@ Brace has been designed to be used in web applications that render HTML, however
 
 ### Iterators
 
-```html
-{{each products}}
-    <p>{{title}}</p>
-{{end}}
+```php
+    /** Process template and echo out */
+    $brace->parse('example',[
+        'products' => [
+            0 => [
+                'title' => 'Product 1',
+                'price' => 22.99,
+                'stock' => 15,
+                'categories' => ['Textile','Cloths']
+            ],
+            1 => [
+                'title' => 'Product 2',
+                'price' => 10.00,
+                'stock' => 62,
+                'categories' => ['Electronics','PC','Hardware']
+            ],
+            2 => [
+                'title' => 'Product 3',
+                'price' => 89.98,
+                'stock' => 120,
+                'categories' => ['PC Game']
+            ]
+        ]
+    ]);
 ```
-
-```html
-<ul>
-{{each products as product}}
-    <li>{{product->title}}</li>
-{{end}}
-</ul>
-```
-
-```html
-{{each names as name}}
-    <p>{{name}}</p>
-{{end}}
-```
-
-#### Iterator Blocks
-
 
 ```html
 <ul>
@@ -63,9 +131,23 @@ Brace has been designed to be used in web applications that render HTML, however
 ```html
 <ul>
 {{each products as product}}
-    <li>{{product->title}}</li>
+    <li>
+        {{product->title}}
+        <ul>
+        {{each product->categories as category}}
+            <li>{{category}}</li>
+        {{end}}
+        </ul>
+    </li>
 {{end}}
 </ul>
+```
+
+```php
+    /** Process template and echo out */
+    $brace->parse('example',[
+        'names' => ['John','Steve','Bert']
+    ]);
 ```
 
 ```html
@@ -77,23 +159,15 @@ Brace has been designed to be used in web applications that render HTML, however
 
 ### Conditional Statements
 
-#### Conditions
-
-| Condition  | Description                              |
-|------------|------------------------------------------|
-| ===        | Is equal to (Strict equality comparison) |
-| >=         | More than or equal to                    |
-| <=         | Less than or equal to                    |
-| >          | More than                                |
-| <          | Less than                                |
-| !!         | Is not                                   |
-| !==        | Is not equal (Same as !! operator)       |
-| EXISTS     | Exists                                   |
-| !EXISTS    | Does not exist                           |
-
-
 #### Condition Blocks
 
+```php
+    /** Process template and echo out */
+    $brace->parse('example',[
+        'first_name' => 'John',
+        'last_name' => 'Doe'
+    ]);
+```
 
 ```html
 {{if first_name EXISTS}}
@@ -102,13 +176,12 @@ Brace has been designed to be used in web applications that render HTML, however
 ```
 
 ```html
-{{if first_name !== "test" || first_name !! null && first_name == "alex"}}
-    <p>May first name is {{first_name}}</p>
+{{if first_name EXISTS && first_name == "John"}}
+    <p>My first name is {{first_name}}</p>
 {{else}}
-    <p>please enter your first name</p>
+    <p>Please enter your first name</p>
 {{end}}
 ```
-
 
 #### In-line Statements
 
@@ -125,17 +198,33 @@ Brace has been designed to be used in web applications that render HTML, however
 <p>{{first_name EXISTS ? "my first name is __first_name__"}}</p>
 ```
 
+#### Conditions
+
+| Condition  | Description                              |
+|------------|------------------------------------------|
+| ===        | Is equal to (Strict equality comparison) |
+| >=         | More than or equal to                    |
+| <=         | Less than or equal to                    |
+| >          | More than                                |
+| <          | Less than                                |
+| !!         | Is not                                   |
+| !==        | Is not equal (Same as !! operator)       |
+| EXISTS     | Exists                                   |
+| !EXISTS    | Does not exist                           |
+
+
+
 ### Includeing Templates
 
-```txt
+```html
 [@include sections/footer]
 ```
 
-```txt
+```html
 [@include header footer]
 ```
 
-```txt
+```html
 [@include {{section}}]
 ```
 
@@ -167,20 +256,20 @@ $brace->parse('content', []);
 
 #### Content Template
 
-```txt
+```html
 <!-- Button shortcode -->
 [button title="Hello world" url="https://hello.world" alt="Hello world button" target="_blank"]
 ```
 
 ### Comment Blocks
 
-#### In-line Code Block
+#### In-line Comment Block
 
 ```html
 <!-- Inline comment block -->
 ```
 
-#### Multi-line Code Block
+#### Multiple Line Comment Block
 
 ```html
 <!-- 
@@ -194,7 +283,7 @@ $brace->parse('content', []);
 
 It would be beneficial to know if the current iteration is currently the first or last.
 
-```txt
+```html
 <ul>
 {{each products as product}}
     <li {{is_first_item ? "class='is_first'"}}>{{product->title}}</li>
@@ -202,12 +291,18 @@ It would be beneficial to know if the current iteration is currently the first o
 </ul>
 ```
 
-#### Add COUNT() condition to IF operators
+#### Add COUNT() condition to conditional statements
 
 Could be beneficial to run conditions based on how many items are in an array of parsed data.
 
-```txt
+```html
 {{if COUNT(products) > 0}}
     Do something
 {{end}}
+```
+
+#### Add in-line iterator statements
+
+```html
+{{names as name "<li>__name__</li>"}}
 ```

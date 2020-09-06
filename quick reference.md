@@ -1,7 +1,7 @@
 # Brace
 ## Simple Reference
 
-### 1. Each statement blocks
+### 1. Iterators
 
 ```html
 {{each products}}
@@ -19,6 +19,14 @@
 {{each names as name}}
     <p>{{name}}</p>
 {{end}}
+```
+
+#### 1.1 In-line iterator statements
+
+__For consideration__
+
+```html
+{{names as name "<li>__name__</li>"}}
 ```
 
 ### 2. Conditional statement blocks
@@ -39,7 +47,7 @@
 {{end}}
 ```
 
-### 3. Shorthand/inline conditional statements
+### 3. Shorthand/In-line conditional statements
 
 ```html
 {{first_name !== "test" ? "__first_name__" : "is test"}}
