@@ -11,10 +11,12 @@ jobs:
     container: php:7.4
 
     steps:
-    - name: PHPUnit
-    - working-directory: ./tests
+    - uses: actions/checkout@v2
     - run: apt update
     - run: apt install -y wget
+    
+    - name: Download and run PHPUnit
+    - working-directory: tests
     - run: wget -O phpunit https://phar.phpunit.de/phpunit-9.phar
     - run: chmod +x phpunit
     - run: ls
