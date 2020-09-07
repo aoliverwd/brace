@@ -10,8 +10,8 @@ jobs:
     steps:
       - name: Brace Unit Tests
         run: |
-          apt update
-          apt install -y wget
+          #apt update
+          #apt install -y wget
           cd tests
           wget -O phpunit https://phar.phpunit.de/phpunit-9.phar
           chmod +x phpunit
