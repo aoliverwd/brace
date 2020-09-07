@@ -21,5 +21,4 @@ jobs:
         apt install -y wget
         wget -O phpunit https://phar.phpunit.de/phpunit-9.phar
         chmod +x phpunit
-        ls
-    #- run: php phpunit
+        php phpunit
