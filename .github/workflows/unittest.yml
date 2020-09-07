@@ -9,15 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     container: php:7.4
     steps:
-      - name: Update APT
-      - run: apt update
-      - name: Install wget
-      - run: apt install -y wget
-      - name: CD into test directory
-      - run: cd tests
-      - name: Download latest PHPUnit
-      - run: wget -O phpunit https://phar.phpunit.de/phpunit-9.phar
-      - name: Make PHPUnit executable
-      - run: chmod +x phpunit
-      - name: Run Tests
-      - run: php phpunit
+      - name: PHPUnit
+      - run: |
+         apt update
+         apt install -y wget
+         cd tests
+         wget -O phpunit https://phar.phpunit.de/phpunit-9.phar
+         chmod +x phpunit
+         php phpunit
