@@ -15,7 +15,7 @@ jobs:
     - run: apt update
     - run: apt install -y wget
     - run: cd tests
-    - run: ls
     - run: wget -O phpunit https://phar.phpunit.de/phpunit-9.phar
     - run: chmod +x phpunit
-    - run: php phpunit
+    - run: ls
+    #- run: php phpunit
