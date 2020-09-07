@@ -12,7 +12,6 @@ jobs:
 
     steps:
     - working-directory: ./tests
-    - uses: actions/checkout@v2
     - run: apt update
     - run: apt install -y wget
     - run: wget -O phpunit https://phar.phpunit.de/phpunit-9.phar
