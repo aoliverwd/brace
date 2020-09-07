@@ -1,0 +1,20 @@
+name: PHPUnit
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    container: php:7.4
+
+    steps:
+    - uses: actions/checkout@v2
+    - run: apt update
+    - run: apt install -y wget
+    - run: cd tests
+    - run: wget -O phpunit https://phar.phpunit.de/phpunit-9.phar
+    - run: chmod +x phpunit
+    - run: php phpunit
