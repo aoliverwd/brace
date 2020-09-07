@@ -1,3 +1,5 @@
+![PHPUnit](https://github.com/aoliverwd/brace/workflows/PHPUnit/badge.svg?branch=master)
+
 # Introduction
 
 brace is a simple template language written in PHP. Brace uses a handlebar notation syntax, this in-turn enables documents to still be easily manageable.
