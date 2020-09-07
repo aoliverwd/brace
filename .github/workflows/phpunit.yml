@@ -9,14 +9,14 @@ jobs:
 
     runs-on: ubuntu-latest
     container: php:7.4
+    env:
+      working-directory: ./tests 
 
     steps:
     - uses: actions/checkout@v2
+    - working-directory: ${{env.working-directory}}
     - run: apt update
     - run: apt install -y wget
-    
-    - name: Download and run PHPUnit
-    - working-directory: tests
     - run: wget -O phpunit https://phar.phpunit.de/phpunit-9.phar
     - run: chmod +x phpunit
     - run: ls
