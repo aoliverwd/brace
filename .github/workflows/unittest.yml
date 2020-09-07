@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    runs-on: php:7.4
+    runs-on: ubuntu-20.04
     steps:
       - name: Brace Unit Tests
         run: |
