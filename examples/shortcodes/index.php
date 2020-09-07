@@ -6,9 +6,10 @@
     $brace = new brace\parser;
 
     /**
-     * [render_the_year description]
-     * @param  array $attr Included data
-     * @return string      Return ISO 8601 formatted date  
+     * Return year
+     *
+     * @param [type] $attr
+     * @return void
      */
     function render_the_year($attr){
         return date('c', (isset($attr['datetime']) ? strtotime($attr['datetime']) : time()));

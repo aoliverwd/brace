@@ -1,4 +1,4 @@
-# What is brace?
+# Introduction
 
 brace is a simple template language written in PHP. Brace uses a handlebar notation syntax, this in-turn enables documents to still be easily manageable.
 
@@ -237,11 +237,7 @@ brace is a simple template language written in PHP. Brace uses a handlebar notat
 /** New brace parser */
 $brace = new brace\parser;
 
-/**
- * [$button_function Return HTML button string]
- * @var     [array]  $attributes  [Array or attributes]
- * @return  [string]              [Return HTML button string]
- */
+/** Return HTML link */
 $button_function = function ($attributes){
     return '<a href="'.$attributes['url'].'" alt="'.$attributes['alt'].'" target="'.$attributes['target'].'" rel="noreferrer noopener">'.$attributes['title'].'</a>';
 };
