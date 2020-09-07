@@ -13,7 +13,8 @@ jobs:
       working-directory: ./tests 
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Update
+      working-directory: ${{env.working-directory}}
       run: |
         apt update
         apt install -y wget
