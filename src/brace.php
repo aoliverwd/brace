@@ -44,11 +44,12 @@
         }
 
         /**
-         * process template files
-         * @param  string       $templates [description]
-         * @param  array        $dataset   [description]
-         * @param  bool|boolean $render    [description]
-         * @return [type]                  [description]
+         * Parse templates
+         *
+         * @param string $templates
+         * @param array $dataset
+         * @param boolean $render
+         * @return object
          */
         public function parse(string $templates, array $dataset, bool $render = true): object{
     
@@ -61,11 +62,12 @@
         }
 
         /**
-         * Process input string
-         * @param  string $input_string [description]
-         * @param  array  $dataset      [description]
-         * @param  bool   $render       [description]
-         * @return [type]               [description]
+         * Parse string
+         *
+         * @param string $input_string
+         * @param array $dataset
+         * @param boolean $render
+         * @return object
          */
         public function parse_input_string(string $input_string, array $dataset, bool $render): object{
             foreach(explode("\n", $input_string) as $this_line){
@@ -77,10 +79,11 @@
 
         /**
          * Compile to file
-         * @param  string $templates        [description]
-         * @param  string $compile_filename [description]
-         * @param  array  $dataset          [description]
-         * @return [type]                   [description]
+         *
+         * @param string $templates
+         * @param string $compile_filename
+         * @param array $dataset
+         * @return void
          */
         public function compile(string $templates, string $compile_filename, array $dataset): void{
             $this->parse($templates, $dataset, false);
@@ -89,7 +92,8 @@
 
         /**
          * Return processed template string
-         * @return [type] [description]
+         *
+         * @return string
          */
         public function return(): string{
             return $this->export_string;
@@ -115,9 +119,11 @@
 
 
         /**
-         * [call_shortcode description]
-         * @param  string $shortcodeSyntax [description]
-         * @return [type]                  [description]
+         * Call shortcode
+         *
+         * @param string $shortcodeSyntax
+         * @param array $dataset
+         * @return string
          */
         private function call_shortcode(string $shortcodeSyntax, array $dataset): string{
             $args = explode(' ', str_replace(array('[', ']'), '', str_replace('&quot;', '"', $shortcodeSyntax)));
@@ -150,8 +156,11 @@
 
         /**
          * Process a individual template file
-         * @param  string $template_name [description]
-         * @return [type]                [description]
+         *
+         * @param string $template_name
+         * @param array $dataset
+         * @param boolean $render
+         * @return void
          */
         private function process_template_file(string $template_name, array $dataset, bool $render): void{
             if(file_exists($this->template_path.$template_name)){
@@ -182,11 +191,12 @@
 
 
         /**
-         * Process string
-         * @param  string $string_line [description]
-         * @param  array  $dataset     [description]
-         * @param  bool   $render      [description]
-         * @return [type]              [description]
+         * Process single line
+         *
+         * @param string $this_line
+         * @param array $dataset
+         * @param boolean $render
+         * @return void
          */
         private function process_line(string $this_line, array $dataset, bool $render): void{
 
@@ -281,9 +291,11 @@
 
         /**
          * Process conditional block
-         * @param  string $block_string [description]
-         * @param  array  $dataset      [description]
-         * @return [type]               [description]
+         *
+         * @param string $block_string
+         * @param array $conditions
+         * @param array $dataset
+         * @return string
          */
         private function process_block(string $block_string, array $conditions, array $dataset): string{
 
@@ -337,11 +349,11 @@
 
         /**
          * Process each statement
-         * @param  string $each_statement  [description]
-         * @param  string $block_content [description]
-         * @param  array  $dataset       [description]
-         * @param  bool   $render        [description]
-         * @return [type]                [description]
+         *
+         * @param string $each_statement
+         * @param string $block_content
+         * @param array $dataset
+         * @return string
          */
         private function process_each_statement(string $each_statement, string $block_content, array $dataset): string{
             $each_set = explode(' ', trim($each_statement));
@@ -400,8 +412,9 @@
 
         /**
          * Return else content from condition block
-         * @param  string $content [description]
-         * @return [type]          [description]
+         *
+         * @param string $content
+         * @return array
          */
         private function return_else_condition(string $content): array{
             $else_condition = str_pad('{{else}}', (strlen('{{else}}') + $this->block_spaces), ' ', STR_PAD_LEFT);
@@ -414,9 +427,10 @@
 
         /**
          * Process variables
-         * @param  string $template_string [description]
-         * @param  array  $dataset         [description]
-         * @return [type]                  [description]
+         *
+         * @param string $template_string
+         * @param array $dataset
+         * @return string
          */
         private function process_variables(string $template_string, array $dataset): string{
             if(preg_match_all('/({{)(.*?)(}})/i', $template_string, $variables, PREG_SET_ORDER)){
@@ -462,9 +476,10 @@
 
         /**
          * Process string
-         * @param  string $input_string [description]
-         * @param  array  $dataset      [description]
-         * @return [type]               [description]
+         *
+         * @param string $input_string
+         * @param array $dataset
+         * @return string
          */
         private function process_string(string $input_string, array $dataset): string{
             if(preg_match('/"(.*?)"/i', $input_string, $content)){
@@ -484,9 +499,10 @@
 
         /**
          * Return chained variable data
-         * @param  string $string  [description]
-         * @param  array  $dataset [description]
-         * @return [type]          [description]
+         *
+         * @param string $string
+         * @param array $dataset
+         * @return void
          */
         private function return_chained_variables(string $string, array $dataset){
             $return;
@@ -505,9 +521,10 @@
 
         /**
          * Process in-line condition
-         * @param  string $condition_string [description]
-         * @param  array  $dataset          [description]
-         * @return [type]                   [description]
+         *
+         * @param string $condition_string
+         * @param array $dataset
+         * @return void
          */
         private function process_inline_condition(string $condition_string, array $dataset){
                 
@@ -523,10 +540,11 @@
         }
 
         /**
-         * Process conditions
-         * @param  string $condition [description]
-         * @param  array  $dataset   [description]
-         * @return [type]            [description]
+         * Undocumented function
+         *
+         * @param string $condition
+         * @param array $dataset
+         * @return boolean
          */
         private function process_conditions(string $condition, array $dataset): bool{
 
@@ -559,9 +577,10 @@
 
         /**
          * Process a single condition block
-         * @param  array  $condition [description]
-         * @param  array  $dataset   [description]
-         * @return [type]            [description]
+         *
+         * @param array $condition
+         * @param array $dataset
+         * @return boolean
          */
         private function process_single_condition(array $condition, array $dataset): bool{    
             if(count($condition) > 1 && $data = $this->return_chained_variables(trim($condition[0]), $dataset)){
