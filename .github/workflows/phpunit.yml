@@ -11,8 +11,8 @@ jobs:
     container: php:7.4
 
     steps:
-    - uses: actions/checkout@v2
     - working-directory: ./tests
+    - uses: actions/checkout@v2
     - run: apt update
     - run: apt install -y wget
     - run: wget -O phpunit https://phar.phpunit.de/phpunit-9.phar
