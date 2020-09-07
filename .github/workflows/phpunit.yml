@@ -14,10 +14,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - working-directory: ${{env.working-directory}}
-    - run: apt update
-    - run: apt install -y wget
-    - run: wget -O phpunit https://phar.phpunit.de/phpunit-9.phar
-    - run: chmod +x phpunit
-    - run: ls
+      run: |
+        apt update
+        apt install -y wget
+    
+    - name: Download PHPUnit
+      working-directory: ${{env.working-directory}}
+      run: |
+        wget -O phpunit https://phar.phpunit.de/phpunit-9.phar
+        chmod +x phpunit
+        ls
     #- run: php phpunit
