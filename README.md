@@ -51,7 +51,7 @@ brace is a simple template language written in PHP. Brace uses a handlebar style
 ?>
 ```
 
-### Compiling to external file
+### Compiling to an external file
 
 ```php
 <?php
@@ -62,7 +62,7 @@ brace is a simple template language written in PHP. Brace uses a handlebar style
     $brace = new brace\parser;
 
     /** Process template and compile to external file */
-    $template_string = $brace->compile('example', 'example.html', [
+    $brace->compile('example', 'example.html', [
         'name' => [
             'first' => 'John',
             'last' => 'Doe'
