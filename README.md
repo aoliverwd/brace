@@ -2,13 +2,14 @@
 
 # Introduction
 
-brace is a simple template language written in PHP. Brace uses a handlebar notation syntax, this in-turn enables documents to still be easily manageable.
+brace is a simple template language written in PHP. Brace uses a handlebar style syntax.
 
 ## Installation and usage
 
 ### Including brace, creating a new class instance and setting instance variables.
 
 ```php
+<?php
     /** Include brace */
     include __DIR__.'/src/brace.php';
 
@@ -19,11 +20,7 @@ brace is a simple template language written in PHP. Brace uses a handlebar notat
     $brace->remove_comment_blocks = false;
     $brace->template_path = __DIR__.'/';
     $brace->template_ext = 'tpl';
-```
 
-### Echoing out templates
-
-```php
     /** Process template and echo out */
     $brace->parse('example',[
         'name' => [
@@ -31,11 +28,19 @@ brace is a simple template language written in PHP. Brace uses a handlebar notat
             'last' => 'Doe'
         ]
     ]);
+?>
 ```
 
 ### Returning processes templates as a string
 
 ```php
+<?php
+    /** Include brace */
+    include __DIR__.'/src/brace.php';
+
+    /** New brace instance */
+    $brace = new brace\parser;
+
     /** Process template and return string */
     $template_string = $brace->parse('example',[
         'name' => [
@@ -43,7 +48,29 @@ brace is a simple template language written in PHP. Brace uses a handlebar notat
             'last' => 'Doe'
         ]
     ], false)->return();
+?>
 ```
+
+### Compiling to external file
+
+```php
+<?php
+    /** Include brace */
+    include __DIR__.'/src/brace.php';
+
+    /** New brace instance */
+    $brace = new brace\parser;
+
+    /** Process template and compile to external file */
+    $template_string = $brace->compile('example', 'example.html', [
+        'name' => [
+            'first' => 'John',
+            'last' => 'Doe'
+        ]
+    ]);
+?>
+```
+
 
 ### Instance variables
 
@@ -58,10 +85,18 @@ brace is a simple template language written in PHP. Brace uses a handlebar notat
 ### Variables
 
 ```php
+<?php
+    /** Include brace */
+    include __DIR__.'/src/brace.php';
+
+    /** New brace instance */
+    $brace = new brace\parser;
+
     /** Process template and echo out */
     $brace->parse('example',[
         'firstname' => 'John Doe'
     ]);
+?>
 ```
 
 ```html
@@ -71,10 +106,18 @@ brace is a simple template language written in PHP. Brace uses a handlebar notat
 #### In-line ```or``` operator
 
 ```php
+<?php
+    /** Include brace */
+    include __DIR__.'/src/brace.php';
+
+    /** New brace instance */
+    $brace = new brace\parser;
+
     /** Process template and echo out */
     $brace->parse('example',[
         'fname' => 'John Doe'
     ]);
+?>
 ```
 
 ```html
@@ -84,10 +127,18 @@ brace is a simple template language written in PHP. Brace uses a handlebar notat
 #### Multiple In-line ```or``` operators
 
 ```php
+<?php
+    /** Include brace */
+    include __DIR__.'/src/brace.php';
+
+    /** New brace instance */
+    $brace = new brace\parser;
+
     /** Process template and echo out */
     $brace->parse('example',[
         'fname' => 'John Doe'
     ]);
+?>
 ```
 
 ```html
@@ -97,6 +148,13 @@ brace is a simple template language written in PHP. Brace uses a handlebar notat
 ### Iterators
 
 ```php
+<?php
+    /** Include brace */
+    include __DIR__.'/src/brace.php';
+
+    /** New brace instance */
+    $brace = new brace\parser;
+
     /** Process template and echo out */
     $brace->parse('example',[
         'products' => [
@@ -120,6 +178,7 @@ brace is a simple template language written in PHP. Brace uses a handlebar notat
             ]
         ]
     ]);
+>
 ```
 
 ```html
@@ -146,10 +205,18 @@ brace is a simple template language written in PHP. Brace uses a handlebar notat
 ```
 
 ```php
+<?php
+    /** Include brace */
+    include __DIR__.'/src/brace.php';
+
+    /** New brace instance */
+    $brace = new brace\parser;
+
     /** Process template and echo out */
     $brace->parse('example',[
         'names' => ['John','Steve','Bert']
     ]);
+?>
 ```
 
 ```html
@@ -164,11 +231,19 @@ brace is a simple template language written in PHP. Brace uses a handlebar notat
 #### Condition Blocks
 
 ```php
+<?php
+    /** Include brace */
+    include __DIR__.'/src/brace.php';
+
+    /** New brace instance */
+    $brace = new brace\parser;
+
     /** Process template and echo out */
     $brace->parse('example',[
         'first_name' => 'John',
         'last_name' => 'Doe'
     ]);
+?>
 ```
 
 ```html
@@ -236,19 +311,24 @@ brace is a simple template language written in PHP. Brace uses a handlebar notat
 #### PHP Implementation Example
 
 ```php
-/** New brace parser */
-$brace = new brace\parser;
+<?php
+    /** Include brace */
+    include __DIR__.'/src/brace.php';
 
-/** Return HTML link */
-$button_function = function ($attributes){
-    return '<a href="'.$attributes['url'].'" alt="'.$attributes['alt'].'" target="'.$attributes['target'].'" rel="noreferrer noopener">'.$attributes['title'].'</a>';
-};
+    /** New brace parser */
+    $brace = new brace\parser;
 
-/** Register shortcode */
-$brace->reg_shortcode('button', 'button_function');
+    /** Return HTML link */
+    $button_function = function ($attributes){
+        return '<a href="'.$attributes['url'].'" alt="'.$attributes['alt'].'" target="'.$attributes['target'].'" rel="noreferrer noopener">'.$attributes['title'].'</a>';
+    };
 
-/** Process content template */
-$brace->parse('content', []);
+    /** Register shortcode */
+    $brace->reg_shortcode('button', 'button_function');
+
+    /** Process content template */
+    $brace->parse('content', []);
+?>
 ```
 
 
