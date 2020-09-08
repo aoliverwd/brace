@@ -105,41 +105,11 @@ brace is a simple template language written in PHP. Brace uses a handlebar style
 
 #### In-line ```or``` operator
 
-```php
-<?php
-    /** Include brace */
-    include __DIR__.'/src/brace.php';
-
-    /** New brace instance */
-    $brace = new brace\parser;
-
-    /** Process template and echo out */
-    $brace->parse('example',[
-        'fname' => 'John Doe'
-    ]);
-?>
-```
-
 ```html
 <p>{{firstname || "No first name found"}}</p>
 ```
 
 #### Multiple In-line ```or``` operators
-
-```php
-<?php
-    /** Include brace */
-    include __DIR__.'/src/brace.php';
-
-    /** New brace instance */
-    $brace = new brace\parser;
-
-    /** Process template and echo out */
-    $brace->parse('example',[
-        'fname' => 'John Doe'
-    ]);
-?>
-```
 
 ```html
 <p>{{firstname || fname || "No first name found"}}</p>
@@ -260,7 +230,7 @@ brace is a simple template language written in PHP. Brace uses a handlebar style
 {{end}}
 ```
 
-#### In-line Statements
+#### In-line conditions
 
 
 ```html
@@ -291,7 +261,7 @@ brace is a simple template language written in PHP. Brace uses a handlebar style
 
 
 
-### Includeing Templates
+### Including Templates
 
 ```html
 [@include sections/footer]
