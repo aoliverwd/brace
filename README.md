@@ -325,9 +325,11 @@ brace is a simple template language written in PHP. Brace uses a handlebar style
 -->
 ```
 
-### Considerations for future development
+----
 
-#### Add first and last item reference to iterators
+## Considerations for future development
+
+### Add first and last item reference to iterators
 
 It would be beneficial to know if the current iteration is currently the first or last.
 
@@ -339,7 +341,7 @@ It would be beneficial to know if the current iteration is currently the first o
 </ul>
 ```
 
-#### Add COUNT() condition to conditional statements
+### Add COUNT() condition to conditional statements
 
 Could be beneficial to run conditions based on how many items are in an array of parsed data.
 
@@ -349,7 +351,7 @@ Could be beneficial to run conditions based on how many items are in an array of
 {{end}}
 ```
 
-#### Add in-line iterator statements
+### Add in-line iterator statements
 
 ```html
 {{names as name "<li>__name__</li>"}}
