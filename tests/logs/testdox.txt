@@ -22,6 +22,7 @@ Block Conditions
  [x] If block condition
  [x] If else block condition
  [x] If and block condition
+ [x] If is true block condition
 
 Conditions
  [x] Equals
