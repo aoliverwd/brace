@@ -69,7 +69,7 @@
             $brace = new brace\parser;
             $this->assertEquals(
                 "My name is Simon and im older then 21 years old\n",
-                $brace->parse_input_string('{{name EXISTS && age === 21 || age > 18 ? "My name is __name__ and im older then 21 years old" : "You are __age__ years old"}}', ['name' => 'Simon', 'age' => 25], false)->return()
+                $brace->parse_input_string('{{name && age === 21 || age > 18 ? "My name is __name__ and im older then 21 years old" : "You are __age__ years old"}}', ['name' => 'Simon', 'age' => 25], false)->return()
             );
         }
     }
