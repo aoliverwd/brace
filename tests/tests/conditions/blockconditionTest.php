@@ -50,5 +50,19 @@
                 ], false)->return()
             );
         }
+
+        public function testIfIsTrueBlockCondition(): void{
+            $brace = new brace\parser;
+            $brace->template_path = __DIR__.'/';
+            $this->assertEquals(
+                "Hello John Smith\n",
+                $brace->parse_input_string('[@include if-is-true-block]', [
+                    'name' => [
+                        'first' => 'John',
+                        'last' => 'Smith'
+                    ]
+                ], false)->return()
+            );
+        }
     }
 ?>
