@@ -1,8 +1,15 @@
 {
-    "name": "alexoliverwd/brace",
+    "name": "brace/brace",
     "description": "A simple template language written in PHP",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alex Oliver",
+            "homepage": "https://github.com/aoliverwd",
+            "role": "Developer"
+        }
+    ],
     "require": {
-        "php": "^7.4",
-        "another-vendor/package": "1.*"
+        "php": "^7.4"
     }
 }
