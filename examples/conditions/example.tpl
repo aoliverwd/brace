@@ -18,4 +18,3 @@
 {{else}}
     First and last name do not exist
 {{end}}
-

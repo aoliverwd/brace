@@ -584,13 +584,13 @@
              * @param array $dataset
              * @return boolean
              */
-            private function process_single_condition(array $condition, array $dataset): bool{    
-                if(count($condition) > 1 && $data = $this->return_chained_variables(trim($condition[0]), $dataset)){
-                    $challange = $condition[1];
+            private function process_single_condition(array $condition, array $dataset): bool{                   
+                if(count($condition) > 0 && $data = $this->return_chained_variables(trim($condition[0]), $dataset)){
+                    $challenge = (isset($condition[1]) ? $condition[1] : 'EXISTS');
                     $expected = (isset($condition[2]) ? trim($condition[2]) : true);
                     $expected = str_replace(['"','+'], ['',' '], $expected);
 
-                    switch($challange){
+                    switch($challenge){
                     case 'EXISTS':
                         return true;
                         break;
