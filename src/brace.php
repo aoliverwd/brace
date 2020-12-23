@@ -3,7 +3,7 @@
     *   Brace
     *   Copyright (C) 2020 Alex Oliver
     *   
-    *   @version: 1.0.0
+    *   @version: 1.0.3
     *   @author: Alex Oliver
     *   @Repo: https://github.com/aoliverwd/brace
     */
@@ -128,7 +128,7 @@
              * @return string
              */
             private function call_shortcode(string $shortcodeSyntax, array $dataset): string{
-                $args = explode(' ', str_replace(array('[', ']'), '', str_replace('&quot;', '"', $shortcodeSyntax)));
+                $args = explode(' ', str_replace(array('[', ']'), '', str_replace('&quot;', '"', $this->str_array($shortcodeSyntax))));
                 $theArgs = array();
 
                 /** check for registered functions */
@@ -140,7 +140,7 @@
                     /** Format arguments */
                     array_shift($args);
                     foreach(explode('" ', implode(' ', $args)) as $thisArg){
-                        if(count($newArg = explode('=', str_replace('"', '', $thisArg))) === 2){
+                        if(count($newArg = explode('=', str_replace('"', '', $this->str_array($thisArg)))) === 2){
                             $theArgs[trim($newArg[0])] = trim($newArg[1]);
                         }
                     }
@@ -174,7 +174,7 @@
                     while (($this_line = fgets($handle, 4096)) !== false){
 
                         /** Convert tabs to spaces */
-                        $this_line = str_replace("\t", '    ', $this_line);
+                        $this_line = str_replace("\t", '    ', $this->str_array($this_line));
 
                         /** Process single line */
                         $this->process_line($this_line, $dataset, $render);
@@ -276,7 +276,7 @@
                 /** Is shortcode */
                 if(preg_match_all('/\[(.*?)\]/', $this_line, $matches, PREG_SET_ORDER )){
                     foreach($matches as $theShortcode){
-                        $this_line = (function_exists('do_shortcode') ? str_replace($theShortcode[0], do_shortcode($theShortcode[0]), $this_line) : str_replace($theShortcode[0], $this->call_shortcode($theShortcode[0], $dataset), $this_line));
+                        $this_line = (function_exists('do_shortcode') ? str_replace($this->str_array($theShortcode[0]), $this->str_array(do_shortcode($theShortcode[0]), $this_line)) : str_replace($this->str_array($theShortcode[0]), $this->str_array($this->call_shortcode($theShortcode[0], $dataset)), $this->str_array($this_line)));
                     }
                 }
 
@@ -468,7 +468,7 @@
 
                         }
 
-                        $template_string = str_replace($replace_string, $replace_variable, $template_string);
+                        $template_string = str_replace($this->str_array($replace_string), $this->str_array($replace_variable), $this->str_array($template_string));
 
                     }
                 }
@@ -489,7 +489,7 @@
                     /** Input string has variables */
                     if(preg_match_all('/__(.*?)__/i', $content[1], $variables, PREG_SET_ORDER)){
                         foreach($variables as $this_variable){
-                            $content[1] = str_replace($this_variable[0], $this->return_chained_variables($this_variable[1], $dataset), $content[1]);
+                            $content[1] = str_replace($this->str_array($this_variable[0]), $this->str_array($this->return_chained_variables($this_variable[1], $dataset)), $this->str_array($content[1]));
                         }
                     }
 
@@ -563,8 +563,8 @@
                         /** Replace spaces in string match */
                         if(preg_match_all('/"(.*)"/', $alternative_condition, $matches, PREG_SET_ORDER)){
                             foreach($matches as $this_match){
-                                $replace_spaces = str_replace(' ', '+', $this_match[0]);
-                                $alternative_condition = str_replace($this_match[0], $replace_spaces, $alternative_condition);
+                                $replace_spaces = str_replace(' ', '+', $this->str_array($this_match[0]));
+                                $alternative_condition = str_replace($this->str_array($this_match[0]), $this->str_array($replace_spaces), $this->str_array($alternative_condition));
                             }  
                         }
 
@@ -588,7 +588,7 @@
                 if(count($condition) > 0 && $data = $this->return_chained_variables(trim($condition[0]), $dataset)){
                     $challenge = (isset($condition[1]) ? $condition[1] : 'EXISTS');
                     $expected = (isset($condition[2]) ? trim($condition[2]) : true);
-                    $expected = str_replace(['"','+'], ['',' '], $expected);
+                    $expected = str_replace(['"','+'], ['',' '], $this->str_array($expected));
 
                     switch($challenge){
                     case 'EXISTS':
@@ -628,6 +628,19 @@
                 }
 
                 return false;
+            }
+
+            /**
+             * Ensure array or string is returned
+             *
+             * @param array $mixed_value
+             * @return mixed
+             */
+            private function str_array($mixed_value){
+                if(!is_array($mixed_value) && !is_string($mixed_value)){
+                    return strval($mixed_value);
+                }
+                return $mixed_value;
             }
         }   
     }
