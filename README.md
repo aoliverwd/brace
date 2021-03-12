@@ -203,6 +203,37 @@ brace is a simple template language written in PHP. Brace uses a handlebar style
 {{end}}
 ```
 
+#### In-line Iterators
+
+```php
+<?php
+    /** Include brace */
+    include __DIR__.'/src/brace.php';
+
+    /** New brace instance */
+    $brace = new brace\parser;
+
+    /** Process template and echo out */
+    $brace->parse('example',[
+        'names' => ['John','Steve','Bert']
+    ]);
+?>
+```
+
+```html
+<ul>
+    {{names as name "<li>__name__</li>"}}
+</ul>
+```
+
+```html
+<ul>
+    <li>John</li>
+    <li>Steve</li>
+    <li>Bert</li>
+</ul>
+```
+
 
 ### Conditional Statements
 
