@@ -1,4 +1,4 @@
-
+<!-- Each products -->
 {{each products}}
     {{title}}
     Cost: £{{price}}
@@ -6,9 +6,12 @@
 
     Categories:
 
+    <!-- Each categories as category -->
     {{each categories as category}}
     - {{category}} 
     {{end}}
 
 {{end}}
 
+<!-- In-line iterator -->
+{{names as name "__name__"}}
