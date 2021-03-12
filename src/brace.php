@@ -1,9 +1,9 @@
 <?php
     /**
     *   Brace
-    *   Copyright (C) 2020 Alex Oliver
+    *   Copyright (C) 2021 Alex Oliver
     *   
-    *   @version: 1.0.3
+    *   @version: 1.0.4
     *   @author: Alex Oliver
     *   @Repo: https://github.com/aoliverwd/brace
     */
