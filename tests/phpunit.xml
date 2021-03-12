@@ -1,28 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit colors="true" testdox="true" bootstrap="autoload.php">
-    <testsuites>
-        <testsuite name="includes">
-            <directory>tests/includes</directory>
-        </testsuite>
-
-        <testsuite name="variables">
-            <directory>tests/variables</directory>
-        </testsuite>
-
-        <testsuite name="conditions">
-            <directory>tests/conditions</directory>
-        </testsuite>
-
-        <testsuite name="iterators">
-            <directory>tests/iterators</directory>
-        </testsuite>
-
-        <testsuite name="shortcodes">
-            <directory>tests/shortcodes</directory>
-        </testsuite>
-    </testsuites>
-
-    <logging>
-        <log type="testdox-text" target="logs/testdox.txt"/>
-    </logging>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" colors="true" testdox="true" bootstrap="autoload.php" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
+  <coverage/>
+  <testsuites>
+    <testsuite name="includes">
+      <directory>tests/includes</directory>
+    </testsuite>
+    <testsuite name="variables">
+      <directory>tests/variables</directory>
+    </testsuite>
+    <testsuite name="conditions">
+      <directory>tests/conditions</directory>
+    </testsuite>
+    <testsuite name="iterators">
+      <directory>tests/iterators</directory>
+    </testsuite>
+    <testsuite name="shortcodes">
+      <directory>tests/shortcodes</directory>
+    </testsuite>
+  </testsuites>
+  <logging>
+    <testdoxText outputFile="logs/testdox.txt"/>
+  </logging>
 </phpunit>
