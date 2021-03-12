@@ -39,6 +39,8 @@ Iterators
  [x] Nested iteration
  [x] As nested iteration
  [x] As iteration
+ [x] Inline iteration
+ [x] Inline iteration two
 
 Shortcode
  [x] Shortcode

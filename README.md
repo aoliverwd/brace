@@ -4,15 +4,23 @@
 
 brace is a simple template language written in PHP. Brace uses a handlebar style syntax.
 
-## Installation and usage
+## Installation
 
-### Including brace, creating a new class instance and setting instance variables.
+### Via composer
+
+```composer require alexoliverwd/brace```
+
+### Or Including the brace class
+
+```php
+    /** Include brace */
+    include __DIR__.'/src/brace.php';
+```
+
+## Usage
 
 ```php
 <?php
-    /** Include brace */
-    include __DIR__.'/src/brace.php';
-
     /** New brace instance */
     $brace = new brace\parser;
 
@@ -195,6 +203,37 @@ brace is a simple template language written in PHP. Brace uses a handlebar style
 {{end}}
 ```
 
+#### In-line Iterators
+
+```php
+<?php
+    /** Include brace */
+    include __DIR__.'/src/brace.php';
+
+    /** New brace instance */
+    $brace = new brace\parser;
+
+    /** Process template and echo out */
+    $brace->parse('example',[
+        'names' => ['John','Steve','Bert']
+    ]);
+?>
+```
+
+```html
+<ul>
+    {{names as name "<li>__name__</li>"}}
+</ul>
+```
+
+```html
+<ul>
+    <li>John</li>
+    <li>Steve</li>
+    <li>Bert</li>
+</ul>
+```
+
 
 ### Conditional Statements
 
@@ -323,36 +362,4 @@ brace is a simple template language written in PHP. Brace uses a handlebar style
 <!-- 
     Comment block over multiple lines
 -->
-```
-
-----
-
-## Considerations for future development
-
-### Add first and last item reference to iterators
-
-It would be beneficial to know if the current iteration is currently the first or last.
-
-```html
-<ul>
-{{each products as product}}
-    <li {{is_first_item ? "class='is_first'"}}>{{product->title}}</li>
-{{end}}
-</ul>
-```
-
-### Add COUNT() condition to conditional statements
-
-Could be beneficial to run conditions based on how many items are in an array of parsed data.
-
-```html
-{{if COUNT(products) > 0}}
-    Do something
-{{end}}
-```
-
-### Add in-line iterator statements
-
-```html
-{{names as name "<li>__name__</li>"}}
 ```

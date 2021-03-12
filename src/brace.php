@@ -1,9 +1,9 @@
 <?php
     /**
     *   Brace
-    *   Copyright (C) 2020 Alex Oliver
+    *   Copyright (C) 2021 Alex Oliver
     *   
-    *   @version: 1.0.3
+    *   @version: 1.0.4
     *   @author: Alex Oliver
     *   @Repo: https://github.com/aoliverwd/brace
     */
@@ -280,7 +280,7 @@
                     }
                 }
 
-                /** Process variables and in-line conditions */
+                /** Process variables, in-line conditions and in-line iterators */
                 $this_line = $this->process_variables($this_line, $dataset);
 
                 /** Output current line */
@@ -442,6 +442,8 @@
                         $process_string = (isset($this_data_variable[2]) ? $this_data_variable[2] : '');
 
                         $is_condition = preg_match_all('/ \? /', $process_string);
+                        $is_itterator = preg_match_all('/ as /', $process_string);;
+
                         $has_alternative_vars = explode(' || ', $process_string);
                         $replace_variable;
 
@@ -450,6 +452,11 @@
 
                             $replace_variable = $this->process_inline_condition($process_string, $dataset);
                             
+                        } elseif($is_itterator){
+
+                            /** Processes in-line iterator */
+                            $replace_variable = $this->process_inline_iterator($process_string, $dataset);
+
                         } elseif(count($has_alternative_vars) > 1) {
                             
                             foreach($has_alternative_vars as $this_variable){
@@ -526,7 +533,7 @@
              *
              * @param string $condition_string
              * @param array $dataset
-             * @return void
+             * @return string
              */
             private function process_inline_condition(string $condition_string, array $dataset){
                     
@@ -539,6 +546,26 @@
                 } elseif($else){
                     return $this->process_string($else, $dataset);
                 }
+
+                return '';
+            }
+
+
+            /**
+             * Process in-line iterator
+             * @param string $iterator_string
+             * @param array $dataset
+             * @return string
+             */
+            private function process_inline_iterator(string $iterator_string, array $dataset){
+                
+                if(count($iterator_fragments = explode(' ', $iterator_string)) === 4){
+                    $process_string = preg_replace('/^"|"$/', '', array_pop($iterator_fragments));
+                    $process_string = preg_replace('/__(.*?)__/', '{{${1}}}', $process_string);
+                    return trim($this->process_each_statement(implode(' ', $iterator_fragments), $process_string, $dataset));
+                }
+
+                return '';
             }
 
             /**

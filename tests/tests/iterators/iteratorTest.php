@@ -74,5 +74,30 @@
                 ], false)->return()
             );
         }
+
+
+        public function testInlineIteration(): void{
+            $brace = new brace\parser;
+            $brace->template_path = __DIR__.'/';
+
+            $this->assertEquals(
+                "Dave\n".
+                "John\n".
+                "Barry",
+                $brace->parse_input_string('[@include inline-iterator]', [
+                    'names' => ['Dave', 'John', 'Barry']
+                ], false)->return()
+            );
+        }
+
+        public function testInlineIterationTwo(): void{
+            $brace = new brace\parser;
+            $this->assertEquals(
+                "<li>Dave</li>\n".
+                "<li>John</li>\n".
+                "<li>Barry</li>\n",
+                $brace->parse_input_string('{{names as name "<li>__name__</li>"}}', ['names' => ['Dave', 'John', 'Barry']], false)->return()
+            );
+        }
     }
 ?>

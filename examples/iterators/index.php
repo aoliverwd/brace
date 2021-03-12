@@ -26,6 +26,7 @@
                 'stock' => 120,
                 'categories' => ['PC Game']
             ]
-        ]
+        ],
+        'names' => ['John','Steve','Bert']
     ]);
 ?>
