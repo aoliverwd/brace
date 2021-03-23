@@ -106,7 +106,7 @@
              * [reg_shortcode description]
              * @param  string $name      [description]
              * @param  string $theMethod [description]
-             * @return [type]            [description]
+             * @return object            [description]
              */
             public function reg_shortcode(string $name, string $theMethod): object{
 
@@ -276,7 +276,9 @@
                 /** Is shortcode */
                 if(preg_match_all('/\[(.*?)\]/', $this_line, $matches, PREG_SET_ORDER )){
                     foreach($matches as $theShortcode){
-                        $this_line = (function_exists('do_shortcode') ? str_replace($this->str_array($theShortcode[0]), $this->str_array(do_shortcode($theShortcode[0]), $this_line)) : str_replace($this->str_array($theShortcode[0]), $this->str_array($this->call_shortcode($theShortcode[0], $dataset)), $this->str_array($this_line)));
+                        $this_line = (function_exists('do_shortcode')
+                            ? str_replace($this->str_array($theShortcode[0]), $this->str_array(do_shortcode($theShortcode[0])), $this_line)
+                            : str_replace($this->str_array($theShortcode[0]), $this->str_array($this->call_shortcode($theShortcode[0], $dataset)), $this->str_array($this_line)));
                     }
                 }
 
@@ -361,7 +363,7 @@
                 $each_set = explode(' ', trim($each_statement));
                 $return_string = '';
 
-                $use_data = (count($each_set) > 0 ? $this->return_chained_variables($each_set[0], $dataset) : false);
+                $use_data = (count($each_set) > 0 ? $this->return_chained_variables($each_set[0], $dataset) : []);
 
                 if($use_data){
 
@@ -445,7 +447,7 @@
                         $is_itterator = preg_match_all('/ as /', $process_string);;
 
                         $has_alternative_vars = explode(' || ', $process_string);
-                        $replace_variable;
+                        $replace_variable = '';
 
                         /** Detect in-line condition, has alternative variables or singular variables */
                         if($is_condition){
@@ -514,7 +516,7 @@
              * @return void
              */
             private function return_chained_variables(string $string, array $dataset){
-                $return;
+                $return = [];
 
                 foreach(explode('->', $string) as $thisVar){
                     if(is_array($dataset) && isset($dataset[$thisVar])){
@@ -524,6 +526,7 @@
                         return;
                     }
                 }
+
                 return $return;
             }
 
