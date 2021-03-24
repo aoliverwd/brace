@@ -28,5 +28,8 @@
         "files": [
             "src/brace.php"
         ]
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^0.12.82"
     }
 }

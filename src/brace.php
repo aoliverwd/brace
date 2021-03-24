@@ -2,12 +2,12 @@
     /**
     *   Brace
     *   Copyright (C) 2021 Alex Oliver
-    *   
-    *   @version: 1.0.4
+    *
+    *   @version: 1.0.5
     *   @author: Alex Oliver
     *   @Repo: https://github.com/aoliverwd/brace
     */
-    
+
     /** Use strict types */
     declare(strict_types=1);
 
@@ -54,7 +54,7 @@
              * @return object
              */
             public function parse(string $templates, array $dataset, bool $render = true): object{
-        
+
                 /** Process individual template files */
                 foreach(explode(',', trim($templates)) as $template_file){
                     $this->process_template_file(trim($template_file).'.'.$this->template_ext, $dataset, $render);
@@ -106,10 +106,10 @@
              * [reg_shortcode description]
              * @param  string $name      [description]
              * @param  string $theMethod [description]
-             * @return [type]            [description]
+             * @return object            [description]
              */
             public function reg_shortcode(string $name, string $theMethod): object{
-                
+
                 $theMethod = (gettype($theMethod) === 'string' && strlen($theMethod) > 0 ? $theMethod : $name);
 
                 if(!isset($this->shortcode_methods[$name]) && gettype($name) === 'string' && strlen($name) > 0){
@@ -133,10 +133,10 @@
 
                 /** check for registered functions */
                 if($methodName = (isset($args[0]) && isset($this->shortcode_methods[$args[0]]) ? $this->shortcode_methods[$args[0]] : false)){
-                    
+
                     /** Check is a global function */
                     $is_global = (is_callable($methodName) ? false : (isset($GLOBALS[$methodName]) && is_callable($GLOBALS[$methodName]) ? true : false));
-                    
+
                     /** Format arguments */
                     array_shift($args);
                     foreach(explode('" ', implode(' ', $args)) as $thisArg){
@@ -166,10 +166,10 @@
              */
             private function process_template_file(string $template_name, array $dataset, bool $render): void{
                 if(file_exists($this->template_path.$template_name)){
-                    
+
                     /** Open template file */
                     $handle = fopen($this->template_path.$template_name, 'r');
-                    
+
                     /** Run through each line */
                     while (($this_line = fgets($handle, 4096)) !== false){
 
@@ -205,13 +205,13 @@
                 /** Is comment block */
                 if($this->remove_comment_blocks){
                     if(preg_match_all('/<!--|-->/i', $this_line, $matches, PREG_SET_ORDER) || $this->is_comment_block){
-                        
+
                         switch((isset($matches[0]) ? $matches[0][0] : '')){
                         case '<!--':
                             $this->is_comment_block = true;
                             break;
                         case '-->':
-                            $this->is_comment_block = false;            
+                            $this->is_comment_block = false;
                             break;
                         }
 
@@ -265,7 +265,7 @@
                         foreach((isset($to_include[2]) ? explode(' ', trim($to_include[2])) : []) as $template){
                             $template = $this->process_variables($template, $dataset);
                             $this->parse($template, $dataset, $render);
-                        }                    
+                        }
                     }
 
                     /** Blank line */
@@ -276,7 +276,9 @@
                 /** Is shortcode */
                 if(preg_match_all('/\[(.*?)\]/', $this_line, $matches, PREG_SET_ORDER )){
                     foreach($matches as $theShortcode){
-                        $this_line = (function_exists('do_shortcode') ? str_replace($this->str_array($theShortcode[0]), $this->str_array(do_shortcode($theShortcode[0]), $this_line)) : str_replace($this->str_array($theShortcode[0]), $this->str_array($this->call_shortcode($theShortcode[0], $dataset)), $this->str_array($this_line)));
+                        $this_line = (function_exists('do_shortcode')
+                            ? str_replace($this->str_array($theShortcode[0]), $this->str_array(do_shortcode($theShortcode[0])), $this_line)
+                            : str_replace($this->str_array($theShortcode[0]), $this->str_array($this->call_shortcode($theShortcode[0], $dataset)), $this->str_array($this_line)));
                     }
                 }
 
@@ -310,7 +312,7 @@
                 $block_string = implode("\n", $block_string);
 
                 $process_content = '';
-                
+
                 /** Set is If or Each statement */
                 $if_or_each = (isset($conditions[3]) ? $conditions[3] : (isset($conditions[2]) ? $conditions[2] : false));
 
@@ -325,7 +327,7 @@
 
                         /** if else content array */
                         $if_else_content = $this->return_else_condition($block_string);
-                    
+
                         /** Process if else content block */
                         if($this->process_conditions($conditions[1], $dataset)){
                             $process_block->parse_input_string($if_else_content[0], $dataset, false);
@@ -342,7 +344,7 @@
                     case 'each':
                         $process_content = $this->process_each_statement($conditions[2], $block_string, $dataset);
                         break;
-                    }                
+                    }
                 }
 
                 return $process_content;
@@ -361,13 +363,13 @@
                 $each_set = explode(' ', trim($each_statement));
                 $return_string = '';
 
-                $use_data = (count($each_set) > 0 ? $this->return_chained_variables($each_set[0], $dataset) : false);
+                $use_data = (count($each_set) > 0 ? $this->return_chained_variables($each_set[0], $dataset) : []);
 
                 if($use_data){
-                    
+
                     /** set global data array */
                     $global_data = (isset($dataset['GLOBAL']) ? $dataset['GLOBAL'] : $dataset);
-                    
+
                     /** remove duplicate data from dataset */
                     if(isset($global_data[$each_set[0]])){
                         unset($global_data[$each_set[0]]);
@@ -445,20 +447,20 @@
                         $is_itterator = preg_match_all('/ as /', $process_string);;
 
                         $has_alternative_vars = explode(' || ', $process_string);
-                        $replace_variable;
+                        $replace_variable = '';
 
                         /** Detect in-line condition, has alternative variables or singular variables */
                         if($is_condition){
 
                             $replace_variable = $this->process_inline_condition($process_string, $dataset);
-                            
+
                         } elseif($is_itterator){
 
                             /** Processes in-line iterator */
                             $replace_variable = $this->process_inline_iterator($process_string, $dataset);
 
                         } elseif(count($has_alternative_vars) > 1) {
-                            
+
                             foreach($has_alternative_vars as $this_variable){
                                 if($replace_variable = $this->return_chained_variables($this_variable, $dataset)){
                                     break;
@@ -491,8 +493,13 @@
              * @return string
              */
             private function process_string(string $input_string, array $dataset): string{
+
+                /** Replace escaped double quotes */
+                $dbl_quote_escape = '[DBL_QUOTE]';
+                $input_string = preg_replace('/\\\"/', $dbl_quote_escape, $input_string);
+
                 if(preg_match('/"(.*?)"/i', $input_string, $content)){
-                    
+
                     /** Input string has variables */
                     if(preg_match_all('/__(.*?)__/i', $content[1], $variables, PREG_SET_ORDER)){
                         foreach($variables as $this_variable){
@@ -500,7 +507,8 @@
                         }
                     }
 
-                    return $content[1];
+                    /** Reinstate double quotes and return processed string replacing */
+                    return str_replace($dbl_quote_escape, '"', $content[1]);
                 }
 
                 return '';
@@ -514,7 +522,7 @@
              * @return void
              */
             private function return_chained_variables(string $string, array $dataset){
-                $return;
+                $return = [];
 
                 foreach(explode('->', $string) as $thisVar){
                     if(is_array($dataset) && isset($dataset[$thisVar])){
@@ -524,6 +532,7 @@
                         return;
                     }
                 }
+
                 return $return;
             }
 
@@ -536,7 +545,7 @@
              * @return string
              */
             private function process_inline_condition(string $condition_string, array $dataset){
-                    
+
                 $condition = explode(' ? ', $condition_string);
                 $outcome = explode(' : ', $condition[1]);
                 $else = (isset($outcome[1]) ? $outcome[1] : false);
@@ -558,7 +567,7 @@
              * @return string
              */
             private function process_inline_iterator(string $iterator_string, array $dataset){
-                
+
                 if(count($iterator_fragments = explode(' ', $iterator_string)) === 4){
                     $process_string = preg_replace('/^"|"$/', '', array_pop($iterator_fragments));
                     $process_string = preg_replace('/__(.*?)__/', '{{${1}}}', $process_string);
@@ -592,7 +601,7 @@
                             foreach($matches as $this_match){
                                 $replace_spaces = str_replace(' ', '+', $this->str_array($this_match[0]));
                                 $alternative_condition = str_replace($this->str_array($this_match[0]), $this->str_array($replace_spaces), $this->str_array($alternative_condition));
-                            }  
+                            }
                         }
 
                         $or_result = (!$or_result && $this->process_single_condition(explode(' ', $alternative_condition), $dataset) ? true : $or_result);
@@ -600,7 +609,7 @@
 
                     $result = ($or_result ? true : $or_result);
                 }
-                
+
                 return ($result ? true : false);
             }
 
@@ -611,7 +620,7 @@
              * @param array $dataset
              * @return boolean
              */
-            private function process_single_condition(array $condition, array $dataset): bool{                   
+            private function process_single_condition(array $condition, array $dataset): bool{
                 if(count($condition) > 0 && $data = $this->return_chained_variables(trim($condition[0]), $dataset)){
                     $challenge = (isset($condition[1]) ? $condition[1] : 'EXISTS');
                     $expected = (isset($condition[2]) ? trim($condition[2]) : true);
@@ -669,6 +678,6 @@
                 }
                 return $mixed_value;
             }
-        }   
+        }
     }
 ?>
