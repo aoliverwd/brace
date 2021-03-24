@@ -1,10 +1,10 @@
 <?php
     //https://phpunit.readthedocs.io/en/9.2/writing-tests-for-phpunit.html
-    //Execute - php phpunit ./tests/braceTest.php 
+    //Execute - php phpunit ./tests/braceTest.php
 
     /** Declare strict types */
     declare(strict_types=1);
-    
+
     /** PHPUnit namespace */
     use PHPUnit\Framework\TestCase;
 
@@ -22,6 +22,14 @@
             $this->assertEquals(
                 "Hello Dave\n",
                 $brace->parse_input_string('{{name EXISTS ? "Hello __name__"}}', ['name' => 'Dave'], false)->return()
+            );
+        }
+
+        public function testInlineConditionWithDoulbeQuotes(): void{
+            $brace = new brace\parser;
+            $this->assertEquals(
+                "Hello \"Dave\"\n",
+                $brace->parse_input_string('{{name EXISTS ? "Hello \"__name__\""}}', ['name' => 'Dave'], false)->return()
             );
         }
 

@@ -13,6 +13,7 @@ Variables
 
 Inline Conditions
  [x] Inline condition
+ [x] Inline condition with doulbe quotes
  [x] Inline else condition
  [x] Inline or condition
  [x] Inline and condition

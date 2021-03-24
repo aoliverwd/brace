@@ -1,5 +1,7 @@
 
 <!-- Inline conditions -->
+{{fullname EXISTS ? "Hello \"__fullname__\""}}
+
 {{fullname EXISTS ? "Hello __fullname__" : "Fullname not found"}}
 
 {{othername EXISTS ? "Hello __othername__" : "Othername not found"}}

@@ -493,6 +493,11 @@
              * @return string
              */
             private function process_string(string $input_string, array $dataset): string{
+
+                /** Replace escaped double quotes */
+                $dbl_quote_escape = '[DBL_QUOTE]';
+                $input_string = preg_replace('/\\\"/', $dbl_quote_escape, $input_string);
+
                 if(preg_match('/"(.*?)"/i', $input_string, $content)){
 
                     /** Input string has variables */
@@ -502,7 +507,8 @@
                         }
                     }
 
-                    return $content[1];
+                    /** Reinstate double quotes and return processed string replacing */
+                    return str_replace($dbl_quote_escape, '"', $content[1]);
                 }
 
                 return '';
