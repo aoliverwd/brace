@@ -284,6 +284,16 @@ brace is a simple template language written in PHP. Brace uses a handlebar style
 <p>{{first_name EXISTS ? "my first name is __first_name__"}}</p>
 ```
 
+Ability to add double quotes.
+
+```html
+<p>{{first_name !== "test" ? "Name is \"__first_name__\"" : "is test"}}</p>
+```
+
+```txt
+Name is "John"
+```
+
 #### Conditions
 
 | Condition  | Description                              |
@@ -359,7 +369,7 @@ brace is a simple template language written in PHP. Brace uses a handlebar style
 #### Multiple Line Comment Block
 
 ```html
-<!-- 
+<!--
     Comment block over multiple lines
 -->
 ```
