@@ -3,7 +3,7 @@
     *   Brace
     *   Copyright (C) 2021 Alex Oliver
     *
-    *   @version: 1.0.5
+    *   @version: 1.0.6
     *   @author: Alex Oliver
     *   @Repo: https://github.com/aoliverwd/brace
     */
@@ -101,6 +101,14 @@
                 return $this->export_string;
             }
 
+            /**
+             * Clear export_string and return brace object
+             * @return object
+             */
+            public function clear(): object{
+                $this->export_string = '';
+                return $this;
+            }
 
             /**
              * [reg_shortcode description]
