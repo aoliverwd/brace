@@ -79,7 +79,6 @@ brace is a simple template language written in PHP. Brace uses a handlebar style
 ?>
 ```
 
-
 ### Instance variables
 
 | Variable                     | Description                                    | Default value                       |
@@ -372,4 +371,33 @@ Name is "John"
 <!--
     Comment block over multiple lines
 -->
+```
+
+### Clearing cached process string
+
+The ```clear``` method is useful when needing to processes multiple templates with differing data using the same brace instance.
+
+By default brace does not clear a processed string at the end of executing a template/string parse.
+
+```php
+
+  // Init brace
+  $brace = new brace\parser;
+  $brace->template_path = __DIR__.'/';
+
+  // Process first template
+  $brace->parse('example',[
+      'name' => [
+          'first' => 'John',
+          'last' => 'Doe'
+      ]
+  ]);
+
+  // Process second template using the same brace instance
+  $brace->clear()->parse('example_two',[
+      'name' => [
+          'first' => 'Dave',
+          'last' => 'Smith'
+      ]
+  ]);
 ```
