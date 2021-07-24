@@ -650,29 +650,36 @@
                     case 'EXISTS':
                         return true;
                         break;
+                    case "==":
+                        return ($data == $expected ? true : false); // Equal
+                        break;
                     case "===":
-                        return ($data === $expected ? true : false);
+                        return ($data === $expected ? true : false); // Identical
+                        break;
+
+                    case "!=":
+                        return ($data != $expected ? true : false); // Not Equal
                         break;
 
                     case "!!":
                     case "!==":
-                        return ($data !== $expected ? true : false);
+                        return ($data !== $expected ? true : false); // Not identical
                         break;
 
                     case ">":
-                        return (intval($data) > intval($expected) ? true : false);
+                        return (intval($data) > intval($expected) ? true : false); // More than
                         break;
 
                     case "<":
-                        return (intval($data) < intval($expected) ? true : false);
+                        return (intval($data) < intval($expected) ? true : false); // Less than
                         break;
 
                     case ">=":
-                        return (intval($data) >= intval($expected) ? true : false);
+                        return (intval($data) >= intval($expected) ? true : false); // Greater than or equal to
                         break;
 
                     case "<=":
-                        return (intval($data) <= intval($expected) ? true : false);
+                        return (intval($data) <= intval($expected) ? true : false); // Less than or equal to
                         break;
                     }
                 } elseif(count($condition) > 1){
