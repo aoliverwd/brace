@@ -333,16 +333,34 @@
                         $process_block = new parser;
                         $process_block->template_path = $this->template_path;
 
-                        /** if else content array */
-                        $if_else_content = $this->return_else_condition($block_string);
+                        /** Else if conditions */
+                        $else_if_content = $this->return_else_if_condition($block_string);
 
                         /** Process if else content block */
                         if($this->process_conditions($conditions[1], $dataset)){
-                            $process_block->parse_input_string($if_else_content[0], $dataset, false);
+                            $process_block->parse_input_string($else_if_content['if'], $dataset, false);
                             $process_content = $process_block->return();
-                        } elseif(isset($if_else_content[1])){
-                            $process_block->parse_input_string($if_else_content[1], $dataset, false);
-                            $process_content = $process_block->return();
+                        } else{
+
+                            $condition_parsed = false;
+
+                            if(isset($else_if_content['elseif'])){
+
+                                foreach($else_if_content['elseif'] as $condition):
+                                    if($this->process_conditions($condition['condition'], $dataset)){
+                                        $process_block->parse_input_string($condition['content'], $dataset, false);
+                                        $process_content = $process_block->return();
+                                        $condition_parsed = true;
+                                        break;
+                                    }
+                                endforeach;
+                            }
+
+                            if(!$condition_parsed && isset($else_if_content['else'])){
+                                $process_block->parse_input_string($else_if_content['else'], $dataset, false);
+                                $process_content = $process_block->return();
+                            }
+
                         }
 
                         /** unset parser core class instance */
@@ -373,7 +391,7 @@
 
                 $use_data = (count($each_set) > 0 ? $this->return_chained_variables($each_set[0], $dataset) : []);
 
-                if($use_data){
+                if($use_data && is_array($use_data)){
 
                     /** set global data array */
                     $global_data = (isset($dataset['GLOBAL']) ? $dataset['GLOBAL'] : $dataset);
@@ -431,6 +449,60 @@
                 }
 
                 return $return_string;
+            }
+
+            /**
+             * Return else if condition
+             * @param  string $content
+             * @return array
+             */
+            private function return_else_if_condition(string $content): array{
+
+                // Get else condition
+                $else_condition = $this->return_else_condition($content);
+
+                $return = [];
+                $process_content = $else_condition[0];
+
+                if(preg_match_all('/{{elseif (.*?)}}/i', $process_content, $matches, PREG_SET_ORDER)){
+                    foreach($matches as $match){
+                        $split_string = explode($match[0], $process_content);
+
+                        // add first if condition to return
+                        if(!$return){
+                            $return['if'] = $split_string[0];
+                            $return['elseif'] = [];
+                        }
+
+                        if(!$return['elseif']){
+                            $return['elseif'][] = [
+                                'condition' => $match[1],
+                                'content' => ''
+                            ];
+                        } else {
+                            $return['elseif'][array_key_last($return['elseif'])]['content'] = rtrim($split_string[0]);
+                            $return['elseif'][] = [
+                                'condition' => $match[1],
+                                'content' => ''
+                            ];
+                        }
+
+                        $process_content = $split_string[1];
+                    }
+
+                    $return['elseif'][array_key_last($return['elseif'])]['content'] = rtrim($process_content);
+
+                } else {
+                    // add first if condition to return
+                    $return['if'] = $else_condition[0];
+                }
+
+                // add else condition to return
+                if(isset($else_condition[1])){
+                    $return['else'] = $else_condition[1];
+                }
+
+                return $return;
             }
 
 
