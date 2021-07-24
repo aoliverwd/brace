@@ -3,7 +3,7 @@
     *   Brace
     *   Copyright (C) 2021 Alex Oliver
     *
-    *   @version: 1.0.6
+    *   @version: 1.0.7
     *   @author: Alex Oliver
     *   @Repo: https://github.com/aoliverwd/brace
     */
@@ -387,14 +387,22 @@
                     $process_each_block = new parser;
                     $process_each_block->template_path = $this->template_path;
 
+                    $iterator_count = 0;
+                    $row_count = count($use_data) - 1;
+
                     switch(count($each_set)){
                     case 1:
                         foreach($use_data as $this_row){
                             if(is_array($this_row)){
                                 $this_row['GLOBAL'] = $global_data;
+                                $this_row['_ITERATION'] = ($iterator_count > 0 ? ($iterator_count === $row_count ? 'is_last_item' : $iterator_count) : 'is_first_item');
+                                $this_row['_ROW_ID'] = $iterator_count;
+
                                 $process_each_block->parse_input_string($block_content, $this_row, false);
                                 $return_string .= $process_each_block->return();
                                 $process_each_block->export_string = '';
+
+                                $iterator_count += 1;
                             }
                         }
                         break;
@@ -403,11 +411,15 @@
                             foreach($use_data as $this_row){
                                 $row_data = [
                                     $each_set[2] => $this_row,
-                                    'GLOBAL' => $global_data
+                                    'GLOBAL' => $global_data,
+                                    '_ITERATION' => ($iterator_count > 0 ? ($iterator_count === $row_count ? 'is_last_item' : $iterator_count) : 'is_first_item'),
+                                    '_ROW_ID' => $iterator_count
                                 ];
                                 $process_each_block->parse_input_string($block_content, $row_data, false);
                                 $return_string .= $process_each_block->return();
                                 $process_each_block->export_string = '';
+
+                                $iterator_count += 1;
                             }
                         }
                         break;
