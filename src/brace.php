@@ -405,15 +405,15 @@
                     $process_each_block = new parser;
                     $process_each_block->template_path = $this->template_path;
 
-                    $iterator_count = 0;
-                    $row_count = count($use_data) - 1;
+                    $iterator_count = 1;
+                    $row_count = count($use_data);
 
                     switch(count($each_set)){
                     case 1:
                         foreach($use_data as $this_row){
                             if(is_array($this_row)){
                                 $this_row['GLOBAL'] = $global_data;
-                                $this_row['_ITERATION'] = ($iterator_count > 0 ? ($iterator_count === $row_count ? 'is_last_item' : $iterator_count) : 'is_first_item');
+                                $this_row['_ITERATION'] = ($iterator_count > 1 ? ($iterator_count === $row_count ? 'is_last_item' : $iterator_count) : 'is_first_item');
                                 $this_row['_ROW_ID'] = $iterator_count;
 
                                 $process_each_block->parse_input_string($block_content, $this_row, false);
@@ -430,7 +430,7 @@
                                 $row_data = [
                                     $each_set[2] => $this_row,
                                     'GLOBAL' => $global_data,
-                                    '_ITERATION' => ($iterator_count > 0 ? ($iterator_count === $row_count ? 'is_last_item' : $iterator_count) : 'is_first_item'),
+                                    '_ITERATION' => ($iterator_count > 1 ? ($iterator_count === $row_count ? 'is_last_item' : $iterator_count) : 'is_first_item'),
                                     '_ROW_ID' => $iterator_count
                                 ];
                                 $process_each_block->parse_input_string($block_content, $row_data, false);
@@ -678,10 +678,11 @@
              */
             private function process_conditions(string $condition, array $dataset): bool{
 
-                $result = false;
+                $result = true;
+                $and_result = true;
 
                 /** And conditions */
-                foreach(explode(' && ', $condition) as $condition_set){
+                foreach(explode(' && ', $condition) as $condition_set):
 
                     $or_result = false;
 
@@ -699,10 +700,15 @@
                         $or_result = (!$or_result && $this->process_single_condition(explode(' ', $alternative_condition), $dataset) ? true : $or_result);
                     }
 
-                    $result = ($or_result ? true : $or_result);
-                }
+                    $and_result = $or_result;
+                    if(!$and_result) {
+                        $result = false;
+                        break;
+                    }
 
-                return ($result ? true : false);
+                endforeach;
+
+                return $result;
             }
 
             /**
