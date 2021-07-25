@@ -81,11 +81,11 @@ brace is a simple template language written in PHP. Brace uses a handlebar style
 
 ### Instance variables
 
-| Variable                     | Description                                    | Default value                       |
-|------------------------------|------------------------------------------------|-------------------------------------|
-| ```remove_comment_blocks```  | Keep or remove comment blocks from templates   | [Boolean] ```true```                |
-| ```template_path```          | Set directory to load template files from      | [String] Current working directory  |
-| ```template_ext```           | Template file extension                        | [String] ```tpl```                  |
+| Variable                     | Description                                    | Default value                         |
+|------------------------------|------------------------------------------------|---------------------------------------|
+| ```remove_comment_blocks```  | Keep or remove comment blocks from templates   | \[Boolean\] ```true```                |
+| ```template_path```          | Set directory to load template files from      | \[String\] Current working directory  |
+| ```template_ext```           | Template file extension                        | \[String\] ```tpl```                  |
 
 ## Template Reference
 
@@ -233,6 +233,50 @@ brace is a simple template language written in PHP. Brace uses a handlebar style
 </ul>
 ```
 
+### Nth children
+
+```php
+<?php
+    /** Include brace */
+    include __DIR__.'/src/brace.php';
+
+    /** New brace instance */
+    $brace = new brace\parser;
+
+    /** Process template and echo out */
+    $brace->parse('example',[
+        'names' => ['John','Steve','Bert','Fred','Cindy']
+    ]);
+?>
+```
+
+```html
+<!-- Is first item -->
+{{each names as name}}
+    <span{{_ITERATION === "is_first_item" ? " class=\"is_first\""}}>{{name}}</span>
+{{end}}
+
+<!-- Is last item -->
+{{each names as name}}
+    <span{{_ITERATION === "is_last_item" ? " class=\"is_last\""}}>{{name}}</span>
+{{end}}
+
+<!-- Is second item -->
+{{each names as name}}
+    <span{{_ITERATION == 2 ? " class=\"is_second_item\""}}>{{name}}</span>
+{{end}}
+```
+
+### Iteration data variables
+
+Additional data variables that are added to each data row.
+
+| ID          | Description                                                         | Type    |
+|-------------|---------------------------------------------------------------------|---------|
+| \_ITERATION | Iteration value (is\_first\_item, is\_last\_item, 2, 3 etc)         | String  |
+| \_ROW_ID    | Record/Row ID (1,2,3, etc)                                          | Integer |
+| GLOBAL      | An array of external record data that is accessible to all rows     | Array   |
+
 
 ### Conditional Statements
 
@@ -268,6 +312,38 @@ brace is a simple template language written in PHP. Brace uses a handlebar style
 {{end}}
 ```
 
+### Else If Statements
+
+```php
+<?php
+    /** Include brace */
+    include __DIR__.'/src/brace.php';
+
+    /** New brace instance */
+    $brace = new brace\parser;
+
+    /** Process template and echo out */
+    $brace->parse('example',[
+        'names' => ['John','Steve','Bert','Fred','Cindy']
+    ]);
+?>
+```
+
+```html
+{{each names as name}}
+    {{if _ITERATION === "is_first_item"}}
+        <span class="first_item" data-rowid="{{_ROW_ID}}">{{name}}</span>
+    {{elseif _ITERATION === "is_last_item"}}
+        <span class="last_item" data-rowid="{{_ROW_ID}}">{{name}}</span>
+    {{elseif _ITERATION == 2}}
+        <span class="second_item" data-rowid="{{_ROW_ID}}">{{name}}</span>
+    {{else}}
+        <span data-rowid="{{_ROW_ID}}">{{name}}</span>
+    {{end}}
+{{end}}
+
+```
+
 #### In-line conditions
 
 
@@ -295,18 +371,19 @@ Name is "John"
 
 #### Conditions
 
-| Condition  | Description                              |
-|------------|------------------------------------------|
-| ===        | Is equal to (Strict equality comparison) |
-| >=         | More than or equal to                    |
-| <=         | Less than or equal to                    |
-| >          | More than                                |
-| <          | Less than                                |
-| !!         | Is not                                   |
-| !==        | Is not equal (Same as !! operator)       |
-| EXISTS     | Exists                                   |
-| !EXISTS    | Does not exist                           |
-
+| Condition  | Description                                                        |
+|------------|--------------------------------------------------------------------|
+| ==         | Is equal to (Loose equality comparison)                            |
+| ===        | Is equal to (Strict equality comparison)                           |
+| >=         | More than or equal to                                              |
+| <=         | Less than or equal to                                              |
+| >          | More than                                                          |
+| <          | Less than                                                          |
+| !=         | Is not equal (Loose non equality comparison)                       |
+| !!         | Is not                                                             |
+| !==        | Is not equal (Same as !! operator, strict non equality comparison  |
+| EXISTS     | Exists                                                             |
+| !EXISTS    | Does not exist                                                     |
 
 
 ### Including Templates

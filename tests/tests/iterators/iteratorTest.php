@@ -4,7 +4,7 @@
 
     /** Declare strict types */
     declare(strict_types=1);
-    
+
     /** PHPUnit namespace */
     use PHPUnit\Framework\TestCase;
 
@@ -12,7 +12,7 @@
      * Test class
      */
     final class IteratorsTest extends TestCase{
-        
+
         public function testNestedIteration(): void{
             $brace = new brace\parser;
             $brace->template_path = __DIR__.'/';
@@ -97,6 +97,48 @@
                 "<li>John</li>\n".
                 "<li>Barry</li>\n",
                 $brace->parse_input_string('{{names as name "<li>__name__</li>"}}', ['names' => ['Dave', 'John', 'Barry']], false)->return()
+            );
+        }
+
+        public function testIteratorIsFirstItem(): void{
+            $brace = new brace\parser;
+            $brace->template_path = __DIR__.'/';
+
+            $this->assertEquals(
+                "<span class=\"is_first\">Dave</span>\n".
+                "<span>John</span>\n".
+                "<span>Barry</span>\n",
+                $brace->parse_input_string('[@include iteration-is-first-item]', [
+                    'names' => ['Dave', 'John', 'Barry']
+                ], false)->return()
+            );
+        }
+
+        public function testIteratorIsLastItem(): void{
+            $brace = new brace\parser;
+            $brace->template_path = __DIR__.'/';
+
+            $this->assertEquals(
+                "<span>Dave</span>\n".
+                "<span>John</span>\n".
+                "<span class=\"is_last\">Barry</span>\n",
+                $brace->parse_input_string('[@include iteration-is-last-item]', [
+                    'names' => ['Dave', 'John', 'Barry']
+                ], false)->return()
+            );
+        }
+
+        public function testIteratorIsNthItem(): void{
+            $brace = new brace\parser;
+            $brace->template_path = __DIR__.'/';
+
+            $this->assertEquals(
+                "<span>Dave</span>\n".
+                "<span class=\"is_second_item\">John</span>\n".
+                "<span>Barry</span>\n",
+                $brace->parse_input_string('[@include iteration-nth-item]', [
+                    'names' => ['Dave', 'John', 'Barry']
+                ], false)->return()
             );
         }
     }

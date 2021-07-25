@@ -3,7 +3,7 @@
     *   Brace
     *   Copyright (C) 2021 Alex Oliver
     *
-    *   @version: 1.0.6
+    *   @version: 1.0.7
     *   @author: Alex Oliver
     *   @Repo: https://github.com/aoliverwd/brace
     */
@@ -333,16 +333,34 @@
                         $process_block = new parser;
                         $process_block->template_path = $this->template_path;
 
-                        /** if else content array */
-                        $if_else_content = $this->return_else_condition($block_string);
+                        /** Else if conditions */
+                        $else_if_content = $this->return_else_if_condition($block_string);
 
                         /** Process if else content block */
                         if($this->process_conditions($conditions[1], $dataset)){
-                            $process_block->parse_input_string($if_else_content[0], $dataset, false);
+                            $process_block->parse_input_string($else_if_content['if'], $dataset, false);
                             $process_content = $process_block->return();
-                        } elseif(isset($if_else_content[1])){
-                            $process_block->parse_input_string($if_else_content[1], $dataset, false);
-                            $process_content = $process_block->return();
+                        } else{
+
+                            $condition_parsed = false;
+
+                            if(isset($else_if_content['elseif'])){
+
+                                foreach($else_if_content['elseif'] as $condition):
+                                    if($this->process_conditions($condition['condition'], $dataset)){
+                                        $process_block->parse_input_string($condition['content'], $dataset, false);
+                                        $process_content = $process_block->return();
+                                        $condition_parsed = true;
+                                        break;
+                                    }
+                                endforeach;
+                            }
+
+                            if(!$condition_parsed && isset($else_if_content['else'])){
+                                $process_block->parse_input_string($else_if_content['else'], $dataset, false);
+                                $process_content = $process_block->return();
+                            }
+
                         }
 
                         /** unset parser core class instance */
@@ -373,7 +391,7 @@
 
                 $use_data = (count($each_set) > 0 ? $this->return_chained_variables($each_set[0], $dataset) : []);
 
-                if($use_data){
+                if($use_data && is_array($use_data)){
 
                     /** set global data array */
                     $global_data = (isset($dataset['GLOBAL']) ? $dataset['GLOBAL'] : $dataset);
@@ -387,14 +405,22 @@
                     $process_each_block = new parser;
                     $process_each_block->template_path = $this->template_path;
 
+                    $iterator_count = 1;
+                    $row_count = count($use_data);
+
                     switch(count($each_set)){
                     case 1:
                         foreach($use_data as $this_row){
                             if(is_array($this_row)){
                                 $this_row['GLOBAL'] = $global_data;
+                                $this_row['_ITERATION'] = ($iterator_count > 1 ? ($iterator_count === $row_count ? 'is_last_item' : $iterator_count) : 'is_first_item');
+                                $this_row['_ROW_ID'] = $iterator_count;
+
                                 $process_each_block->parse_input_string($block_content, $this_row, false);
                                 $return_string .= $process_each_block->return();
                                 $process_each_block->export_string = '';
+
+                                $iterator_count += 1;
                             }
                         }
                         break;
@@ -403,11 +429,15 @@
                             foreach($use_data as $this_row){
                                 $row_data = [
                                     $each_set[2] => $this_row,
-                                    'GLOBAL' => $global_data
+                                    'GLOBAL' => $global_data,
+                                    '_ITERATION' => ($iterator_count > 1 ? ($iterator_count === $row_count ? 'is_last_item' : $iterator_count) : 'is_first_item'),
+                                    '_ROW_ID' => $iterator_count
                                 ];
                                 $process_each_block->parse_input_string($block_content, $row_data, false);
                                 $return_string .= $process_each_block->return();
                                 $process_each_block->export_string = '';
+
+                                $iterator_count += 1;
                             }
                         }
                         break;
@@ -419,6 +449,60 @@
                 }
 
                 return $return_string;
+            }
+
+            /**
+             * Return else if condition
+             * @param  string $content
+             * @return array
+             */
+            private function return_else_if_condition(string $content): array{
+
+                // Get else condition
+                $else_condition = $this->return_else_condition($content);
+
+                $return = [];
+                $process_content = $else_condition[0];
+
+                if(preg_match_all('/{{elseif (.*?)}}/i', $process_content, $matches, PREG_SET_ORDER)){
+                    foreach($matches as $match){
+                        $split_string = explode($match[0], $process_content);
+
+                        // add first if condition to return
+                        if(!$return){
+                            $return['if'] = $split_string[0];
+                            $return['elseif'] = [];
+                        }
+
+                        if(!$return['elseif']){
+                            $return['elseif'][] = [
+                                'condition' => $match[1],
+                                'content' => ''
+                            ];
+                        } else {
+                            $return['elseif'][array_key_last($return['elseif'])]['content'] = rtrim($split_string[0]);
+                            $return['elseif'][] = [
+                                'condition' => $match[1],
+                                'content' => ''
+                            ];
+                        }
+
+                        $process_content = $split_string[1];
+                    }
+
+                    $return['elseif'][array_key_last($return['elseif'])]['content'] = rtrim($process_content);
+
+                } else {
+                    // add first if condition to return
+                    $return['if'] = $else_condition[0];
+                }
+
+                // add else condition to return
+                if(isset($else_condition[1])){
+                    $return['else'] = $else_condition[1];
+                }
+
+                return $return;
             }
 
 
@@ -594,10 +678,11 @@
              */
             private function process_conditions(string $condition, array $dataset): bool{
 
-                $result = false;
+                $result = true;
+                $and_result = true;
 
                 /** And conditions */
-                foreach(explode(' && ', $condition) as $condition_set){
+                foreach(explode(' && ', $condition) as $condition_set):
 
                     $or_result = false;
 
@@ -615,10 +700,15 @@
                         $or_result = (!$or_result && $this->process_single_condition(explode(' ', $alternative_condition), $dataset) ? true : $or_result);
                     }
 
-                    $result = ($or_result ? true : $or_result);
-                }
+                    $and_result = $or_result;
+                    if(!$and_result) {
+                        $result = false;
+                        break;
+                    }
 
-                return ($result ? true : false);
+                endforeach;
+
+                return $result;
             }
 
             /**
@@ -638,29 +728,36 @@
                     case 'EXISTS':
                         return true;
                         break;
+                    case "==":
+                        return ($data == $expected ? true : false); // Equal
+                        break;
                     case "===":
-                        return ($data === $expected ? true : false);
+                        return ($data === $expected ? true : false); // Identical
+                        break;
+
+                    case "!=":
+                        return ($data != $expected ? true : false); // Not Equal
                         break;
 
                     case "!!":
                     case "!==":
-                        return ($data !== $expected ? true : false);
+                        return ($data !== $expected ? true : false); // Not identical
                         break;
 
                     case ">":
-                        return (intval($data) > intval($expected) ? true : false);
+                        return (intval($data) > intval($expected) ? true : false); // More than
                         break;
 
                     case "<":
-                        return (intval($data) < intval($expected) ? true : false);
+                        return (intval($data) < intval($expected) ? true : false); // Less than
                         break;
 
                     case ">=":
-                        return (intval($data) >= intval($expected) ? true : false);
+                        return (intval($data) >= intval($expected) ? true : false); // Greater than or equal to
                         break;
 
                     case "<=":
-                        return (intval($data) <= intval($expected) ? true : false);
+                        return (intval($data) <= intval($expected) ? true : false); // Less than or equal to
                         break;
                     }
                 } elseif(count($condition) > 1){
