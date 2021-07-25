@@ -9,7 +9,7 @@
     $brace->parse('example',[
         'fullname' => 'Jane Smith',
         'name' => [
-            'first' =>'John',
+            //'first' =>'John',
             'last' => 'Doe'
         ]
     ]);

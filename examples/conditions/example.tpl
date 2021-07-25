@@ -15,8 +15,13 @@
     First name does not exist
 {{end}}
 
-{{if name->first EXISTS && name->last EXISTS}}
+
+{{if name->first && name->last}}
     Hello {{name->first}} {{name->last}}
+{{elseif name->last}}
+    Hello Mr {{name->last}}
+{{elseif name->first}}
+    Dear {{name->first}}
 {{else}}
     First and last name do not exist
 {{end}}
