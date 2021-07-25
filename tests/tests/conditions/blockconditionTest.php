@@ -64,5 +64,31 @@
                 ], false)->return()
             );
         }
+
+        public function testIfElseCondition(): void{
+            $brace = new brace\parser;
+            $brace->template_path = __DIR__.'/';
+            $this->assertEquals(
+                "\nHello John\n",
+                $brace->parse_input_string('[@include if-else-block]', [
+                    'name' => [
+                        'first' => 'John'
+                    ]
+                ], false)->return()
+            );
+        }
+
+        public function testMultipleIfElseCondition(): void{
+            $brace = new brace\parser;
+            $brace->template_path = __DIR__.'/';
+            $this->assertEquals(
+                "\nHello Mr Smith\n",
+                $brace->parse_input_string('[@include multiple-if-else-block]', [
+                    'name' => [
+                        'last' => 'Smith'
+                    ]
+                ], false)->return()
+            );
+        }
     }
 ?>

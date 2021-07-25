@@ -24,6 +24,8 @@ Block Conditions
  [x] If else block condition
  [x] If and block condition
  [x] If is true block condition
+ [x] If else condition
+ [x] Multiple if else condition
 
 Conditions
  [x] Equals
@@ -42,6 +44,9 @@ Iterators
  [x] As iteration
  [x] Inline iteration
  [x] Inline iteration two
+ [x] Iterator is first item
+ [x] Iterator is last item
+ [x] Iterator is nth item
 
 Shortcode
  [x] Shortcode

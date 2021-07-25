@@ -27,6 +27,6 @@
                 'categories' => ['PC Game']
             ]
         ],
-        'names' => ['John','Steve','Bert']
+        'names' => ['John','Steve','Bert','Fred','Cindy']
     ]);
 ?>
