@@ -48,6 +48,7 @@ Iterators
  [x] Iterator is last item
  [x] Iterator is nth item
  [x] Iterator key value
+ [x] Iterator key value type two
 
 Shortcode
  [x] Shortcode

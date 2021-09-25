@@ -331,6 +331,14 @@ composer require alexoliverwd/brace
 {{end}}
 ```
 
+Or
+
+```html
+{{each names as key value}}
+    <span data-key="{{key}}">{{value}}</span>
+{{end}}
+```
+
 ## Iteration data variables
 
 Additional data variables that are added to each data row.

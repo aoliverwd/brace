@@ -431,15 +431,21 @@
                         }
                         break;
                     case 3:
+                    case 4:
                         if ($each_set[1] === 'as') {
                             foreach ($use_data as $key => $this_row) {
                                 $row_data = [
-                                    $each_set[2] => $this_row,
+                                    (isset($each_set[3]) ? $each_set[3] : $each_set[2]) => $this_row,
                                     'GLOBAL' => $global_data,
                                     '_ITERATION' => ($iterator_count > 1 ? ($iterator_count === $row_count ? 'is_last_item' : $iterator_count) : 'is_first_item'),
                                     '_ROW_ID' => $iterator_count,
                                     '_KEY' => $key
                                 ];
+
+                                if (isset($each_set[3])) {
+                                    $row_data[$each_set[2]] = $key;
+                                }
+
                                 $process_each_block->parse_input_string($block_content, $row_data, false);
                                 $return_string .= $process_each_block->return();
                                 $process_each_block->export_string = '';
