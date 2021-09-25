@@ -47,6 +47,7 @@ Iterators
  [x] Iterator is first item
  [x] Iterator is last item
  [x] Iterator is nth item
+ [x] Iterator key value
 
 Shortcode
  [x] Shortcode

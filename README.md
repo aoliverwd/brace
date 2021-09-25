@@ -1,23 +1,60 @@
 ![PHPUnit](https://github.com/aoliverwd/brace/workflows/PHPUnit/badge.svg?branch=master) [![Latest Stable Version](https://poser.pugx.org/alexoliverwd/brace/v)](//packagist.org/packages/alexoliverwd/brace) [![License](https://poser.pugx.org/alexoliverwd/brace/license)](//packagist.org/packages/alexoliverwd/brace)
 
+<!-- MarkdownTOC -->
+
+- Introduction
+- Installation
+    - Via composer
+    - Or Including the brace class
+- Usage
+    - Returning processes templates as a string
+    - Compiling to an external file
+    - Instance variables
+- Template Reference
+    - Variables
+        - In-line "or" operator
+        - Multiple In-line "or" operators
+    - Iterators
+        - In-line Iterators
+    - Nth children
+    - Row keys
+    - Iteration data variables
+    - Conditional Statements
+        - Condition Blocks
+    - Else If Statements
+        - In-line conditions
+        - Conditions
+    - Including Templates
+    - Shortcodes
+        - PHP Implementation Example
+        - Content Template
+    - Comment Blocks
+        - In-line Comment Block
+        - Multiple Line Comment Block
+    - Clearing cached process string
+
+<!-- /MarkdownTOC -->
+
 # Introduction
 
 brace is a simple template language written in PHP. Brace uses a handlebar style syntax.
 
-## Installation
+# Installation
 
-### Via composer
+## Via composer
 
-```composer require alexoliverwd/brace```
+```
+composer require alexoliverwd/brace
+```
 
-### Or Including the brace class
+## Or Including the brace class
 
 ```php
     /** Include brace */
     include __DIR__.'/src/brace.php';
 ```
 
-## Usage
+# Usage
 
 ```php
 <?php
@@ -39,7 +76,7 @@ brace is a simple template language written in PHP. Brace uses a handlebar style
 ?>
 ```
 
-### Returning processes templates as a string
+## Returning processes templates as a string
 
 ```php
 <?php
@@ -59,7 +96,7 @@ brace is a simple template language written in PHP. Brace uses a handlebar style
 ?>
 ```
 
-### Compiling to an external file
+## Compiling to an external file
 
 ```php
 <?php
@@ -79,7 +116,7 @@ brace is a simple template language written in PHP. Brace uses a handlebar style
 ?>
 ```
 
-### Instance variables
+## Instance variables
 
 | Variable                     | Description                                    | Default value                         |
 |------------------------------|------------------------------------------------|---------------------------------------|
@@ -87,9 +124,9 @@ brace is a simple template language written in PHP. Brace uses a handlebar style
 | ```template_path```          | Set directory to load template files from      | \[String\] Current working directory  |
 | ```template_ext```           | Template file extension                        | \[String\] ```tpl```                  |
 
-## Template Reference
+# Template Reference
 
-### Variables
+## Variables
 
 ```php
 <?php
@@ -110,19 +147,19 @@ brace is a simple template language written in PHP. Brace uses a handlebar style
 <p>{{firstname}}</p>
 ```
 
-#### In-line ```or``` operator
+### In-line "or" operator
 
 ```html
 <p>{{firstname || "No first name found"}}</p>
 ```
 
-#### Multiple In-line ```or``` operators
+### Multiple In-line "or" operators
 
 ```html
 <p>{{firstname || fname || "No first name found"}}</p>
 ```
 
-### Iterators
+## Iterators
 
 ```php
 <?php
@@ -202,7 +239,7 @@ brace is a simple template language written in PHP. Brace uses a handlebar style
 {{end}}
 ```
 
-#### In-line Iterators
+### In-line Iterators
 
 ```php
 <?php
@@ -233,7 +270,7 @@ brace is a simple template language written in PHP. Brace uses a handlebar style
 </ul>
 ```
 
-### Nth children
+## Nth children
 
 ```php
 <?php
@@ -267,7 +304,34 @@ brace is a simple template language written in PHP. Brace uses a handlebar style
 {{end}}
 ```
 
-### Iteration data variables
+## Row keys
+
+```php
+<?php
+    /** Include brace */
+    include __DIR__.'/src/brace.php';
+
+    /** New brace instance */
+    $brace = new brace\parser;
+
+    /** Process template and echo out */
+    $brace->parse('example',[
+        'names' => [
+            'name_1' => 'Dave',
+            'name_2' => 'John',
+            'name_3' => 'Barry'
+        ]
+    ]);
+?>
+```
+
+```html
+{{each names as name}}
+    <span data-key="{{_KEY}}">{{name}}</span>
+{{end}}
+```
+
+## Iteration data variables
 
 Additional data variables that are added to each data row.
 
@@ -275,12 +339,13 @@ Additional data variables that are added to each data row.
 |-------------|---------------------------------------------------------------------|---------|
 | \_ITERATION | Iteration value (is\_first\_item, is\_last\_item, 2, 3 etc)         | String  |
 | \_ROW_ID    | Record/Row ID (1,2,3, etc)                                          | Integer |
+| \_KEY       | Record/Row key                                                      | Mixed   |
 | GLOBAL      | An array of external record data that is accessible to all rows     | Array   |
 
 
-### Conditional Statements
+## Conditional Statements
 
-#### Condition Blocks
+### Condition Blocks
 
 ```php
 <?php
@@ -312,7 +377,7 @@ Additional data variables that are added to each data row.
 {{end}}
 ```
 
-### Else If Statements
+## Else If Statements
 
 ```php
 <?php
@@ -344,8 +409,7 @@ Additional data variables that are added to each data row.
 
 ```
 
-#### In-line conditions
-
+### In-line conditions
 
 ```html
 <p>{{first_name !== "test" ? "__first_name__" : "is test"}}</p>
@@ -369,7 +433,7 @@ Ability to add double quotes.
 Name is "John"
 ```
 
-#### Conditions
+### Conditions
 
 | Condition  | Description                                                        |
 |------------|--------------------------------------------------------------------|
@@ -386,7 +450,7 @@ Name is "John"
 | !EXISTS    | Does not exist                                                     |
 
 
-### Including Templates
+## Including Templates
 
 ```html
 [@include sections/footer]
@@ -400,10 +464,10 @@ Name is "John"
 [@include {{section}}]
 ```
 
-### Shortcodes
+## Shortcodes
 
 
-#### PHP Implementation Example
+### PHP Implementation Example
 
 ```php
 <?php
@@ -427,22 +491,22 @@ Name is "John"
 ```
 
 
-#### Content Template
+### Content Template
 
 ```html
 <!-- Button shortcode -->
 [button title="Hello world" url="https://hello.world" alt="Hello world button" target="_blank"]
 ```
 
-### Comment Blocks
+## Comment Blocks
 
-#### In-line Comment Block
+### In-line Comment Block
 
 ```html
 <!-- Inline comment block -->
 ```
 
-#### Multiple Line Comment Block
+### Multiple Line Comment Block
 
 ```html
 <!--
@@ -450,9 +514,9 @@ Name is "John"
 -->
 ```
 
-### Clearing cached process string
+## Clearing cached process string
 
-The ```clear``` method is useful when needing to processes multiple templates with differing data using the same brace instance.
+The --clear-- method is useful when needing to processes multiple templates with differing data using the same brace instance.
 
 By default brace does not clear a processed string at the end of executing a template/string parse.
 

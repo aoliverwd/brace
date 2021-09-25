@@ -141,5 +141,23 @@
                 ], false)->return()
             );
         }
+
+        public function testIteratorKeyValue(): void{
+            $brace = new brace\parser;
+            $brace->template_path = __DIR__.'/';
+
+            $this->assertEquals(
+                "<span data-key=\"name_1\">Dave</span>\n".
+                "<span data-key=\"name_2\">John</span>\n".
+                "<span data-key=\"name_3\">Barry</span>\n",
+                $brace->parse_input_string('[@include iteration-key-value]', [
+                    'names' => [
+                        'name_1' => 'Dave',
+                        'name_2' => 'John',
+                        'name_3' => 'Barry'
+                    ]
+                ], false)->return()
+            );
+        }
     }
 ?>
