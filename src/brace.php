@@ -668,10 +668,15 @@
              */
             private function process_inline_iterator(string $iterator_string, array $dataset)
             {
-                if (count($iterator_fragments = explode(' ', $iterator_string)) === 4) {
-                    $process_string = preg_replace('/^"|"$/', '', array_pop($iterator_fragments));
+                if (count($process_string = array_values(array_filter(preg_split('/^(.*?)"/', $iterator_string)))) === 1) {
+                    $process_string = '"'.$process_string[0];
+                    $iterator_fragments = array_values(array_filter(explode($process_string, $iterator_string)));
+                    $iterator_fragments = (isset($iterator_fragments[0]) ? trim($iterator_fragments[0]) : '');
+
                     $process_string = preg_replace('/__(.*?)__/', '{{${1}}}', $process_string);
-                    return trim($this->process_each_statement(implode(' ', $iterator_fragments), $process_string, $dataset));
+                    $process_string = preg_replace('/^"|"$/', '', $process_string);
+
+                    return trim($this->process_each_statement($iterator_fragments, $process_string, $dataset));
                 }
 
                 return '';

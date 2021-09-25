@@ -262,6 +262,14 @@ composer require alexoliverwd/brace
 </ul>
 ```
 
+Or
+
+```html
+<ul>
+    {{names as key value "<li data-key="__key__">__value__</li>"}}
+</ul>
+```
+
 ```html
 <ul>
     <li>John</li>

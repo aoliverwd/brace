@@ -1,0 +1,1 @@
+{{names as key value "<span data-key="__key__">__value__</span>"}}

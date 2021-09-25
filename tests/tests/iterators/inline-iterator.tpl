@@ -1,1 +1,1 @@
-{{names as name "__name__"}}
+{{names as name "<span> __name__ </span>"}}

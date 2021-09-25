@@ -49,6 +49,7 @@ Iterators
  [x] Iterator is nth item
  [x] Iterator key value
  [x] Iterator key value type two
+ [x] Inline iterator key value
 
 Shortcode
  [x] Shortcode
