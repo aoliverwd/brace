@@ -2,6 +2,7 @@ Include
  [x] Include template
  [x] Include multiple templates
  [x] Include multiple includes
+ [x] Include from parent path
 
 Variables
  [x] Variables
