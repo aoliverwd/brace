@@ -4,7 +4,7 @@
     *   Brace
     *   Copyright (C) 2021 Alex Oliver
     *
-    *   @version: 1.0.7
+    *   @version: 1.0.9
     *   @author: Alex Oliver
     *   @Repo: https://github.com/aoliverwd/brace
     */
@@ -415,11 +415,12 @@
 
                     switch (count($each_set)) {
                     case 1:
-                        foreach ($use_data as $this_row) {
+                        foreach ($use_data as $key => $this_row) {
                             if (is_array($this_row)) {
                                 $this_row['GLOBAL'] = $global_data;
                                 $this_row['_ITERATION'] = ($iterator_count > 1 ? ($iterator_count === $row_count ? 'is_last_item' : $iterator_count) : 'is_first_item');
                                 $this_row['_ROW_ID'] = $iterator_count;
+                                $this_row['_KEY'] = $key;
 
                                 $process_each_block->parse_input_string($block_content, $this_row, false);
                                 $return_string .= $process_each_block->return();
@@ -430,14 +431,21 @@
                         }
                         break;
                     case 3:
+                    case 4:
                         if ($each_set[1] === 'as') {
-                            foreach ($use_data as $this_row) {
+                            foreach ($use_data as $key => $this_row) {
                                 $row_data = [
-                                    $each_set[2] => $this_row,
+                                    (isset($each_set[3]) ? $each_set[3] : $each_set[2]) => $this_row,
                                     'GLOBAL' => $global_data,
                                     '_ITERATION' => ($iterator_count > 1 ? ($iterator_count === $row_count ? 'is_last_item' : $iterator_count) : 'is_first_item'),
-                                    '_ROW_ID' => $iterator_count
+                                    '_ROW_ID' => $iterator_count,
+                                    '_KEY' => $key
                                 ];
+
+                                if (isset($each_set[3])) {
+                                    $row_data[$each_set[2]] = $key;
+                                }
+
                                 $process_each_block->parse_input_string($block_content, $row_data, false);
                                 $return_string .= $process_each_block->return();
                                 $process_each_block->export_string = '';
@@ -660,10 +668,15 @@
              */
             private function process_inline_iterator(string $iterator_string, array $dataset)
             {
-                if (count($iterator_fragments = explode(' ', $iterator_string)) === 4) {
-                    $process_string = preg_replace('/^"|"$/', '', array_pop($iterator_fragments));
+                if (count($process_string = array_values(array_filter(preg_split('/^(.*?)"/', $iterator_string)))) === 1) {
+                    $process_string = '"'.$process_string[0];
+                    $iterator_fragments = array_values(array_filter(explode($process_string, $iterator_string)));
+                    $iterator_fragments = (isset($iterator_fragments[0]) ? trim($iterator_fragments[0]) : '');
+
                     $process_string = preg_replace('/__(.*?)__/', '{{${1}}}', $process_string);
-                    return trim($this->process_each_statement(implode(' ', $iterator_fragments), $process_string, $dataset));
+                    $process_string = preg_replace('/^"|"$/', '', $process_string);
+
+                    return trim($this->process_each_statement($iterator_fragments, $process_string, $dataset));
                 }
 
                 return '';

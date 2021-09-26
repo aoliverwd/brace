@@ -2,6 +2,7 @@ Include
  [x] Include template
  [x] Include multiple templates
  [x] Include multiple includes
+ [x] Include from parent path
 
 Variables
  [x] Variables
@@ -47,6 +48,9 @@ Iterators
  [x] Iterator is first item
  [x] Iterator is last item
  [x] Iterator is nth item
+ [x] Iterator key value
+ [x] Iterator key value type two
+ [x] Inline iterator key value
 
 Shortcode
  [x] Shortcode
