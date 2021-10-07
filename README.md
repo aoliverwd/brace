@@ -59,7 +59,7 @@ composer require alexoliverwd/brace
 ```php
 <?php
     /** New brace instance */
-    $brace = new brace\parser;
+    $brace = new Brace\Parser;
 
     /** Set instance variables (Optional) */
     $brace->remove_comment_blocks = false;
@@ -67,7 +67,7 @@ composer require alexoliverwd/brace
     $brace->template_ext = 'tpl';
 
     /** Process template and echo out */
-    $brace->parse('example',[
+    $brace->Parse('example',[
         'name' => [
             'first' => 'John',
             'last' => 'Doe'
@@ -84,10 +84,10 @@ composer require alexoliverwd/brace
     include __DIR__.'/src/brace.php';
 
     /** New brace instance */
-    $brace = new brace\parser;
+    $brace = new Brace\Parser;
 
     /** Process template and return string */
-    $template_string = $brace->parse('example',[
+    $template_string = $brace->Parse('example',[
         'name' => [
             'first' => 'John',
             'last' => 'Doe'
@@ -104,7 +104,7 @@ composer require alexoliverwd/brace
     include __DIR__.'/src/brace.php';
 
     /** New brace instance */
-    $brace = new brace\parser;
+    $brace = new Brace\Parser;
 
     /** Process template and compile to external file */
     $brace->compile('example', 'example.html', [
@@ -134,10 +134,10 @@ composer require alexoliverwd/brace
     include __DIR__.'/src/brace.php';
 
     /** New brace instance */
-    $brace = new brace\parser;
+    $brace = new Brace\Parser;
 
     /** Process template and echo out */
-    $brace->parse('example',[
+    $brace->Parse('example',[
         'firstname' => 'John Doe'
     ]);
 ?>
@@ -167,10 +167,10 @@ composer require alexoliverwd/brace
     include __DIR__.'/src/brace.php';
 
     /** New brace instance */
-    $brace = new brace\parser;
+    $brace = new Brace\Parser;
 
     /** Process template and echo out */
-    $brace->parse('example',[
+    $brace->Parse('example',[
         'products' => [
             0 => [
                 'title' => 'Product 1',
@@ -224,10 +224,10 @@ composer require alexoliverwd/brace
     include __DIR__.'/src/brace.php';
 
     /** New brace instance */
-    $brace = new brace\parser;
+    $brace = new Brace\Parser;
 
     /** Process template and echo out */
-    $brace->parse('example',[
+    $brace->Parse('example',[
         'names' => ['John','Steve','Bert']
     ]);
 ?>
@@ -247,10 +247,10 @@ composer require alexoliverwd/brace
     include __DIR__.'/src/brace.php';
 
     /** New brace instance */
-    $brace = new brace\parser;
+    $brace = new Brace\Parser;
 
     /** Process template and echo out */
-    $brace->parse('example',[
+    $brace->Parse('example',[
         'names' => ['John','Steve','Bert']
     ]);
 ?>
@@ -286,10 +286,10 @@ Or
     include __DIR__.'/src/brace.php';
 
     /** New brace instance */
-    $brace = new brace\parser;
+    $brace = new Brace\Parser;
 
     /** Process template and echo out */
-    $brace->parse('example',[
+    $brace->Parse('example',[
         'names' => ['John','Steve','Bert','Fred','Cindy']
     ]);
 ?>
@@ -320,10 +320,10 @@ Or
     include __DIR__.'/src/brace.php';
 
     /** New brace instance */
-    $brace = new brace\parser;
+    $brace = new Brace\Parser;
 
     /** Process template and echo out */
-    $brace->parse('example',[
+    $brace->Parse('example',[
         'names' => [
             'name_1' => 'Dave',
             'name_2' => 'John',
@@ -369,10 +369,10 @@ Additional data variables that are added to each data row.
     include __DIR__.'/src/brace.php';
 
     /** New brace instance */
-    $brace = new brace\parser;
+    $brace = new Brace\Parser;
 
     /** Process template and echo out */
-    $brace->parse('example',[
+    $brace->Parse('example',[
         'first_name' => 'John',
         'last_name' => 'Doe'
     ]);
@@ -401,10 +401,10 @@ Additional data variables that are added to each data row.
     include __DIR__.'/src/brace.php';
 
     /** New brace instance */
-    $brace = new brace\parser;
+    $brace = new Brace\Parser;
 
     /** Process template and echo out */
-    $brace->parse('example',[
+    $brace->Parse('example',[
         'names' => ['John','Steve','Bert','Fred','Cindy']
     ]);
 ?>
@@ -491,7 +491,7 @@ Name is "John"
     include __DIR__.'/src/brace.php';
 
     /** New brace parser */
-    $brace = new brace\parser;
+    $brace = new Brace\Parser;
 
     /** Return HTML link */
     $button_function = function ($attributes){
@@ -499,10 +499,10 @@ Name is "John"
     };
 
     /** Register shortcode */
-    $brace->reg_shortcode('button', 'button_function');
+    $brace->regShortcode('button', 'button_function');
 
     /** Process content template */
-    $brace->parse('content', []);
+    $brace->Parse('content', []);
 ?>
 ```
 
@@ -539,11 +539,11 @@ By default brace does not clear a processed string at the end of executing a tem
 ```php
 
   // Init brace
-  $brace = new brace\parser;
+  $brace = new Brace\Parser;
   $brace->template_path = __DIR__.'/';
 
   // Process first template
-  $brace->parse('example',[
+  $brace->Parse('example',[
       'name' => [
           'first' => 'John',
           'last' => 'Doe'
