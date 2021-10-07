@@ -3,6 +3,7 @@
 <!-- MarkdownTOC -->
 
 - Introduction
+- Requirements
 - Installation
     - Via composer
     - Or Including the brace class
@@ -32,12 +33,17 @@
         - In-line Comment Block
         - Multiple Line Comment Block
     - Clearing cached process string
+    - Running Tests
 
 <!-- /MarkdownTOC -->
 
 # Introduction
 
 brace is a simple template language written in PHP. Brace uses a handlebar style syntax.
+
+# Requirements
+
+Brace requires PHP version 7.4 or later.
 
 # Installation
 
@@ -557,4 +563,13 @@ By default brace does not clear a processed string at the end of executing a tem
           'last' => 'Smith'
       ]
   ]);
+```
+
+## Running Tests
+
+Running PHPStan and PHPUnit tests can be achieved with the following commands
+
+```bash
+./vendor/bin/phpstan analyse -c phpstan.neon
+./vendor/bin/phpunit -c ./tests/phpunit.xml
 ```
