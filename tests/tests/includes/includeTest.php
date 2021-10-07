@@ -1,50 +1,60 @@
 <?php
-    //https://phpunit.readthedocs.io/en/9.2/writing-tests-for-phpunit.html
-    //Execute - php phpunit ./tests/braceTest.php 
 
-    /** Declare strict types */
-    declare(strict_types=1);
+//https://phpunit.readthedocs.io/en/9.2/writing-tests-for-phpunit.html
+//Execute - php phpunit ./tests/braceTest.php
 
-    /** PHPUnit namespace */
-    use PHPUnit\Framework\TestCase;
+/** Declare strict types */
 
-    final class IncludeTest extends TestCase{
+declare(strict_types=1);
 
-        public function testIncludeTemplate(): void{
-            $brace = new brace\parser;
-            $brace->template_path = __DIR__.'/';
-            $this->assertEquals(
-                "Hello",
-                $brace->parse_input_string('[@include include-file]', [], false)->return()
-            );
-        }
+namespace ConditionTests;
 
-        public function testIncludeMultipleTemplates(): void{
-            $brace = new brace\parser;
-            $brace->template_path = __DIR__.'/';
-            $this->assertEquals(
-                "Hello ,Welcome",
-                $brace->parse_input_string('[@include include-file include-file-two]', [], false)->return()
-            );
-        }
+use Brace;
 
-        public function testIncludeMultipleIncludes(): void{
-            $brace = new brace\parser;
-            $brace->template_path = __DIR__.'/';
-            $this->assertEquals(
-                "Hello ,Welcome",
-                $brace->parse_input_string('[@include include-file] [@include include-file-two]', [], false)->return()
-            );
-        }
+/** PHPUnit namespace */
+use PHPUnit\Framework\TestCase;
 
-        public function testIncludeFromParentPath(): void{
-            $brace = new brace\parser;
-            $brace->template_path = __DIR__.'/';
+final class IncludeTest extends TestCase
+{
 
-            $this->assertEquals(
-                "Foo bar",
-                $brace->parse_input_string('[@include ../include-from-parent/include]', [], false)->return()
-            );
-        }
+    public function testIncludeTemplate(): void
+    {
+        $brace = new Brace\Parser();
+        $brace->template_path = __DIR__ . '/';
+        $this->assertEquals(
+            "Hello",
+            $brace->parseInputString('[@include include-file]', [], false)->return()
+        );
     }
-?>
+
+    public function testIncludeMultipleTemplates(): void
+    {
+        $brace = new Brace\Parser();
+        $brace->template_path = __DIR__ . '/';
+        $this->assertEquals(
+            "Hello ,Welcome",
+            $brace->parseInputString('[@include include-file include-file-two]', [], false)->return()
+        );
+    }
+
+    public function testIncludeMultipleIncludes(): void
+    {
+        $brace = new Brace\Parser();
+        $brace->template_path = __DIR__ . '/';
+        $this->assertEquals(
+            "Hello ,Welcome",
+            $brace->parseInputString('[@include include-file] [@include include-file-two]', [], false)->return()
+        );
+    }
+
+    public function testIncludeFromParentPath(): void
+    {
+        $brace = new Brace\Parser();
+        $brace->template_path = __DIR__ . '/';
+
+        $this->assertEquals(
+            "Foo bar",
+            $brace->parseInputString('[@include ../include-from-parent/include]', [], false)->return()
+        );
+    }
+}

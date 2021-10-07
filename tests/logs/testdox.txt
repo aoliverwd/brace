@@ -1,10 +1,10 @@
-Include
+Include (ConditionTests\Include)
  [x] Include template
  [x] Include multiple templates
  [x] Include multiple includes
  [x] Include from parent path
 
-Variables
+Variables (ConditionTests\Variables)
  [x] Variables
  [x] Or variables
  [x] Multiple or variable
@@ -12,7 +12,7 @@ Variables
  [x] Alternate variable
  [x] Nested variables
 
-Inline Conditions
+Inline Conditions (ConditionTests\InlineConditions)
  [x] Inline condition
  [x] Inline condition with doulbe quotes
  [x] Inline else condition
@@ -20,7 +20,7 @@ Inline Conditions
  [x] Inline and condition
  [x] Inline and or condition
 
-Block Conditions
+Block Conditions (ConditionTests\BlockConditions)
  [x] If block condition
  [x] If else block condition
  [x] If and block condition
@@ -28,7 +28,7 @@ Block Conditions
  [x] If else condition
  [x] Multiple if else condition
 
-Conditions
+Conditions (ConditionTests\Conditions)
  [x] Equals
  [x] More than or equal to
  [x] Less than or equal to
@@ -39,7 +39,7 @@ Conditions
  [x] Exists
  [x] Not exists
 
-Iterators
+Iterators (ConditionTests\Iterators)
  [x] Nested iteration
  [x] As nested iteration
  [x] As iteration
@@ -52,7 +52,7 @@ Iterators
  [x] Iterator key value type two
  [x] Inline iterator key value
 
-Shortcode
+Shortcode (ConditionTests\Shortcode)
  [x] Shortcode
  [x] Shortcode include template
  [x] Shortcode include template via variable

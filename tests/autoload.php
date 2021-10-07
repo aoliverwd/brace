@@ -1,4 +1,5 @@
 <?php
-    /** Include brace class */
-    include '../src/brace.php';
-?>
+
+/** Include brace class */
+
+include '../src/brace.php';
