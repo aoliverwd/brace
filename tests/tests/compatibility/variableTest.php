@@ -108,7 +108,7 @@ final class CompatibilityVariablesTest extends TestCase
      */
     public function testShortcode(): void
     {
-        $brace = new Brace\Parser();
+        $brace = new brace\parser();
 
         $brace->regShortcode('foo', 'bar');
 
@@ -125,7 +125,7 @@ final class CompatibilityVariablesTest extends TestCase
      */
     public function testShortcodeIncludeTemplate(): void
     {
-        $brace = new Brace\Parser();
+        $brace = new brace\parser();
         $brace->template_path = __DIR__ . '/';
 
         $brace->regShortcode('foo', 'bar');
@@ -142,7 +142,7 @@ final class CompatibilityVariablesTest extends TestCase
      */
     public function testShortcodeIncludeTemplateViaVariable(): void
     {
-        $brace = new Brace\Parser();
+        $brace = new brace\parser();
         $brace->template_path = __DIR__ . '/';
 
         $brace->regShortcode('foo', 'bar');
