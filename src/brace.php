@@ -85,6 +85,19 @@ if (!class_exists('Brace\Parser')) {
         }
 
         /**
+         * Parse string - Backward compatibility function
+         *
+         * @param string $input_string
+         * @param array $dataset
+         * @param boolean $render
+         * @return object
+         */
+        public function parse_input_string(string $input_string, array $dataset, bool $render): object
+        {
+            return $this->parseInputString($input_string, $dataset, $render);
+        }
+
+        /**
          * Compile to file
          *
          * @param string $templates
@@ -119,7 +132,7 @@ if (!class_exists('Brace\Parser')) {
         }
 
         /**
-         * [regShortcode description]
+         * Register shortcode
          * @param  string $name      [description]
          * @param  string $theMethod [description]
          * @return object            [description]
@@ -135,6 +148,16 @@ if (!class_exists('Brace\Parser')) {
             return $this;
         }
 
+        /**
+         * Register shortcode - Backward compatibility function
+         * @param  string $name      [description]
+         * @param  string $theMethod [description]
+         * @return object            [description]
+         */
+        public function reg_shortcode(string $name, string $theMethod): object
+        {
+            return $this->regShortcode($name, $theMethod);
+        }
 
         /**
          * Call shortcode

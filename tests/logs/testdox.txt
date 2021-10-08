@@ -57,3 +57,14 @@ Shortcode (ConditionTests\Shortcode)
  [x] Shortcode include template
  [x] Shortcode include template via variable
 
+Compatibility Variables (ConditionTests\CompatibilityVariables)
+ [x] Variables
+ [x] Or variables
+ [x] Multiple or variable
+ [x] Multiple or variable string
+ [x] Alternate variable
+ [x] Nested variables
+ [x] Shortcode
+ [x] Shortcode include template
+ [x] Shortcode include template via variable
+
