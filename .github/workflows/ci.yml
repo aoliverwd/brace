@@ -6,13 +6,12 @@ on:
 
 defaults:
   run:
-    working-directory: .
+    working-directory: ./
 
 jobs:
   build:
 
     runs-on: ubuntu-latest
-    container: php:7.4
 
     steps:
     - uses: "actions/checkout@v2"
