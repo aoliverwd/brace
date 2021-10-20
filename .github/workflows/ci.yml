@@ -17,6 +17,5 @@ jobs:
 
     - run: |
         composer install
-        ls -a
-        # ./vendor/bin/phpstan analyse -c phpstan.neon
-        # ./vendor/bin/phpunit -c ./tests/phpunit.xml
+        ./vendor/bin/phpstan analyse -c phpstan.neon
+        ./vendor/bin/phpunit -c ./tests/phpunit.xml
