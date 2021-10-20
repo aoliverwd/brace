@@ -14,9 +14,9 @@ jobs:
     - uses: "shivammathur/setup-php@v2"
       with:
         php-version: 7.4
-    - uses: "ramsey/composer-install@v1"
 
     - run: |
-        composer -V
+        composer install
+        ls -a
         # ./vendor/bin/phpstan analyse -c phpstan.neon
-        vendor/bin/phpunit -c tests/phpunit.xml
+        # ./vendor/bin/phpunit -c ./tests/phpunit.xml
