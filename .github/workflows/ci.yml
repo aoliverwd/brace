@@ -4,10 +4,6 @@ on:
   push:
     branches: [ develop ]
 
-defaults:
-  run:
-    working-directory: ./
-
 jobs:
   build:
 
@@ -21,5 +17,7 @@ jobs:
     - uses: "ramsey/composer-install@v1"
 
     - run: |
-        ./vendor/bin/phpstan analyse -c phpstan.neon
-        ./vendor/bin/phpunit -c ./tests/phpunit.xml
+        ls
+        composer -V
+        # ./vendor/bin/phpstan analyse -c phpstan.neon
+        # ./vendor/bin/phpunit -c ./tests/phpunit.xml
