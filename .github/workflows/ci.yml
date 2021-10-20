@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches: [ develop ]
+
+# defaults:
+#   run:
+#     working-directory: .
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    container: php:7.4
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: php-actions/composer@v6
+
+    - run: |
+        apt update
+        apt install -y wget
+        ./vendor/bin/phpstan analyse -c phpstan.neon
+        ./vendor/bin/phpunit -c ./tests/phpunit.xml
