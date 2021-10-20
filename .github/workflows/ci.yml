@@ -17,7 +17,6 @@ jobs:
     - uses: "ramsey/composer-install@v1"
 
     - run: |
-        ls
         composer -V
         # ./vendor/bin/phpstan analyse -c phpstan.neon
-        # ./vendor/bin/phpunit -c ./tests/phpunit.xml
+        vendor/bin/phpunit -c tests/phpunit.xml
