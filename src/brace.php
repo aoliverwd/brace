@@ -754,8 +754,12 @@ if (!class_exists('Brace\Parser')) {
         {
             if (count($condition) > 0 && $data = $this->returnChainedVariables(trim($condition[0]), $dataset)) {
                 $challenge = (isset($condition[1]) ? $condition[1] : 'EXISTS');
-                $expected = (isset($condition[2]) ? trim($condition[2]) : true);
-                $expected = str_replace(['"','+'], ['',' '], $this->strArray($expected));
+                $expected = (isset($condition[2]) ? $this->returnChainedVariables(trim($condition[2]), $dataset) : false);
+
+                if(!$expected){
+                    $expected = (isset($condition[2]) ? trim($condition[2]) : true);
+                    $expected = str_replace(['"','+'], ['',' '], $this->strArray($expected));
+                }
 
                 switch ($challenge) {
                     case 'EXISTS':
