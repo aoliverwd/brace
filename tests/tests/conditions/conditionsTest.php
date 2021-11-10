@@ -47,6 +47,19 @@ final class ConditionsTest extends TestCase
     }
 
     /**
+     * [testMoreThanOrEqualToIncludeVariable description]
+     * @return [type] [description]
+     */
+    public function testMoreThanOrEqualToIncludeVariable(): void
+    {
+        $brace = new Brace\Parser();
+        $this->assertEquals(
+            "25\n",
+            $brace->parseInputString('{{age_1 >= age_2 ? "__age_1__"}}', ['age_1' => 25, 'age_2' => 21], false)->return()
+        );
+    }
+
+    /**
      * [testLessThanOrEqualTo description]
      * @return [type] [description]
      */
