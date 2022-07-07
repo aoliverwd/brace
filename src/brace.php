@@ -77,8 +77,8 @@ if (!class_exists('Brace\Parser')) {
          */
         public function parseInputString(string $input_string, array $dataset, bool $render): object
         {
-            foreach (explode("\r\n", $input_string) as $this_line) {
-                $this->processLine($this_line . "\r\n", $dataset, $render);
+            foreach (explode("\n", $input_string) as $this_line) {
+                $this->processLine($this_line . "\n", $dataset, $render);
             }
 
             return $this;
@@ -343,12 +343,12 @@ if (!class_exists('Brace\Parser')) {
         {
 
             /** Remove phantom line break */
-            $block_string = explode("\r\n", $block_string);
+            $block_string = explode("\n", $block_string);
             if (strlen($block_string[count($block_string) - 1]) === 0) {
                 array_pop($block_string);
             }
 
-            $block_string = implode("\r\n", $block_string);
+            $block_string = implode("\n", $block_string);
 
             $process_content = '';
 
@@ -550,7 +550,7 @@ if (!class_exists('Brace\Parser')) {
         {
             $else_condition = str_pad('{{else}}', (strlen('{{else}}') + $this->block_spaces), ' ', STR_PAD_LEFT);
             if (preg_match('/' . $else_condition . '/', $content)) {
-                return explode("\r\n" . $else_condition . "\r\n", $content);
+                return explode("\n" . $else_condition . "\n", $content);
             }
             return [0 => $content];
         }
