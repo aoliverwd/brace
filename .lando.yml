@@ -1,0 +1,11 @@
+name: brace
+
+services:
+  myservice:
+    type: php:7.4
+    via: apache:2.4
+    ssl: false
+    webroot: .
+    xdebug: false
+    composer: []
+    composer_version: '2.2.12'
