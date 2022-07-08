@@ -550,6 +550,7 @@ if (!class_exists('Brace\Parser')) {
         {
             $else_condition = str_pad('{{else}}', (strlen('{{else}}') + $this->block_spaces), ' ', STR_PAD_LEFT);
             if (preg_match('/' . $else_condition . '/', $content)) {
+                $content = str_replace("\r\n", "\n", $content);
                 return explode("\n" . $else_condition . "\n", $content);
             }
             return [0 => $content];

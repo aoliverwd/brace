@@ -32,5 +32,11 @@
     "require-dev": {
         "phpstan/phpstan": "^0.12.82",
         "phpunit/phpunit": "^9.5"
+    },
+    "scripts": {
+        "test" : [
+            "./vendor/bin/phpstan analyse -c phpstan.neon",
+            "./vendor/bin/phpunit -c ./tests/phpunit.xml"
+        ]
     }
 }
