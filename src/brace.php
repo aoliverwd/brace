@@ -2,9 +2,9 @@
 
 /**
 *   Brace
-*   Copyright (C) 2021 Alex Oliver
+*   Copyright (C) 2022 Alex Oliver
 *
-*   @version: 1.0.10
+*   @version: 1.0.13
 *   @author: Alex Oliver
 *   @Repo: https://github.com/aoliverwd/brace
 */
@@ -646,11 +646,18 @@ if (!class_exists('Brace\Parser')) {
         private function returnChainedVariables(string $string, array $dataset)
         {
             $return = [];
+            $is_count = false;
+
+            // Check for count
+            if (preg_match('/^COUNT\((.*?)\)/', $string, $match)) {
+                $string = isset($match[1]) ? $match[1] : $string;
+                $is_count = true;
+            }
 
             foreach (explode('->', $string) as $thisVar) {
                 if (is_array($dataset) && isset($dataset[$thisVar])) {
                     $dataset = $dataset[$thisVar];
-                    $return = $dataset;
+                    $return = $is_count ? count($dataset) : $dataset;
                 } else {
                     return;
                 }

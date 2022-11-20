@@ -164,4 +164,15 @@ final class ConditionsTest extends TestCase
             $brace->parseInputString('{{age !EXISTS ? "No age"}}', [], false)->return()
         );
     }
+
+    public function testCount(): void
+    {
+        $brace = new Brace\Parser();
+        $this->assertEquals(
+            "3\n",
+            $brace->parseInputString('{{COUNT(items) == 3 ? "__COUNT(items)__"}}', [
+                'items' => [1,2,3]
+            ], false)->return()
+        );
+    }
 }

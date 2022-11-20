@@ -29,6 +29,9 @@
     - Shortcodes
         - PHP Implementation Example
         - Content Template
+    - Array Counting
+        - Display Count:
+        - Check Count
     - Comment Blocks
         - In-line Comment Block
         - Multiple Line Comment Block
@@ -518,6 +521,32 @@ Name is "John"
 ```html
 <!-- Button shortcode -->
 [button title="Hello world" url="https://hello.world" alt="Hello world button" target="_blank"]
+```
+
+## Array Counting
+
+Ability to check and display array item counts
+
+### Display Count:
+
+```html
+<p>Total items is: {{COUNT(items)}}</p>
+```
+
+```txt
+Total items is: 3
+```
+
+### Check Count
+
+```html
+{{if COUNT(items) == 3}}
+<p>There are three items</p>
+{{end}}
+```
+
+```txt
+There are three items
 ```
 
 ## Comment Blocks

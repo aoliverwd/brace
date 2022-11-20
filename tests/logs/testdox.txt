@@ -34,11 +34,13 @@ Conditions (ConditionTests\Conditions)
  [x] More than or equal to include variable
  [x] Less than or equal to
  [x] More than
+ [x] More than nested data attribute
  [x] Less than
  [x] Is not
  [x] Is not equal to
  [x] Exists
  [x] Not exists
+ [x] Count
 
 Iterators (ConditionTests\Iterators)
  [x] Nested iteration
