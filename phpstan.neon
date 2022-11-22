@@ -6,5 +6,5 @@ parameters:
         - src
     ignoreErrors:
         # The below constants are defined when running the application from a web server
-        - '#Function do_shortcode not found#' # WordPress shortcode
+        # - '#Function do_shortcode not found#' # WordPress shortcode
         # - '#return_chained_variables#' # Return mixed

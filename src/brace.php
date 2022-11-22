@@ -2,9 +2,9 @@
 
 /**
 *   Brace
-*   Copyright (C) 2021 Alex Oliver
+*   Copyright (C) 2022 Alex Oliver
 *
-*   @version: 1.0.10
+*   @version: 1.0.13
 *   @author: Alex Oliver
 *   @Repo: https://github.com/aoliverwd/brace
 */
@@ -264,16 +264,29 @@ if (!class_exists('Brace\Parser')) {
             }
 
             /** Process if condition or each block */
-            if (!$this->is_block && preg_match_all('/{{if (.*?)}}|{{each (.*?)}}/i', $this_line, $matches, PREG_SET_ORDER)) {
+            if (!$this->is_block && preg_match_all('/{{if (.*?)}}|{{each (.*?)}}|{{loop (.*?)}}/i', $this_line, $matches, PREG_SET_ORDER)) {
 
                 /** Set block variables */
                 $this->block_condition = $matches[0];
 
                 /** Set condition type */
                 $condition_type = $this->block_condition[0];
-                $this->block_condition[] = (preg_match('/{{if/', $condition_type) ? 'if' : (preg_match('/{{each/', $condition_type) ? 'each' : ''));
 
-                $this->block_spaces = strpos($this_line, '{{' . (isset($this->block_condition[3]) ? $this->block_condition[3] : $this->block_condition[2]));
+                preg_match('/{{(.*?) /', $condition_type, $match_types);
+                $block_type = '';
+
+                if (isset($match_types[1])) {
+                    switch ($match_types[1]) {
+                        case 'if':
+                        case 'each':
+                        case 'loop':
+                            $block_type = $match_types[1];
+                            break;
+                    }
+                }
+
+                $this->block_condition[] = $block_type;
+                $this->block_spaces = strpos($this_line, '{{' . $block_type);
                 $this->is_block = true;
 
                 /** Blank line */
@@ -353,10 +366,11 @@ if (!class_exists('Brace\Parser')) {
             $process_content = '';
 
             /** Set is If or Each statement */
-            $if_or_each = (isset($conditions[3]) ? $conditions[3] : (isset($conditions[2]) ? $conditions[2] : false));
+            $block_type = end($conditions);
+            // $if_or_each = (isset($conditions[3]) ? $conditions[3] : (isset($conditions[2]) ? $conditions[2] : false));
 
-            if ($if_or_each) {
-                switch ($if_or_each) {
+            if ($block_type) {
+                switch ($block_type) {
                     case 'if':
                         /** new core parser class instance */
                         $processBlock = new Parser();
@@ -396,12 +410,55 @@ if (!class_exists('Brace\Parser')) {
                     case 'each':
                         $process_content = $this->processEachStatement($conditions[2], $block_string, $dataset);
                         break;
+                    case 'loop':
+                        $process_content = $this->processLoop($conditions[3], $block_string);
+                        break;
                 }
             }
 
             return $process_content;
         }
 
+        /**
+         * Process loop
+         * @param  string $loop_statement
+         * @param  string $block_content
+         * @return string
+         */
+        private function processLoop(string $loop_statement, string $block_content): string
+        {
+            $loop_components = explode(' ', trim($loop_statement));
+            $return_string = '';
+
+            if (count($loop_components) === 3 && $loop_components[1] === 'to') {
+                $from = intval($loop_components[0]);
+                $to = intval($loop_components[2]);
+
+                /** new core parser class instance */
+                $process_each_block = new Parser();
+                $process_each_block->template_path = $this->template_path;
+
+                if ($from < $to) {
+                    for ($i = $from; $i <= $to; $i += 1) {
+                        $process_each_block->parseInputString($block_content, [
+                            '_KEY' => $i
+                        ], false);
+                        $return_string .= $process_each_block->return();
+                        $process_each_block->export_string = '';
+                    }
+                } else {
+                    for ($i = $from; $i >= $to; $i -= 1) {
+                        $process_each_block->parseInputString($block_content, [
+                            '_KEY' => $i
+                        ], false);
+                        $return_string .= $process_each_block->return();
+                        $process_each_block->export_string = '';
+                    }
+                }
+            }
+
+            return $return_string;
+        }
 
         /**
          * Process each statement
@@ -646,11 +703,18 @@ if (!class_exists('Brace\Parser')) {
         private function returnChainedVariables(string $string, array $dataset)
         {
             $return = [];
+            $is_count = false;
+
+            // Check for count
+            if (preg_match('/^COUNT\((.*?)\)/', $string, $match)) {
+                $string = isset($match[1]) ? $match[1] : $string;
+                $is_count = true;
+            }
 
             foreach (explode('->', $string) as $thisVar) {
                 if (is_array($dataset) && isset($dataset[$thisVar])) {
                     $dataset = $dataset[$thisVar];
-                    $return = $dataset;
+                    $return = $is_count ? count($dataset) : $dataset;
                 } else {
                     return;
                 }

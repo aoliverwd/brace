@@ -213,4 +213,30 @@ final class IteratorsTest extends TestCase
             ], false)->return()
         );
     }
+
+    public function testLoopIterationAscending(): void
+    {
+        $brace = new Brace\Parser();
+        $brace->template_path = __DIR__ . '/';
+
+        $this->assertEquals(
+            "<li>1</li>\n" .
+            "<li>2</li>\n" .
+            "<li>3</li>\n",
+            $brace->parseInputString('[@include iteration-loop-ascending]', [], false)->return()
+        );
+    }
+
+    public function testLoopIterationDescending(): void
+    {
+        $brace = new Brace\Parser();
+        $brace->template_path = __DIR__ . '/';
+
+        $this->assertEquals(
+            "<li>3</li>\n" .
+            "<li>2</li>\n" .
+            "<li>1</li>\n",
+            $brace->parseInputString('[@include iteration-loop-descending]', [], false)->return()
+        );
+    }
 }

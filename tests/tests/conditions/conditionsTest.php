@@ -22,7 +22,7 @@ final class ConditionsTest extends TestCase
 
     /**
      * [testEquals description]
-     * @return [type] [description]
+     * @return void
      */
     public function testEquals(): void
     {
@@ -35,7 +35,7 @@ final class ConditionsTest extends TestCase
 
     /**
      * [testMoreThanOrEqualTo description]
-     * @return [type] [description]
+     * @return void
      */
     public function testMoreThanOrEqualTo(): void
     {
@@ -48,7 +48,7 @@ final class ConditionsTest extends TestCase
 
     /**
      * [testMoreThanOrEqualToIncludeVariable description]
-     * @return [type] [description]
+     * @return void
      */
     public function testMoreThanOrEqualToIncludeVariable(): void
     {
@@ -61,7 +61,7 @@ final class ConditionsTest extends TestCase
 
     /**
      * [testLessThanOrEqualTo description]
-     * @return [type] [description]
+     * @return void
      */
     public function testLessThanOrEqualTo(): void
     {
@@ -74,7 +74,7 @@ final class ConditionsTest extends TestCase
 
     /**
      * [testMoreThan description]
-     * @return [type] [description]
+     * @return void
      */
     public function testMoreThan(): void
     {
@@ -86,8 +86,26 @@ final class ConditionsTest extends TestCase
     }
 
     /**
+     * [testMoreThanNestedDataAttribute description]
+     * @return void
+     */
+    public function testMoreThanNestedDataAttribute(): void
+    {
+        $brace = new Brace\Parser();
+        $this->assertEquals(
+            "21\n",
+            $brace->parseInputString('{{age->current > age->required ? "__age->current__"}}', [
+                'age' => [
+                    'current' => 21,
+                    'required' => 18
+                ]
+            ], false)->return()
+        );
+    }
+
+    /**
      * [testLessThan description]
-     * @return [type] [description]
+     * @return void
      */
     public function testLessThan(): void
     {
@@ -97,6 +115,7 @@ final class ConditionsTest extends TestCase
             $brace->parseInputString('{{age < 21 ? "__age__"}}', ['age' => 18], false)->return()
         );
     }
+
 
     public function testIsNot(): void
     {
@@ -109,7 +128,7 @@ final class ConditionsTest extends TestCase
 
     /**
      * [testIsNotEqualTo description]
-     * @return [type] [description]
+     * @return void
      */
     public function testIsNotEqualTo(): void
     {
@@ -122,7 +141,7 @@ final class ConditionsTest extends TestCase
 
     /**
      * [testExists description]
-     * @return [type] [description]
+     * @return void
      */
     public function testExists(): void
     {
@@ -135,7 +154,7 @@ final class ConditionsTest extends TestCase
 
     /**
      * [testNotExists description]
-     * @return [type] [description]
+     * @return void
      */
     public function testNotExists(): void
     {
@@ -143,6 +162,17 @@ final class ConditionsTest extends TestCase
         $this->assertEquals(
             "No age\n",
             $brace->parseInputString('{{age !EXISTS ? "No age"}}', [], false)->return()
+        );
+    }
+
+    public function testCount(): void
+    {
+        $brace = new Brace\Parser();
+        $this->assertEquals(
+            "3\n",
+            $brace->parseInputString('{{COUNT(items) == 3 ? "__COUNT(items)__"}}', [
+                'items' => [1,2,3]
+            ], false)->return()
         );
     }
 }
