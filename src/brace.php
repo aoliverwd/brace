@@ -4,7 +4,7 @@
 *   Brace
 *   Copyright (C) 2022 Alex Oliver
 *
-*   @version: 1.0.13
+*   @version: 1.1.0
 *   @author: Alex Oliver
 *   @Repo: https://github.com/aoliverwd/brace
 */
