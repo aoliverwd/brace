@@ -26,18 +26,27 @@ if (!class_exists('Brace\Parser')) {
     class Parser
     {
         /** Public variables */
-        public $remove_comment_blocks = true;
-        public $template_path = __DIR__ . '/';
-        public $template_ext = 'tpl';
+        public bool $remove_comment_blocks = true;
+        public string $template_path = __DIR__ . '/';
+        public string $template_ext = 'tpl';
 
         /** Internal variables */
-        private $export_string = '';
-        private $shortcode_methods;
-        private $is_comment_block;
-        private $block_condition;
-        private $block_content;
-        private $block_spaces;
-        private $is_block;
+        private string $export_string = '';
+        private bool $is_comment_block = false;
+        private string $block_content = '';
+        private int $block_spaces = 0;
+        private bool $is_block = false;
+
+        /**
+         * shortcode_methods
+         * @var array<mixed>
+         */
+        private array $shortcode_methods = [];
+        /**
+         * block_condition
+         * @var array<mixed>
+         */
+        private array $block_condition = [];
 
         /**
          * Class constructor
@@ -52,7 +61,7 @@ if (!class_exists('Brace\Parser')) {
          * Parse templates
          *
          * @param string $templates
-         * @param array $dataset
+         * @param array<mixed> $dataset
          * @param boolean $render
          * @return object
          */
@@ -71,7 +80,7 @@ if (!class_exists('Brace\Parser')) {
          * Parse string
          *
          * @param string $input_string
-         * @param array $dataset
+         * @param array<mixed> $dataset
          * @param boolean $render
          * @return object
          */
@@ -89,7 +98,7 @@ if (!class_exists('Brace\Parser')) {
          *
          * @param string $templates
          * @param string $compile_filename
-         * @param array $dataset
+         * @param array<mixed> $dataset
          * @return void
          */
         public function compile(string $templates, string $compile_filename, array $dataset): void
@@ -139,13 +148,13 @@ if (!class_exists('Brace\Parser')) {
          * Call shortcode
          *
          * @param string $shortcodeSyntax
-         * @param array $dataset
+         * @param array<mixed> $dataset
          * @return string
          */
         private function callShortcode(string $shortcodeSyntax, array $dataset): string
         {
-            $args = explode(' ', str_replace(array('[', ']'), '', str_replace('&quot;', '"', $this->strArray($shortcodeSyntax))));
-            $theArgs = array();
+            $args = explode(' ', str_replace(['[', ']'], '', str_replace('&quot;', '"', $this->strArray($shortcodeSyntax))));
+            $theArgs = [];
 
             /** check for registered functions */
             if ($methodName = (isset($args[0]) && isset($this->shortcode_methods[$args[0]]) ? $this->shortcode_methods[$args[0]] : false)) {
@@ -175,7 +184,7 @@ if (!class_exists('Brace\Parser')) {
          * Process a individual template file
          *
          * @param string $template_name
-         * @param array $dataset
+         * @param array<mixed> $dataset
          * @param boolean $render
          * @return void
          */
@@ -212,7 +221,7 @@ if (!class_exists('Brace\Parser')) {
          * Process single line
          *
          * @param string $this_line
-         * @param array $dataset
+         * @param array<mixed> $dataset
          * @param boolean $render
          * @return void
          */
@@ -324,8 +333,8 @@ if (!class_exists('Brace\Parser')) {
          * Process conditional block
          *
          * @param string $block_string
-         * @param array $conditions
-         * @param array $dataset
+         * @param array<mixed> $conditions
+         * @param array<mixed> $dataset
          * @return string
          */
         private function processBlock(string $block_string, array $conditions, array $dataset): string
@@ -441,7 +450,7 @@ if (!class_exists('Brace\Parser')) {
          *
          * @param string $each_statement
          * @param string $block_content
-         * @param array $dataset
+         * @param array<mixed> $dataset
          * @return string
          */
         private function processEachStatement(string $each_statement, string $block_content, array $dataset): string
@@ -449,7 +458,7 @@ if (!class_exists('Brace\Parser')) {
             $each_set = explode(' ', trim($each_statement));
             $return_string = '';
 
-            $use_data = (count($each_set) > 0 ? $this->returnChainedVariables($each_set[0], $dataset) : []);
+            $use_data = $this->returnChainedVariables($each_set[0], $dataset);
 
             if ($use_data && is_array($use_data)) {
 
@@ -521,7 +530,7 @@ if (!class_exists('Brace\Parser')) {
         /**
          * Return else if condition
          * @param  string $content
-         * @return array
+         * @return array<mixed>
          */
         private function returnElseIfCondition(string $content): array
         {
@@ -534,7 +543,7 @@ if (!class_exists('Brace\Parser')) {
 
             if (preg_match_all('/{{elseif (.*?)}}/i', $process_content, $matches, PREG_SET_ORDER)) {
                 foreach ($matches as $match) {
-                    $split_string = explode($match[0], $process_content);
+                    $split_string = empty($match[0]) ? [] : explode($match[0], $process_content);
 
                     // add first if condition to return
                     if (!$return) {
@@ -577,7 +586,7 @@ if (!class_exists('Brace\Parser')) {
          * Return else content from condition block
          *
          * @param string $content
-         * @return array
+         * @return array<mixed>
          */
         private function returnElseCondition(string $content): array
         {
@@ -594,7 +603,7 @@ if (!class_exists('Brace\Parser')) {
          * Process variables
          *
          * @param string $template_string
-         * @param array $dataset
+         * @param array<mixed> $dataset
          * @return string
          */
         private function processVariables(string $template_string, array $dataset): string
@@ -626,7 +635,7 @@ if (!class_exists('Brace\Parser')) {
                         }
 
                         if (!$replace_variable && $content = $this->processString($processString, $dataset)) {
-                            $replace_variable = ($content ? $content : '');
+                            $replace_variable = $content;
                         }
                     } else {
                         $replace_variable = $this->returnChainedVariables($processString, $dataset);
@@ -643,7 +652,7 @@ if (!class_exists('Brace\Parser')) {
          * Process string
          *
          * @param string $input_string
-         * @param array $dataset
+         * @param array<mixed> $dataset
          * @return string
          */
         private function processString(string $input_string, array $dataset): string
@@ -673,7 +682,7 @@ if (!class_exists('Brace\Parser')) {
          * Return chained variable data
          *
          * @param string $string
-         * @param array $dataset
+         * @param array<mixed> $dataset
          * @return mixed
          */
         private function returnChainedVariables(string $string, array $dataset)
@@ -704,7 +713,7 @@ if (!class_exists('Brace\Parser')) {
          * Process in-line condition
          *
          * @param string $condition_string
-         * @param array $dataset
+         * @param array<mixed> $dataset
          * @return string
          */
         private function processInlineCondition(string $condition_string, array $dataset)
@@ -726,7 +735,7 @@ if (!class_exists('Brace\Parser')) {
         /**
          * Process in-line iterator
          * @param string $iterator_string
-         * @param array $dataset
+         * @param array<mixed> $dataset
          * @return string
          */
         private function processInlineIterator(string $iterator_string, array $dataset)
@@ -749,7 +758,7 @@ if (!class_exists('Brace\Parser')) {
          * Undocumented function
          *
          * @param string $condition
-         * @param array $dataset
+         * @param array<mixed> $dataset
          * @return boolean
          */
         private function processConditions(string $condition, array $dataset): bool
@@ -787,8 +796,8 @@ if (!class_exists('Brace\Parser')) {
         /**
          * Process a single condition block
          *
-         * @param array $condition
-         * @param array $dataset
+         * @param array<mixed> $condition
+         * @param array<mixed> $dataset
          * @return boolean
          */
         private function processSingleCondition(array $condition, array $dataset): bool
@@ -805,44 +814,34 @@ if (!class_exists('Brace\Parser')) {
                 switch ($challenge) {
                     case 'EXISTS':
                         return true;
-                        break;
                     case "==":
                         return ($data == $expected ? true : false); // Equal
-                        break;
                     case "===":
                         return ($data === $expected ? true : false); // Identical
-                        break;
 
                     case "!=":
                         return ($data != $expected ? true : false); // Not Equal
-                        break;
 
                     case "!!":
                     case "!==":
                         return ($data !== $expected ? true : false); // Not identical
-                        break;
 
                     case ">":
                         return (intval($data) > intval($expected) ? true : false); // More than
-                        break;
 
                     case "<":
                         return (intval($data) < intval($expected) ? true : false); // Less than
-                        break;
 
                     case ">=":
                         return (intval($data) >= intval($expected) ? true : false); // Greater than or equal to
-                        break;
 
                     case "<=":
                         return (intval($data) <= intval($expected) ? true : false); // Less than or equal to
-                        break;
                 }
             } elseif (count($condition) > 1) {
                 switch ($condition[1]) {
                     case '!EXISTS':
                         return true;
-                        break;
                 }
             }
 
@@ -852,15 +851,12 @@ if (!class_exists('Brace\Parser')) {
         /**
          * Ensure array or string is returned
          *
-         * @param array $mixed_value
-         * @return mixed
+         * @param mixed $mixed_value
+         * @return array<mixed>|string
          */
-        private function strArray($mixed_value)
+        private function strArray(mixed $mixed_value): array|string
         {
-            if (!is_array($mixed_value) && !is_string($mixed_value)) {
-                return strval($mixed_value);
-            }
-            return $mixed_value;
+            return is_array($mixed_value) ? $mixed_value : strval($mixed_value);
         }
     }
 }
