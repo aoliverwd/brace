@@ -824,33 +824,19 @@ if (!class_exists('Brace\Parser')) {
                     $expected = is_string($expected) ? str_replace(['"','+'], ['',' '], $expected) : $expected;
                 }
 
-                switch ($challenge) {
-                    case 'EXISTS':
-                        return true;
-                    case "==":
-                        return ($data == $expected ? true : false); // Equal
-                    case "===":
-                        return ($data === $expected ? true : false); // Identical
-
-                    case "!=":
-                        return ($data != $expected ? true : false); // Not Equal
-
-                    case "!!":
-                    case "!==":
-                        return ($data !== $expected ? true : false); // Not identical
-
-                    case ">":
-                        return (intval($data) > intval($expected) ? true : false); // More than
-
-                    case "<":
-                        return (intval($data) < intval($expected) ? true : false); // Less than
-
-                    case ">=":
-                        return (intval($data) >= intval($expected) ? true : false); // Greater than or equal to
-
-                    case "<=":
-                        return (intval($data) <= intval($expected) ? true : false); // Less than or equal to
-                }
+                return match ($challenge) {
+                    'EXISTS' => true,
+                    '==' => $data == $expected ? true : false, // Equal
+                    '===' => $data === $expected ? true : false, // Identical
+                    '!=' => $data != $expected ? true : false, // Not Equal
+                    '!!' => $data !== $expected ? true : false, // Not identical
+                    '!==' => $data !== $expected ? true : false, // Not identical
+                    '>' => intval($data) > intval($expected) ? true : false, // More than,
+                    '<' => intval($data) < intval($expected) ? true : false, // Less than,
+                    '>=' => intval($data) >= intval($expected) ? true : false, // Greater than or equal to,
+                    '<=' => intval($data) <= intval($expected) ? true : false, // Less than or equal to,
+                    default => false
+                };
             } elseif (count($condition) > 1) {
                 switch ($condition[1]) {
                     case '!EXISTS':
