@@ -1,10 +1,6 @@
-# PHPStan finds bugs in your code without writing tests: https://phpstan.org/
-# Run tests via the CLI: vendor/bin/phpstan analyse -c phpstan.neon
 parameters:
     level: 8
     paths:
         - src
     ignoreErrors:
         # The below constants are defined when running the application from a web server
-        # - '#Function do_shortcode not found#' # WordPress shortcode
-        # - '#return_chained_variables#' # Return mixed
