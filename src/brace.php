@@ -688,7 +688,7 @@ if (!class_exists('Brace\Parser')) {
          * @param array<mixed> $dataset
          * @return mixed
          */
-        private function returnChainedVariables(string $string, array $dataset)
+        private function returnChainedVariables(string $string, array $dataset): mixed
         {
             $return = [];
             $is_count = false;
@@ -704,7 +704,7 @@ if (!class_exists('Brace\Parser')) {
                     $dataset = $dataset[$thisVar];
                     $return = $is_count ? count($dataset) : $dataset;
                 } else {
-                    return;
+                    return '';
                 }
             }
 
