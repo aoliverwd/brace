@@ -9,13 +9,6 @@
 *   @Repo: https://github.com/aoliverwd/brace
 */
 
-/** Use strict types */
-declare(strict_types=1);
-
-/**
- * Brace name space
- */
-
 namespace Brace;
 
 /** Check to see if Brace\Parser class does not already exist */
@@ -23,7 +16,7 @@ if (!class_exists('Brace\Parser')) {
     /**
      * Core parser class
      */
-    class Parser
+    final class Parser
     {
         /** Public variables */
         public bool $remove_comment_blocks = true;
@@ -726,7 +719,7 @@ if (!class_exists('Brace\Parser')) {
          * @param array<mixed> $dataset
          * @return string
          */
-        private function processInlineCondition(string $condition_string, array $dataset)
+        private function processInlineCondition(string $condition_string, array $dataset): string
         {
             $condition = explode(' ? ', $condition_string);
             $outcome = explode(' : ', $condition[1]);
@@ -748,7 +741,7 @@ if (!class_exists('Brace\Parser')) {
          * @param array<mixed> $dataset
          * @return string
          */
-        private function processInlineIterator(string $iterator_string, array $dataset)
+        private function processInlineIterator(string $iterator_string, array $dataset): string
         {
             $iterator_split = preg_split('/^(.*?)"/', $iterator_string);
             $processString = is_array($iterator_split) ? array_values(array_filter($iterator_split)) : [];
