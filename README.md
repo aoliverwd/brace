@@ -1,8 +1,11 @@
 ![PHPUnit](https://github.com/aoliverwd/brace/actions/workflows/ci.yml/badge.svg) [![Latest Stable Version](https://poser.pugx.org/alexoliverwd/brace/v)](//packagist.org/packages/alexoliverwd/brace) [![License](https://poser.pugx.org/alexoliverwd/brace/license)](//packagist.org/packages/alexoliverwd/brace)
 
+# Brace
+
+brace is a simple template language written in PHP. Brace uses a handlebar style syntax.
+
 <!-- MarkdownTOC -->
 
-- Introduction
 - Requirements
 - Installation
     - Via composer
@@ -43,10 +46,6 @@
     - Running Tests
 
 <!-- /MarkdownTOC -->
-
-# Introduction
-
-brace is a simple template language written in PHP. Brace uses a handlebar style syntax.
 
 # Requirements
 
@@ -388,7 +387,7 @@ Variables that are added to each iteration.
 
 | ID          | Description                                                         | Type    |
 |-------------|---------------------------------------------------------------------|---------|
-| \_KEY       | Record/Row key                                                      | Integer |
+| \_KEY       | Row key                                                             | Integer |
 
 
 ## Conditional Statements
@@ -464,7 +463,7 @@ $brace->Parse('example',[
 <p>{{first_name EXISTS ? "my first name is __first_name__"}}</p>
 ```
 
-Ability to add double quotes.
+Escaping quotations
 
 ```html
 <p>{{first_name !== "test" ? "Name is \"__first_name__\"" : "is test"}}</p>
@@ -618,4 +617,4 @@ Running PHPStan and PHPUnit tests can be achieved with the following commands
 ./vendor/bin/phpunit -c ./tests/phpunit.xml
 ```
 
-Or by running a the composer script ```composer test```
+Or by running via composer ```composer test```
