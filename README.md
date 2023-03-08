@@ -21,8 +21,8 @@
     - Row keys
     - Iteration data variables
     - Loops
-        - Increasing Iteration
-        - Decreasing Iteration
+        - Increasing
+        - Decreasing
     - Loop data variables
     - Conditional Statements
         - Condition Blocks
@@ -366,7 +366,7 @@ $brace->Parse('example',[]);
 {{end}}
 ```
 
-### Increasing Iteration
+### Increasing
 
 ```html
 {{loop 1 to 3}}
@@ -374,7 +374,7 @@ $brace->Parse('example',[]);
 {{end}}
 ```
 
-### Decreasing Iteration
+### Decreasing
 
 ```html
 {{loop 3 to 1}}
