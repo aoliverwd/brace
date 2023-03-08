@@ -360,6 +360,12 @@ $brace = new Brace\Parser();
 $brace->Parse('example',[]);
 ```
 
+```html
+{{loop 3}}
+<li>{{_KEY}}</li>
+{{end}}
+```
+
 ### Increasing Iteration
 
 ```html

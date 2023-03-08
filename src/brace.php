@@ -415,6 +415,9 @@ if (!class_exists('Brace\Parser')) {
             $loop_components = explode(' ', trim($loop_statement));
             $return_string = '';
 
+            // Check if single value was passed
+            $loop_components = count($loop_components) === 1 ? [1, 'to', intval($loop_components[0])] : $loop_components;
+
             if (count($loop_components) === 3 && $loop_components[1] === 'to') {
                 $from = intval($loop_components[0]);
                 $to = intval($loop_components[2]);
