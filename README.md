@@ -1,8 +1,11 @@
 ![PHPUnit](https://github.com/aoliverwd/brace/actions/workflows/ci.yml/badge.svg) [![Latest Stable Version](https://poser.pugx.org/alexoliverwd/brace/v)](//packagist.org/packages/alexoliverwd/brace) [![License](https://poser.pugx.org/alexoliverwd/brace/license)](//packagist.org/packages/alexoliverwd/brace)
 
+# Brace
+
+brace is a simple template language written in PHP. Brace uses a handlebar style syntax.
+
 <!-- MarkdownTOC -->
 
-- Introduction
 - Requirements
 - Installation
     - Via composer
@@ -20,6 +23,10 @@
     - Nth children
     - Row keys
     - Iteration data variables
+    - Loops
+        - Increasing
+        - Decreasing
+    - Loop data variables
     - Conditional Statements
         - Condition Blocks
     - Else If Statements
@@ -40,13 +47,9 @@
 
 <!-- /MarkdownTOC -->
 
-# Introduction
-
-brace is a simple template language written in PHP. Brace uses a handlebar style syntax.
-
 # Requirements
 
-Brace requires PHP version 7.4 or later.
+Brace requires PHP version 8.1 or later.
 
 # Installation
 
@@ -59,70 +62,64 @@ composer require alexoliverwd/brace
 ## Or Including the brace class
 
 ```php
-    /** Include brace */
-    include __DIR__.'/src/brace.php';
+/** Include brace */
+include __DIR__.'/src/brace.php';
 ```
 
 # Usage
 
 ```php
 <?php
-    /** New brace instance */
-    $brace = new Brace\Parser;
 
-    /** Set instance variables (Optional) */
-    $brace->remove_comment_blocks = false;
-    $brace->template_path = __DIR__.'/';
-    $brace->template_ext = 'tpl';
+/** New brace instance */
+$brace = new Brace\Parser();
 
-    /** Process template and echo out */
-    $brace->Parse('example',[
-        'name' => [
-            'first' => 'John',
-            'last' => 'Doe'
-        ]
-    ]);
-?>
+/** Set instance variables (Optional) */
+$brace->remove_comment_blocks = false;
+$brace->template_path = __DIR__.'/';
+$brace->template_ext = 'tpl';
+
+/** Process template and echo out */
+$brace->Parse('example',[
+    'name' => [
+        'first' => 'John',
+        'last' => 'Doe'
+    ]
+]);
 ```
 
 ## Returning processes templates as a string
 
 ```php
 <?php
-    /** Include brace */
-    include __DIR__.'/src/brace.php';
 
-    /** New brace instance */
-    $brace = new Brace\Parser;
+/** New brace instance */
+$brace = new Brace\Parser();
 
-    /** Process template and return string */
-    $template_string = $brace->Parse('example',[
-        'name' => [
-            'first' => 'John',
-            'last' => 'Doe'
-        ]
-    ], false)->return();
-?>
+/** Process template and return string */
+$template_string = $brace->Parse('example',[
+    'name' => [
+        'first' => 'John',
+        'last' => 'Doe'
+    ]
+], false)->return();
 ```
 
 ## Compiling to an external file
 
 ```php
 <?php
-    /** Include brace */
-    include __DIR__.'/src/brace.php';
 
-    /** New brace instance */
-    $brace = new Brace\Parser;
+/** New brace instance */
+$brace = new Brace\Parser();
 
-    /** Process template and compile to external file */
-    $brace->compile('example', 'example.html', [
-        'name' => [
-            'first' => 'John',
-            'last' => 'Doe'
-        ]
-    ]);
-?>
+/** Process template and compile to external file */
+$brace->compile('example', 'example.html', [
+    'name' => [
+        'first' => 'John',
+        'last' => 'Doe'
+    ]
+]);
 ```
 
 ## Instance variables
@@ -139,17 +136,14 @@ composer require alexoliverwd/brace
 
 ```php
 <?php
-    /** Include brace */
-    include __DIR__.'/src/brace.php';
 
-    /** New brace instance */
-    $brace = new Brace\Parser;
+/** New brace instance */
+$brace = new Brace\Parser();
 
-    /** Process template and echo out */
-    $brace->Parse('example',[
-        'firstname' => 'John Doe'
-    ]);
-?>
+/** Process template and echo out */
+$brace->Parse('example',[
+    'firstname' => 'John Doe'
+]);
 ```
 
 ```html
@@ -172,36 +166,33 @@ composer require alexoliverwd/brace
 
 ```php
 <?php
-    /** Include brace */
-    include __DIR__.'/src/brace.php';
 
-    /** New brace instance */
-    $brace = new Brace\Parser;
+/** New brace instance */
+$brace = new Brace\Parser();
 
-    /** Process template and echo out */
-    $brace->Parse('example',[
-        'products' => [
-            0 => [
-                'title' => 'Product 1',
-                'price' => 22.99,
-                'stock' => 15,
-                'categories' => ['Textile','Cloths']
-            ],
-            1 => [
-                'title' => 'Product 2',
-                'price' => 10.00,
-                'stock' => 62,
-                'categories' => ['Electronics','PC','Hardware']
-            ],
-            2 => [
-                'title' => 'Product 3',
-                'price' => 89.98,
-                'stock' => 120,
-                'categories' => ['PC Game']
-            ]
+/** Process template and echo out */
+$brace->Parse('example',[
+    'products' => [
+        0 => [
+            'title' => 'Product 1',
+            'price' => 22.99,
+            'stock' => 15,
+            'categories' => ['Textile','Cloths']
+        ],
+        1 => [
+            'title' => 'Product 2',
+            'price' => 10.00,
+            'stock' => 62,
+            'categories' => ['Electronics','PC','Hardware']
+        ],
+        2 => [
+            'title' => 'Product 3',
+            'price' => 89.98,
+            'stock' => 120,
+            'categories' => ['PC Game']
         ]
-    ]);
->
+    ]
+]);
 ```
 
 ```html
@@ -229,17 +220,14 @@ composer require alexoliverwd/brace
 
 ```php
 <?php
-    /** Include brace */
-    include __DIR__.'/src/brace.php';
 
-    /** New brace instance */
-    $brace = new Brace\Parser;
+/** New brace instance */
+$brace = new Brace\Parser();
 
-    /** Process template and echo out */
-    $brace->Parse('example',[
-        'names' => ['John','Steve','Bert']
-    ]);
-?>
+/** Process template and echo out */
+$brace->Parse('example',[
+    'names' => ['John','Steve','Bert']
+]);
 ```
 
 ```html
@@ -252,17 +240,14 @@ composer require alexoliverwd/brace
 
 ```php
 <?php
-    /** Include brace */
-    include __DIR__.'/src/brace.php';
 
-    /** New brace instance */
-    $brace = new Brace\Parser;
+/** New brace instance */
+$brace = new Brace\Parser();
 
-    /** Process template and echo out */
-    $brace->Parse('example',[
-        'names' => ['John','Steve','Bert']
-    ]);
-?>
+/** Process template and echo out */
+$brace->Parse('example',[
+    'names' => ['John','Steve','Bert']
+]);
 ```
 
 ```html
@@ -291,17 +276,14 @@ Or
 
 ```php
 <?php
-    /** Include brace */
-    include __DIR__.'/src/brace.php';
 
-    /** New brace instance */
-    $brace = new Brace\Parser;
+/** New brace instance */
+$brace = new Brace\Parser();
 
-    /** Process template and echo out */
-    $brace->Parse('example',[
-        'names' => ['John','Steve','Bert','Fred','Cindy']
-    ]);
-?>
+/** Process template and echo out */
+$brace->Parse('example',[
+    'names' => ['John','Steve','Bert','Fred','Cindy']
+]);
 ```
 
 ```html
@@ -325,21 +307,18 @@ Or
 
 ```php
 <?php
-    /** Include brace */
-    include __DIR__.'/src/brace.php';
 
-    /** New brace instance */
-    $brace = new Brace\Parser;
+/** New brace instance */
+$brace = new Brace\Parser();
 
-    /** Process template and echo out */
-    $brace->Parse('example',[
-        'names' => [
-            'name_1' => 'Dave',
-            'name_2' => 'John',
-            'name_3' => 'Barry'
-        ]
-    ]);
-?>
+/** Process template and echo out */
+$brace->Parse('example',[
+    'names' => [
+        'name_1' => 'Dave',
+        'name_2' => 'John',
+        'name_3' => 'Barry'
+    ]
+]);
 ```
 
 ```html
@@ -358,7 +337,7 @@ Or
 
 ## Iteration data variables
 
-Additional data variables that are added to each data row.
+Variables that are added to each iteration.
 
 | ID          | Description                                                         | Type    |
 |-------------|---------------------------------------------------------------------|---------|
@@ -368,24 +347,64 @@ Additional data variables that are added to each data row.
 | GLOBAL      | An array of external record data that is accessible to all rows     | Array   |
 
 
+## Loops
+
+```php
+<?php
+
+/** New brace instance */
+$brace = new Brace\Parser();
+
+/** Process template and echo out */
+$brace->Parse('example',[]);
+```
+
+```html
+{{loop 3}}
+<li>{{_KEY}}</li>
+{{end}}
+```
+
+### Increasing
+
+```html
+{{loop 1 to 3}}
+<li>{{_KEY}}</li>
+{{end}}
+```
+
+### Decreasing
+
+```html
+{{loop 3 to 1}}
+<li>{{_KEY}}</li>
+{{end}}
+```
+
+## Loop data variables
+
+Variables that are added to each iteration.
+
+| ID          | Description                                                         | Type    |
+|-------------|---------------------------------------------------------------------|---------|
+| \_KEY       | Row key                                                             | Integer |
+
+
 ## Conditional Statements
 
 ### Condition Blocks
 
 ```php
 <?php
-    /** Include brace */
-    include __DIR__.'/src/brace.php';
 
-    /** New brace instance */
-    $brace = new Brace\Parser;
+/** New brace instance */
+$brace = new Brace\Parser();
 
-    /** Process template and echo out */
-    $brace->Parse('example',[
-        'first_name' => 'John',
-        'last_name' => 'Doe'
-    ]);
-?>
+/** Process template and echo out */
+$brace->Parse('example',[
+    'first_name' => 'John',
+    'last_name' => 'Doe'
+]);
 ```
 
 ```html
@@ -406,17 +425,14 @@ Additional data variables that are added to each data row.
 
 ```php
 <?php
-    /** Include brace */
-    include __DIR__.'/src/brace.php';
 
-    /** New brace instance */
-    $brace = new Brace\Parser;
+/** New brace instance */
+$brace = new Brace\Parser();
 
-    /** Process template and echo out */
-    $brace->Parse('example',[
-        'names' => ['John','Steve','Bert','Fred','Cindy']
-    ]);
-?>
+/** Process template and echo out */
+$brace->Parse('example',[
+    'names' => ['John','Steve','Bert','Fred','Cindy']
+]);
 ```
 
 ```html
@@ -431,7 +447,6 @@ Additional data variables that are added to each data row.
         <span data-rowid="{{_ROW_ID}}">{{name}}</span>
     {{end}}
 {{end}}
-
 ```
 
 ### In-line conditions
@@ -448,7 +463,7 @@ Additional data variables that are added to each data row.
 <p>{{first_name EXISTS ? "my first name is __first_name__"}}</p>
 ```
 
-Ability to add double quotes.
+Escaping quotations
 
 ```html
 <p>{{first_name !== "test" ? "Name is \"__first_name__\"" : "is test"}}</p>
@@ -496,23 +511,20 @@ Name is "John"
 
 ```php
 <?php
-    /** Include brace */
-    include __DIR__.'/src/brace.php';
 
-    /** New brace parser */
-    $brace = new Brace\Parser;
+/** New brace parser */
+$brace = new Brace\Parser();
 
-    /** Return HTML link */
-    $button_function = function ($attributes){
-        return '<a href="'.$attributes['url'].'" alt="'.$attributes['alt'].'" target="'.$attributes['target'].'" rel="noreferrer noopener">'.$attributes['title'].'</a>';
-    };
+/** Return HTML link */
+$button_function = function ($attributes){
+    return '<a href="'.$attributes['url'].'" alt="'.$attributes['alt'].'" target="'.$attributes['target'].'" rel="noreferrer noopener">'.$attributes['title'].'</a>';
+};
 
-    /** Register shortcode */
-    $brace->regShortcode('button', 'button_function');
+/** Register shortcode */
+$brace->regShortcode('button', 'button_function');
 
-    /** Process content template */
-    $brace->Parse('content', []);
-?>
+/** Process content template */
+$brace->Parse('content', []);
 ```
 
 
@@ -572,26 +584,28 @@ The --clear-- method is useful when needing to processes multiple templates with
 By default brace does not clear a processed string at the end of executing a template/string parse.
 
 ```php
+<?php
 
-  // Init brace
-  $brace = new Brace\Parser;
-  $brace->template_path = __DIR__.'/';
+// Init brace
+$brace = new Brace\Parser();
+$brace->template_path = __DIR__.'/';
 
-  // Process first template
-  $brace->Parse('example',[
-      'name' => [
-          'first' => 'John',
-          'last' => 'Doe'
-      ]
-  ]);
+// Process first template
+$brace->Parse('example',[
+    'name' => [
+      'first' => 'John',
+      'last' => 'Doe'
+    ]
+]);
 
-  // Process second template using the same brace instance
-  $brace->clear()->parse('example_two',[
-      'name' => [
-          'first' => 'Dave',
-          'last' => 'Smith'
-      ]
-  ]);
+// Process second template using the same brace instance
+$brace->clear()->parse('example_two',[
+    'name' => [
+      'first' => 'Dave',
+      'last' => 'Smith'
+    ]
+]);
+
 ```
 
 ## Running Tests
@@ -602,3 +616,5 @@ Running PHPStan and PHPUnit tests can be achieved with the following commands
 ./vendor/bin/phpstan analyse -c phpstan.neon
 ./vendor/bin/phpunit -c ./tests/phpunit.xml
 ```
+
+Or by running via composer ```composer test```

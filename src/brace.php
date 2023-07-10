@@ -2,19 +2,12 @@
 
 /**
 *   Brace
-*   Copyright (C) 2022 Alex Oliver
+*   Copyright (C) 2023 Alex Oliver
 *
 *   @version: 1.1.0
 *   @author: Alex Oliver
 *   @Repo: https://github.com/aoliverwd/brace
 */
-
-/** Use strict types */
-declare(strict_types=1);
-
-/**
- * Brace name space
- */
 
 namespace Brace;
 
@@ -23,7 +16,7 @@ if (!class_exists('Brace\Parser')) {
     /**
      * Core parser class
      */
-    class Parser
+    final class Parser
     {
         /** Public variables */
         public bool $remove_comment_blocks = true;
@@ -422,6 +415,9 @@ if (!class_exists('Brace\Parser')) {
             $loop_components = explode(' ', trim($loop_statement));
             $return_string = '';
 
+            // Check if single value was passed
+            $loop_components = count($loop_components) === 1 ? [1, 'to', intval($loop_components[0])] : $loop_components;
+
             if (count($loop_components) === 3 && $loop_components[1] === 'to') {
                 $from = intval($loop_components[0]);
                 $to = intval($loop_components[2]);
@@ -695,7 +691,7 @@ if (!class_exists('Brace\Parser')) {
          * @param array<mixed> $dataset
          * @return mixed
          */
-        private function returnChainedVariables(string $string, array $dataset)
+        private function returnChainedVariables(string $string, array $dataset): mixed
         {
             $return = [];
             $is_count = false;
@@ -711,7 +707,7 @@ if (!class_exists('Brace\Parser')) {
                     $dataset = $dataset[$thisVar];
                     $return = $is_count ? count($dataset) : $dataset;
                 } else {
-                    return;
+                    return '';
                 }
             }
 
@@ -726,7 +722,7 @@ if (!class_exists('Brace\Parser')) {
          * @param array<mixed> $dataset
          * @return string
          */
-        private function processInlineCondition(string $condition_string, array $dataset)
+        private function processInlineCondition(string $condition_string, array $dataset): string
         {
             $condition = explode(' ? ', $condition_string);
             $outcome = explode(' : ', $condition[1]);
@@ -748,7 +744,7 @@ if (!class_exists('Brace\Parser')) {
          * @param array<mixed> $dataset
          * @return string
          */
-        private function processInlineIterator(string $iterator_string, array $dataset)
+        private function processInlineIterator(string $iterator_string, array $dataset): string
         {
             $iterator_split = preg_split('/^(.*?)"/', $iterator_string);
             $processString = is_array($iterator_split) ? array_values(array_filter($iterator_split)) : [];
