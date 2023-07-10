@@ -1,4 +1,4 @@
-![PHPUnit](https://github.com/aoliverwd/brace/actions/workflows/ci.yml/badge.svg) [![Latest Stable Version](https://poser.pugx.org/alexoliverwd/brace/v)](//packagist.org/packages/alexoliverwd/brace) [![License](https://poser.pugx.org/alexoliverwd/brace/license)](//packagist.org/packages/alexoliverwd/brace)
+![PHPUnit](https://github.com/aoliverwd/brace/actions/workflows/ci.yml/badge.svg) [![Latest Stable Version](https://poser.pugx.org/alexoliverwd/brace/v)](//packagist.org/packages/alexoliverwd/brace) [![License](https://poser.pugx.org/alexoliverwd/brace/license)](//packagist.org/packages/alexoliverwd/brace) [![PHP Version Require](http://poser.pugx.org/alexoliverwd/brace/require/php)](https://packagist.org/packages/alexoliverwd/brace) [![Total Downloads](http://poser.pugx.org/alexoliverwd/brace/downloads)](https://packagist.org/packages/alexoliverwd/brace)
 
 # Brace
 
