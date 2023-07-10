@@ -1,7 +1,7 @@
 # PHPStan finds bugs in your code without writing tests: https://phpstan.org/
 # Run tests via the CLI: vendor/bin/phpstan analyse -c phpstan.neon
 parameters:
-    level: 3
+    level: 8
     paths:
         - src
     ignoreErrors:

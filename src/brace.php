@@ -4,7 +4,7 @@
 *   Brace
 *   Copyright (C) 2022 Alex Oliver
 *
-*   @version: 1.0.13
+*   @version: 1.1.0
 *   @author: Alex Oliver
 *   @Repo: https://github.com/aoliverwd/brace
 */
@@ -26,18 +26,27 @@ if (!class_exists('Brace\Parser')) {
     class Parser
     {
         /** Public variables */
-        public $remove_comment_blocks = true;
-        public $template_path = __DIR__ . '/';
-        public $template_ext = 'tpl';
+        public bool $remove_comment_blocks = true;
+        public string $template_path = __DIR__ . '/';
+        public string $template_ext = 'tpl';
 
         /** Internal variables */
-        private $export_string = '';
-        private $shortcode_methods;
-        private $is_comment_block;
-        private $block_condition;
-        private $block_content;
-        private $block_spaces;
-        private $is_block;
+        private string $export_string = '';
+        private bool $is_comment_block = false;
+        private string $block_content = '';
+        private int $block_spaces = 0;
+        private bool $is_block = false;
+
+        /**
+         * shortcode_methods
+         * @var array<mixed>
+         */
+        private array $shortcode_methods = [];
+        /**
+         * block_condition
+         * @var array<mixed>
+         */
+        private array $block_condition = [];
 
         /**
          * Class constructor
@@ -52,7 +61,7 @@ if (!class_exists('Brace\Parser')) {
          * Parse templates
          *
          * @param string $templates
-         * @param array $dataset
+         * @param array<mixed> $dataset
          * @param boolean $render
          * @return object
          */
@@ -71,7 +80,7 @@ if (!class_exists('Brace\Parser')) {
          * Parse string
          *
          * @param string $input_string
-         * @param array $dataset
+         * @param array<mixed> $dataset
          * @param boolean $render
          * @return object
          */
@@ -85,24 +94,11 @@ if (!class_exists('Brace\Parser')) {
         }
 
         /**
-         * Parse string - Backward compatibility function
-         *
-         * @param string $input_string
-         * @param array $dataset
-         * @param boolean $render
-         * @return object
-         */
-        public function parse_input_string(string $input_string, array $dataset, bool $render): object
-        {
-            return $this->parseInputString($input_string, $dataset, $render);
-        }
-
-        /**
          * Compile to file
          *
          * @param string $templates
          * @param string $compile_filename
-         * @param array $dataset
+         * @param array<mixed> $dataset
          * @return void
          */
         public function compile(string $templates, string $compile_filename, array $dataset): void
@@ -149,27 +145,19 @@ if (!class_exists('Brace\Parser')) {
         }
 
         /**
-         * Register shortcode - Backward compatibility function
-         * @param  string $name      [description]
-         * @param  string $theMethod [description]
-         * @return object            [description]
-         */
-        public function reg_shortcode(string $name, string $theMethod): object
-        {
-            return $this->regShortcode($name, $theMethod);
-        }
-
-        /**
          * Call shortcode
          *
          * @param string $shortcodeSyntax
-         * @param array $dataset
+         * @param array<mixed> $dataset
          * @return string
          */
         private function callShortcode(string $shortcodeSyntax, array $dataset): string
         {
-            $args = explode(' ', str_replace(array('[', ']'), '', str_replace('&quot;', '"', $this->strArray($shortcodeSyntax))));
-            $theArgs = array();
+            $sanatise_1 = str_replace('&quot;', '"', $shortcodeSyntax);
+            $sanatise_2 = str_replace(['[', ']'], '', $sanatise_1);
+            $args = explode(' ', $sanatise_2);
+
+            $theArgs = [];
 
             /** check for registered functions */
             if ($methodName = (isset($args[0]) && isset($this->shortcode_methods[$args[0]]) ? $this->shortcode_methods[$args[0]] : false)) {
@@ -180,7 +168,9 @@ if (!class_exists('Brace\Parser')) {
                 /** Format arguments */
                 array_shift($args);
                 foreach (explode('" ', implode(' ', $args)) as $thisArg) {
-                    if (count($newArg = explode('=', str_replace('"', '', $this->strArray($thisArg)))) === 2) {
+                    $newArg = explode('=', str_replace('"', '', $thisArg));
+
+                    if (count($newArg) === 2) {
                         $theArgs[trim($newArg[0])] = trim($newArg[1]);
                     }
                 }
@@ -199,7 +189,7 @@ if (!class_exists('Brace\Parser')) {
          * Process a individual template file
          *
          * @param string $template_name
-         * @param array $dataset
+         * @param array<mixed> $dataset
          * @param boolean $render
          * @return void
          */
@@ -210,23 +200,25 @@ if (!class_exists('Brace\Parser')) {
                 /** Open template file */
                 $handle = fopen($this->template_path . $template_name, 'r');
 
-                /** Run through each line */
-                while (($this_line = fgets($handle, 4096)) !== false) {
+                if (is_resource($handle)) {
+                    /** Run through each line */
+                    while (($this_line = fgets($handle, 4096)) !== false) {
 
-                    /** Convert tabs to spaces */
-                    $this_line = str_replace("\t", '    ', $this->strArray($this_line));
+                        /** Convert tabs to spaces */
+                        $this_line = str_replace("\t", '    ', $this_line);
 
-                    /** Process single line */
-                    $this->processLine($this_line, $dataset, $render);
-                }
+                        /** Process single line */
+                        $this->processLine($this_line, $dataset, $render);
+                    }
 
-                /** Close template file */
-                fclose($handle);
+                    /** Close template file */
+                    fclose($handle);
 
-                /** If block has not been closed */
-                if ($this->is_block) {
-                    trigger_error("IF/EACH block has not been closed");
-                    exit;
+                    /** If block has not been closed */
+                    if ($this->is_block) {
+                        trigger_error("IF/EACH block has not been closed");
+                        exit;
+                    }
                 }
             }
         }
@@ -236,7 +228,7 @@ if (!class_exists('Brace\Parser')) {
          * Process single line
          *
          * @param string $this_line
-         * @param array $dataset
+         * @param array<mixed> $dataset
          * @param boolean $render
          * @return void
          */
@@ -286,7 +278,7 @@ if (!class_exists('Brace\Parser')) {
                 }
 
                 $this->block_condition[] = $block_type;
-                $this->block_spaces = strpos($this_line, '{{' . $block_type);
+                $this->block_spaces = (int) strpos($this_line, '{{' . $block_type);
                 $this->is_block = true;
 
                 /** Blank line */
@@ -328,8 +320,8 @@ if (!class_exists('Brace\Parser')) {
             if (preg_match_all('/\[(.*?)\]/', $this_line, $matches, PREG_SET_ORDER)) {
                 foreach ($matches as $theShortcode) {
                     $this_line = (function_exists('do_shortcode')
-                        ? str_replace($this->strArray($theShortcode[0]), $this->strArray(do_shortcode($theShortcode[0])), $this_line)
-                        : str_replace($this->strArray($theShortcode[0]), $this->strArray($this->callShortcode($theShortcode[0], $dataset)), $this->strArray($this_line)));
+                        ? str_replace($theShortcode[0], do_shortcode($theShortcode[0]), $this_line)
+                        : str_replace($theShortcode[0], $this->callShortcode($theShortcode[0], $dataset), $this_line));
                 }
             }
 
@@ -348,8 +340,8 @@ if (!class_exists('Brace\Parser')) {
          * Process conditional block
          *
          * @param string $block_string
-         * @param array $conditions
-         * @param array $dataset
+         * @param array<mixed> $conditions
+         * @param array<mixed> $dataset
          * @return string
          */
         private function processBlock(string $block_string, array $conditions, array $dataset): string
@@ -465,7 +457,7 @@ if (!class_exists('Brace\Parser')) {
          *
          * @param string $each_statement
          * @param string $block_content
-         * @param array $dataset
+         * @param array<mixed> $dataset
          * @return string
          */
         private function processEachStatement(string $each_statement, string $block_content, array $dataset): string
@@ -473,7 +465,7 @@ if (!class_exists('Brace\Parser')) {
             $each_set = explode(' ', trim($each_statement));
             $return_string = '';
 
-            $use_data = (count($each_set) > 0 ? $this->returnChainedVariables($each_set[0], $dataset) : []);
+            $use_data = $this->returnChainedVariables($each_set[0], $dataset);
 
             if ($use_data && is_array($use_data)) {
 
@@ -545,7 +537,7 @@ if (!class_exists('Brace\Parser')) {
         /**
          * Return else if condition
          * @param  string $content
-         * @return array
+         * @return array<mixed>
          */
         private function returnElseIfCondition(string $content): array
         {
@@ -558,7 +550,7 @@ if (!class_exists('Brace\Parser')) {
 
             if (preg_match_all('/{{elseif (.*?)}}/i', $process_content, $matches, PREG_SET_ORDER)) {
                 foreach ($matches as $match) {
-                    $split_string = explode($match[0], $process_content);
+                    $split_string = empty($match[0]) ? [] : explode($match[0], $process_content);
 
                     // add first if condition to return
                     if (!$return) {
@@ -582,7 +574,10 @@ if (!class_exists('Brace\Parser')) {
                     $process_content = $split_string[1];
                 }
 
-                $return['elseif'][array_key_last($return['elseif'])]['content'] = rtrim($process_content);
+                if (isset($return['elseif'])) {
+                    $last_key = array_key_last($return['elseif']);
+                    $return['elseif'][$last_key]['content'] = rtrim($process_content);
+                }
             } else {
                 // add first if condition to return
                 $return['if'] = $else_condition[0];
@@ -601,7 +596,7 @@ if (!class_exists('Brace\Parser')) {
          * Return else content from condition block
          *
          * @param string $content
-         * @return array
+         * @return array<mixed>
          */
         private function returnElseCondition(string $content): array
         {
@@ -618,7 +613,7 @@ if (!class_exists('Brace\Parser')) {
          * Process variables
          *
          * @param string $template_string
-         * @param array $dataset
+         * @param array<mixed> $dataset
          * @return string
          */
         private function processVariables(string $template_string, array $dataset): string
@@ -650,13 +645,13 @@ if (!class_exists('Brace\Parser')) {
                         }
 
                         if (!$replace_variable && $content = $this->processString($processString, $dataset)) {
-                            $replace_variable = ($content ? $content : '');
+                            $replace_variable = $content;
                         }
                     } else {
                         $replace_variable = $this->returnChainedVariables($processString, $dataset);
                     }
 
-                    $template_string = str_replace($this->strArray($replace_string), $this->strArray($replace_variable), $this->strArray($template_string));
+                    $template_string = str_replace($replace_string, (string) $replace_variable, $template_string);
                 }
             }
 
@@ -667,7 +662,7 @@ if (!class_exists('Brace\Parser')) {
          * Process string
          *
          * @param string $input_string
-         * @param array $dataset
+         * @param array<mixed> $dataset
          * @return string
          */
         private function processString(string $input_string, array $dataset): string
@@ -677,12 +672,12 @@ if (!class_exists('Brace\Parser')) {
             $dbl_quote_escape = '[DBL_QUOTE]';
             $input_string = preg_replace('/\\\"/', $dbl_quote_escape, $input_string);
 
-            if (preg_match('/"(.*?)"/i', $input_string, $content)) {
+            if (preg_match('/"(.*?)"/i', (string) $input_string, $content)) {
 
                 /** Input string has variables */
                 if (preg_match_all('/__(.*?)__/i', $content[1], $variables, PREG_SET_ORDER)) {
                     foreach ($variables as $this_variable) {
-                        $content[1] = str_replace($this->strArray($this_variable[0]), $this->strArray($this->returnChainedVariables($this_variable[1], $dataset)), $this->strArray($content[1]));
+                        $content[1] = str_replace($this_variable[0], (string) $this->returnChainedVariables($this_variable[1], $dataset), $content[1]);
                     }
                 }
 
@@ -697,7 +692,7 @@ if (!class_exists('Brace\Parser')) {
          * Return chained variable data
          *
          * @param string $string
-         * @param array $dataset
+         * @param array<mixed> $dataset
          * @return mixed
          */
         private function returnChainedVariables(string $string, array $dataset)
@@ -728,7 +723,7 @@ if (!class_exists('Brace\Parser')) {
          * Process in-line condition
          *
          * @param string $condition_string
-         * @param array $dataset
+         * @param array<mixed> $dataset
          * @return string
          */
         private function processInlineCondition(string $condition_string, array $dataset)
@@ -750,20 +745,23 @@ if (!class_exists('Brace\Parser')) {
         /**
          * Process in-line iterator
          * @param string $iterator_string
-         * @param array $dataset
+         * @param array<mixed> $dataset
          * @return string
          */
         private function processInlineIterator(string $iterator_string, array $dataset)
         {
-            if (count($processString = array_values(array_filter(preg_split('/^(.*?)"/', $iterator_string)))) === 1) {
+            $iterator_split = preg_split('/^(.*?)"/', $iterator_string);
+            $processString = is_array($iterator_split) ? array_values(array_filter($iterator_split)) : [];
+
+            if (count($processString) === 1) {
                 $processString = '"' . $processString[0];
                 $iterator_fragments = array_values(array_filter(explode($processString, $iterator_string)));
                 $iterator_fragments = (isset($iterator_fragments[0]) ? trim($iterator_fragments[0]) : '');
 
-                $processString = preg_replace('/__(.*?)__/', '{{${1}}}', $processString);
+                $processString = (string) preg_replace('/__(.*?)__/', '{{${1}}}', $processString);
                 $processString = preg_replace('/^"|"$/', '', $processString);
 
-                return trim($this->processEachStatement($iterator_fragments, $processString, $dataset));
+                return trim($this->processEachStatement($iterator_fragments, (string) $processString, $dataset));
             }
 
             return '';
@@ -773,7 +771,7 @@ if (!class_exists('Brace\Parser')) {
          * Undocumented function
          *
          * @param string $condition
-         * @param array $dataset
+         * @param array<mixed> $dataset
          * @return boolean
          */
         private function processConditions(string $condition, array $dataset): bool
@@ -790,8 +788,8 @@ if (!class_exists('Brace\Parser')) {
                     /** Replace spaces in string match */
                     if (preg_match_all('/"(.*)"/', $alternative_condition, $matches, PREG_SET_ORDER)) {
                         foreach ($matches as $this_match) {
-                            $replace_spaces = str_replace(' ', '+', $this->strArray($this_match[0]));
-                            $alternative_condition = str_replace($this->strArray($this_match[0]), $this->strArray($replace_spaces), $this->strArray($alternative_condition));
+                            $replace_spaces = str_replace(' ', '+', $this_match[0]);
+                            $alternative_condition = str_replace($this_match[0], $replace_spaces, $alternative_condition);
                         }
                     }
 
@@ -811,8 +809,8 @@ if (!class_exists('Brace\Parser')) {
         /**
          * Process a single condition block
          *
-         * @param array $condition
-         * @param array $dataset
+         * @param array<mixed> $condition
+         * @param array<mixed> $dataset
          * @return boolean
          */
         private function processSingleCondition(array $condition, array $dataset): bool
@@ -822,69 +820,31 @@ if (!class_exists('Brace\Parser')) {
                 $expected = (isset($condition[2]) ? $this->returnChainedVariables(trim($condition[2]), $dataset) : false);
 
                 if (!$expected) {
-                    $expected = (isset($condition[2]) ? trim($condition[2]) : true);
-                    $expected = str_replace(['"','+'], ['',' '], $this->strArray($expected));
+                    $expected = isset($condition[2]) ? trim($condition[2]) : true;
+                    $expected = is_string($expected) ? str_replace(['"','+'], ['',' '], $expected) : $expected;
                 }
 
-                switch ($challenge) {
-                    case 'EXISTS':
-                        return true;
-                        break;
-                    case "==":
-                        return ($data == $expected ? true : false); // Equal
-                        break;
-                    case "===":
-                        return ($data === $expected ? true : false); // Identical
-                        break;
-
-                    case "!=":
-                        return ($data != $expected ? true : false); // Not Equal
-                        break;
-
-                    case "!!":
-                    case "!==":
-                        return ($data !== $expected ? true : false); // Not identical
-                        break;
-
-                    case ">":
-                        return (intval($data) > intval($expected) ? true : false); // More than
-                        break;
-
-                    case "<":
-                        return (intval($data) < intval($expected) ? true : false); // Less than
-                        break;
-
-                    case ">=":
-                        return (intval($data) >= intval($expected) ? true : false); // Greater than or equal to
-                        break;
-
-                    case "<=":
-                        return (intval($data) <= intval($expected) ? true : false); // Less than or equal to
-                        break;
-                }
+                return match ($challenge) {
+                    'EXISTS' => true,
+                    '==' => $data == $expected ? true : false, // Equal
+                    '===' => $data === $expected ? true : false, // Identical
+                    '!=' => $data != $expected ? true : false, // Not Equal
+                    '!!' => $data !== $expected ? true : false, // Not identical
+                    '!==' => $data !== $expected ? true : false, // Not identical
+                    '>' => intval($data) > intval($expected) ? true : false, // More than,
+                    '<' => intval($data) < intval($expected) ? true : false, // Less than,
+                    '>=' => intval($data) >= intval($expected) ? true : false, // Greater than or equal to,
+                    '<=' => intval($data) <= intval($expected) ? true : false, // Less than or equal to,
+                    default => false
+                };
             } elseif (count($condition) > 1) {
                 switch ($condition[1]) {
                     case '!EXISTS':
                         return true;
-                        break;
                 }
             }
 
             return false;
-        }
-
-        /**
-         * Ensure array or string is returned
-         *
-         * @param array $mixed_value
-         * @return mixed
-         */
-        private function strArray($mixed_value)
-        {
-            if (!is_array($mixed_value) && !is_string($mixed_value)) {
-                return strval($mixed_value);
-            }
-            return $mixed_value;
         }
     }
 }
