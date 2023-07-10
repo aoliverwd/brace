@@ -36,7 +36,7 @@
     "scripts": {
         "test" : [
             "./vendor/bin/phpstan analyse -c phpstan.neon",
-            "./vendor/bin/phpunit -c ./tests/phpunit.xml"
+            "@unit"
         ],
         "unit" : [
             "./vendor/bin/phpunit -c ./tests/phpunit.xml"
