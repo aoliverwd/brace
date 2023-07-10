@@ -122,9 +122,9 @@ if (!class_exists('Brace\Parser')) {
 
         /**
          * Register shortcode
-         * @param  string $name      [description]
-         * @param  string $theMethod [description]
-         * @return object            [description]
+         * @param  string $name
+         * @param  string $theMethod
+         * @return object
          */
         public function regShortcode(string $name, string $theMethod): object
         {
@@ -135,6 +135,36 @@ if (!class_exists('Brace\Parser')) {
             }
 
             return $this;
+        }
+
+        /**
+         * Return chained variable data
+         *
+         * @param string $string
+         * @param array<mixed> $dataset
+         * @return string|array<mixed>
+         */
+        public static function returnChainedVariables(string $string, array $dataset): string|array
+        {
+            $return = [];
+            $is_count = false;
+
+            // Check for count
+            if (preg_match('/^COUNT\((.*?)\)/', $string, $match)) {
+                $string = isset($match[1]) ? $match[1] : $string;
+                $is_count = true;
+            }
+
+            foreach (explode('->', $string) as $thisVar) {
+                if (is_array($dataset) && isset($dataset[$thisVar])) {
+                    $dataset = $dataset[$thisVar];
+                    $return = $is_count ? count($dataset) : $dataset;
+                } else {
+                    return '';
+                }
+            }
+
+            return $return;
         }
 
         /**
@@ -461,7 +491,7 @@ if (!class_exists('Brace\Parser')) {
             $each_set = explode(' ', trim($each_statement));
             $return_string = '';
 
-            $use_data = $this->returnChainedVariables($each_set[0], $dataset);
+            $use_data = self::returnChainedVariables($each_set[0], $dataset);
 
             if ($use_data && is_array($use_data)) {
 
@@ -635,7 +665,7 @@ if (!class_exists('Brace\Parser')) {
                         $replace_variable = $this->processInlineIterator($processString, $dataset);
                     } elseif (count($has_alternative_vars) > 1) {
                         foreach ($has_alternative_vars as $this_variable) {
-                            if ($replace_variable = $this->returnChainedVariables($this_variable, $dataset)) {
+                            if ($replace_variable = self::returnChainedVariables($this_variable, $dataset)) {
                                 break;
                             }
                         }
@@ -644,10 +674,10 @@ if (!class_exists('Brace\Parser')) {
                             $replace_variable = $content;
                         }
                     } else {
-                        $replace_variable = $this->returnChainedVariables($processString, $dataset);
+                        $replace_variable = self::returnChainedVariables($processString, $dataset);
                     }
 
-                    $template_string = str_replace($replace_string, (string) $replace_variable, $template_string);
+                    $template_string = str_replace($replace_string, $replace_variable, $template_string);
                 }
             }
 
@@ -673,7 +703,7 @@ if (!class_exists('Brace\Parser')) {
                 /** Input string has variables */
                 if (preg_match_all('/__(.*?)__/i', $content[1], $variables, PREG_SET_ORDER)) {
                     foreach ($variables as $this_variable) {
-                        $content[1] = str_replace($this_variable[0], (string) $this->returnChainedVariables($this_variable[1], $dataset), $content[1]);
+                        $content[1] = str_replace($this_variable[0], self::returnChainedVariables($this_variable[1], $dataset), $content[1]);
                     }
                 }
 
@@ -683,37 +713,6 @@ if (!class_exists('Brace\Parser')) {
 
             return '';
         }
-
-        /**
-         * Return chained variable data
-         *
-         * @param string $string
-         * @param array<mixed> $dataset
-         * @return mixed
-         */
-        private function returnChainedVariables(string $string, array $dataset): mixed
-        {
-            $return = [];
-            $is_count = false;
-
-            // Check for count
-            if (preg_match('/^COUNT\((.*?)\)/', $string, $match)) {
-                $string = isset($match[1]) ? $match[1] : $string;
-                $is_count = true;
-            }
-
-            foreach (explode('->', $string) as $thisVar) {
-                if (is_array($dataset) && isset($dataset[$thisVar])) {
-                    $dataset = $dataset[$thisVar];
-                    $return = $is_count ? count($dataset) : $dataset;
-                } else {
-                    return '';
-                }
-            }
-
-            return $return;
-        }
-
 
         /**
          * Process in-line condition
@@ -811,9 +810,9 @@ if (!class_exists('Brace\Parser')) {
          */
         private function processSingleCondition(array $condition, array $dataset): bool
         {
-            if (count($condition) > 0 && $data = $this->returnChainedVariables(trim($condition[0]), $dataset)) {
+            if (count($condition) > 0 && $data = self::returnChainedVariables(trim($condition[0]), $dataset)) {
                 $challenge = (isset($condition[1]) ? $condition[1] : 'EXISTS');
-                $expected = (isset($condition[2]) ? $this->returnChainedVariables(trim($condition[2]), $dataset) : false);
+                $expected = (isset($condition[2]) ? self::returnChainedVariables(trim($condition[2]), $dataset) : false);
 
                 if (!$expected) {
                     $expected = isset($condition[2]) ? trim($condition[2]) : true;
