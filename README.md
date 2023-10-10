@@ -18,6 +18,7 @@ brace is a simple template language written in PHP. Brace uses a handlebar style
     - Variables
         - In-line "or" operator
         - Multiple In-line "or" operators
+        - Return variable values by an array index value
     - Iterators
         - In-line Iterators
     - Nth children
@@ -160,6 +161,44 @@ $brace->Parse('example',[
 
 ```html
 <p>{{firstname || fname || "No first name found"}}</p>
+```
+
+### Return variable values by an array index value
+
+```html
+<p>Hi {{names->?first[Jane]->title}} {{names->?first[Jane]->last}}</p>
+```
+
+```php
+/** New brace instance */
+$brace = new Brace\Parser();
+
+/** Process template and echo out */
+$brace->Parse('example',[
+    'names' => [
+        0 => [
+            'title' => 'Mr',
+            'first' => 'John',
+            'last' => 'Smith'
+        ],
+        1 => [
+            'title' => 'Miss',
+            'first' => 'Jane',
+            'last' => 'Doe'
+        ],
+        2 => [
+            'title' => 'Dr',
+            'first' => 'David',
+            'last' => 'Jones'
+        ]
+    ]
+]);
+```
+
+Result:
+
+```html
+<p>Hi Miss Doe</p>
 ```
 
 ## Iterators

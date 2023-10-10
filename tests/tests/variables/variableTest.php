@@ -9,10 +9,8 @@ declare(strict_types=1);
 
 namespace ConditionTests;
 
-use Brace;
-
-/** PHPUnit namespace */
 use PHPUnit\Framework\TestCase;
+use Brace;
 
 /**
  * VariablesTest class
@@ -20,8 +18,8 @@ use PHPUnit\Framework\TestCase;
 final class VariablesTest extends TestCase
 {
     /**
-     * Simple variable
-     * @return [type] [description]
+     * Test simple variable
+     * @return void
      */
     public function testVariables(): void
     {
@@ -33,8 +31,8 @@ final class VariablesTest extends TestCase
     }
 
     /**
-     * [testOrVariables description]
-     * @return [type] [description]
+     * Test inline or condition
+     * @return void
      */
     public function testOrVariables(): void
     {
@@ -46,8 +44,8 @@ final class VariablesTest extends TestCase
     }
 
     /**
-     * [testOrOrVariable description]
-     * @return [type] [description]
+     * Test inline or or condition
+     * @return void
      */
     public function testMultipleOrVariable(): void
     {
@@ -59,8 +57,27 @@ final class VariablesTest extends TestCase
     }
 
     /**
-     * [testOrOrVariablesString description]
-     * @return [type] [description]
+     * Test inline or or condition with nested data
+     * @return void
+     */
+    public function testMultipleOrVariableWithNestedData(): void
+    {
+        $brace = new Brace\Parser();
+        $this->assertEquals(
+            "Hello Dave\n",
+            $brace->parseInputString('Hello {{fname || name->first || "Simon"}}', [
+                'name' => [
+                    'first' => 'Dave',
+                    'last' => 'Smith'
+                ]
+            ], false)->return()
+        );
+    }
+
+
+    /**
+     * Test multiple or variables
+     * @return void
      */
     public function testMultipleOrVariableString(): void
     {
@@ -72,8 +89,8 @@ final class VariablesTest extends TestCase
     }
 
     /**
-     * [testAlternateVariable description]
-     * @return [type] [description]
+     * Test alternative variable
+     * @return void
      */
     public function testAlternateVariable(): void
     {
@@ -85,8 +102,8 @@ final class VariablesTest extends TestCase
     }
 
     /**
-     * [testNestedVariables description]
-     * @return [type] [description]
+     * Test nested variables
+     * @return void
      */
     public function testNestedVariables(): void
     {
@@ -97,6 +114,68 @@ final class VariablesTest extends TestCase
                 'name' => [
                     'first' => 'John',
                     'last' => 'Smith'
+                ]
+            ], false)->return()
+        );
+    }
+
+    /**
+     * Test nested variables by array value
+     * @return void
+     */
+    public function testNestedVariablesByArrayName(): void
+    {
+        $brace = new Brace\Parser();
+        $this->assertEquals(
+            "Hi Miss Doe\n",
+            $brace->parseInputString('Hi {{names->?first[Jane]->title}} {{names->?first[Jane]->last}}', [
+                'names' => [
+                    0 => [
+                        'title' => 'Mr',
+                        'first' => 'John',
+                        'last' => 'Smith'
+                    ],
+                    1 => [
+                        'title' => 'Miss',
+                        'first' => 'Jane',
+                        'last' => 'Doe'
+                    ],
+                    2 => [
+                        'title' => 'Dr',
+                        'first' => 'David',
+                        'last' => 'Jones'
+                    ]
+                ]
+            ], false)->return()
+        );
+    }
+
+    /**
+     * Test blank return nested variable by array value
+     * @return void
+     */
+    public function testBlankReturnNestedVariableByArrayName(): void
+    {
+        $brace = new Brace\Parser();
+        $this->assertEquals(
+            "\n",
+            $brace->parseInputString('{{names->?last[Brown]->first}}', [
+                'names' => [
+                    0 => [
+                        'title' => 'Mr',
+                        'first' => 'John',
+                        'last' => 'Smith'
+                    ],
+                    1 => [
+                        'title' => 'Miss',
+                        'first' => 'Jane',
+                        'last' => 'Doe'
+                    ],
+                    2 => [
+                        'title' => 'Dr',
+                        'first' => 'David',
+                        'last' => 'Jones'
+                    ]
                 ]
             ], false)->return()
         );

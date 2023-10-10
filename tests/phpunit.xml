@@ -17,13 +17,8 @@
     <testsuite name="shortcodes">
       <directory>tests/shortcodes</directory>
     </testsuite>
-    <!--
-    <testsuite name="compatibility">
-      <directory>tests/compatibility</directory>
-    </testsuite>
-    -->
   </testsuites>
   <logging>
-    <testdoxText outputFile="logs/testdox.txt"/>
+    <testdoxText outputFile="testdox.txt"/>
   </logging>
 </phpunit>

@@ -8,9 +8,12 @@ Variables (ConditionTests\Variables)
  [x] Variables
  [x] Or variables
  [x] Multiple or variable
+ [x] Multiple or variable with nested data
  [x] Multiple or variable string
  [x] Alternate variable
  [x] Nested variables
+ [x] Nested variables by array name
+ [x] Blank return nested variable by array name
 
 Inline Conditions (ConditionTests\InlineConditions)
  [x] Inline condition
