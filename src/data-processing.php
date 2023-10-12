@@ -26,7 +26,7 @@ final class DataProcessing
                     }
                 }
 
-                $dataset = !empty(trim($thisVar)) ? self::processChain($thisVar, $dataset) : $dataset;
+                $dataset = !empty(trim($thisVar)) ? self::processChain($thisVar, is_array($dataset) ? $dataset : []) : $dataset;
             }
         }
 
