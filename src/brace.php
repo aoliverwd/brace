@@ -314,7 +314,7 @@ final class Parser
         if (preg_match_all('/\[(.*?)\]/', $this_line, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $theShortcode) {
                 $this_line = (function_exists('do_shortcode')
-                    ? str_replace($theShortcode[0], do_shortcode($theShortcode[0]), $this_line)
+                    ? str_replace($theShortcode[0], do_shortcode($this->processVariables($theShortcode[0], $dataset)), $this_line)
                     : str_replace($theShortcode[0], $this->callShortcode($theShortcode[0], $dataset), $this_line));
             }
         }
