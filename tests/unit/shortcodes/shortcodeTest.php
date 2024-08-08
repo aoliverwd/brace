@@ -29,7 +29,6 @@ $bar = function () {
  */
 final class ShortcodeTest extends TestCase
 {
-
     /**
      * [testIncludeTemplate description]
      * @return [type] [description]
@@ -80,6 +79,38 @@ final class ShortcodeTest extends TestCase
             $brace->parseInputString('[@include {{file}}]', [
                 'file' => 'include-file'
             ], false)->return()
+        );
+    }
+
+    /**
+     * [testIncludeTemplate description]
+     * @return [type] [description]
+     */
+    public function testShortcodeArrowFunction(): void
+    {
+        $brace = new Brace\Parser();
+
+        $brace->regShortcode('foo', fn() => 'foo bar');
+
+        $this->assertEquals(
+            "foo bar\n",
+            $brace->parseInputString('[foo]', [], false)->return()
+        );
+    }
+
+    /**
+     * [testIncludeTemplate description]
+     * @return [type] [description]
+     */
+    public function testShortcodeArrowFunctionYear(): void
+    {
+        $brace = new Brace\Parser();
+
+        $brace->regShortcode('year', fn() => date('Y', strtotime('2024-01-01')));
+
+        $this->assertEquals(
+            "2024\n",
+            $brace->parseInputString('[year]', [], false)->return()
         );
     }
 }

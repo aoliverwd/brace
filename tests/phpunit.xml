@@ -3,19 +3,19 @@
   <coverage/>
   <testsuites>
     <testsuite name="includes">
-      <directory>tests/includes</directory>
+      <directory>unit/includes</directory>
     </testsuite>
     <testsuite name="variables">
-      <directory>tests/variables</directory>
+      <directory>unit/variables</directory>
     </testsuite>
     <testsuite name="conditions">
-      <directory>tests/conditions</directory>
+      <directory>unit/conditions</directory>
     </testsuite>
     <testsuite name="iterators">
-      <directory>tests/iterators</directory>
+      <directory>unit/iterators</directory>
     </testsuite>
     <testsuite name="shortcodes">
-      <directory>tests/shortcodes</directory>
+      <directory>unit/shortcodes</directory>
     </testsuite>
   </testsuites>
   <logging>

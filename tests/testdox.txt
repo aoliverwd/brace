@@ -65,4 +65,6 @@ Shortcode (ConditionTests\Shortcode)
  [x] Shortcode
  [x] Shortcode include template
  [x] Shortcode include template via variable
+ [x] Shortcode arrow function
+ [x] Shortcode arrow function year
 
