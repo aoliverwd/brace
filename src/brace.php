@@ -124,14 +124,12 @@ final class Parser
     /**
      * Register shortcode
      * @param  string $name
-     * @param  string $theMethod
+     * @param  string|callable $theMethod
      * @return object
      */
-    public function regShortcode(string $name, string $theMethod): object
+    public function regShortcode(string $name, string|callable $theMethod): object
     {
-        $theMethod = (gettype($theMethod) === 'string' && strlen($theMethod) > 0 ? $theMethod : $name);
-
-        if (!isset($this->shortcode_methods[$name]) && gettype($name) === 'string' && strlen($name) > 0) {
+        if (!isset($this->shortcode_methods[$name])) {
             $this->shortcode_methods[$name] = $theMethod;
         }
 
