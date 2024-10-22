@@ -127,4 +127,25 @@ final class ShortcodeTest extends TestCase
             ], false)->return()
         );
     }
+
+
+    public function testShortcodeWithArrayDataVariables(): void
+    {
+        $brace = new Brace\Parser();
+        $brace->template_path = __DIR__ . '/';
+
+        $brace->regShortcode('name', fn($attributes) => $attributes['name']);
+        $names = [
+            0 => 'Alex',
+            1 => 'John',
+            2 => 'Andre'
+        ];
+
+        $this->assertEquals(
+            "Alex\nJohn\nAndre\n",
+            $brace->Parse('data-variables', [
+                'names' => $names
+            ], false)->return()
+        );
+    }
 }

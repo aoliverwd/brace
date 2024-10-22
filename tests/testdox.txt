@@ -72,4 +72,5 @@ Shortcode (ConditionTests\Shortcode)
  [x] Shortcode arrow function
  [x] Shortcode arrow function year
  [x] Shortcode with data variables
+ [x] Shortcode with array data variables
 
