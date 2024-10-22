@@ -140,10 +140,8 @@ final class Parser
      * @param  string|callable $theMethod
      * @return object
      */
-    public function regShortcode(
-        string $name,
-        string|callable $theMethod
-    ): object {
+    public function regShortcode(string $name, string|callable $theMethod): object
+    {
         if (!isset($this->shortcode_methods[$name])) {
             $this->shortcode_methods[$name] = $theMethod;
         }
@@ -158,10 +156,8 @@ final class Parser
      * @param array<mixed> $dataset
      * @return string
      */
-    private function callShortcode(
-        string $shortcodeSyntax,
-        array $dataset
-    ): string {
+    private function callShortcode(string $shortcodeSyntax, array $dataset): string
+    {
         $sanatise_1 = str_replace("&quot;", '"', $shortcodeSyntax);
         $sanatise_2 = str_replace(["[", "]"], "", $sanatise_1);
         $args = explode(" ", $sanatise_2);
@@ -374,6 +370,9 @@ final class Parser
             $this_line = "";
         }
 
+        /** Process variables, in-line conditions and in-line iterators */
+        $this_line = $this->processVariables($this_line, $dataset);
+
         /** Is shortcode */
         if (
             preg_match_all("/\[(.*?)\]/", $this_line, $matches, PREG_SET_ORDER)
@@ -394,9 +393,6 @@ final class Parser
                     );
             }
         }
-
-        /** Process variables, in-line conditions and in-line iterators */
-        $this_line = $this->processVariables($this_line, $dataset);
 
         /** Output current line */
         if ($render) {

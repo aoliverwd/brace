@@ -113,4 +113,18 @@ final class ShortcodeTest extends TestCase
             $brace->parseInputString('[year]', [], false)->return()
         );
     }
+
+    public function testShortcodeWithDataVariables(): void
+    {
+        $brace = new Brace\Parser();
+
+        $brace->regShortcode('year', fn($attributes) => date('Y', strtotime($attributes['date'])));
+
+        $this->assertEquals(
+            "2024\n",
+            $brace->parseInputString('[year date="{{date}}"]', [
+                'date' => '2024-01-01'
+            ], false)->return()
+        );
+    }
 }
