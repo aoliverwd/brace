@@ -32,6 +32,8 @@ Block Conditions (ConditionTests\BlockConditions)
  [x] If is true block condition
  [x] If else condition
  [x] Multiple if else condition
+ [x] Bool check function call return true
+ [x] Bool check function call return false
 
 Conditions (ConditionTests\Conditions)
  [x] Equals

@@ -19,7 +19,6 @@ use PHPUnit\Framework\TestCase;
  */
 final class BlockConditionsTest extends TestCase
 {
-
     public function testIfBlockCondition(): void
     {
         $brace = new \Brace\Parser();
@@ -102,5 +101,37 @@ final class BlockConditionsTest extends TestCase
                 ]
             ], false)->return()
         );
+    }
+
+    public function testBoolCheckFunctionCallReturnTrue(): void
+    {
+        $brace = new Brace\Parser();
+        $brace->template_path = __DIR__ . '/';
+
+        $this->assertEquals(
+            "success\n",
+            $brace->Parse('inline-method-check-true', [], false)->return()
+        );
+    }
+
+    public function testBoolCheckFunctionCallReturnFalse(): void
+    {
+        $brace = new Brace\Parser();
+        $brace->template_path = __DIR__ . '/';
+
+        $this->assertEquals(
+            "fail\n",
+            $brace->Parse('inline-method-check-false', [], false)->return()
+        );
+    }
+
+    public static function methodTrue(): bool
+    {
+        return true;
+    }
+
+    public static function methodFalse(): void
+    {
+        return;
     }
 }
