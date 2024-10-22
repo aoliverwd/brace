@@ -19,7 +19,6 @@ use PHPUnit\Framework\TestCase;
  */
 final class InlineConditionsTest extends TestCase
 {
-
     /**
      * [testInlineCondition description]
      * @return [type] [description]
@@ -92,5 +91,33 @@ final class InlineConditionsTest extends TestCase
             "My name is Simon and im older then 21 years old\n",
             $brace->parseInputString('{{name && age === 21 || age > 18 ? "My name is __name__ and im older then 21 years old" : "You are __age__ years old"}}', ['name' => 'Simon', 'age' => 25], false)->return()
         );
+    }
+
+    public function testInlineBoolCheckFunctionCallReturnTrue(): void
+    {
+        $brace = new Brace\Parser();
+        $this->assertEquals(
+            "success\n",
+            $brace->parseInputString('{{\ConditionTests\InlineConditionsTest::methodTrue ? "success" : "fail"}}', [], false)->return()
+        );
+    }
+
+    public function testInlineBoolCheckFunctionCallReturnFalse(): void
+    {
+        $brace = new Brace\Parser();
+        $this->assertEquals(
+            "fail\n",
+            $brace->parseInputString('{{\ConditionTests\InlineConditionsTest::methodFalse ? "success" : "fail"}}', [], false)->return()
+        );
+    }
+
+    public static function methodTrue(): bool
+    {
+        return true;
+    }
+
+    public static function methodFalse(): void
+    {
+        return;
     }
 }
