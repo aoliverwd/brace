@@ -62,8 +62,8 @@ final class DataProcessing
         $is_count = self::checkForCount($input);
         $is_a_callable = self::checkForCallable($input);
 
-        if (!empty($is_a_callable) && is_callable($is_a_callable)) {
-            return boolval($is_a_callable());
+        if (!empty($is_a_callable) && is_callable($is_a_callable['callable'])) {
+            return boolval(call_user_func($is_a_callable['callable'], $is_a_callable['attributes']));
         }
 
         $input = !empty($is_count) ? $is_count : $input;
@@ -97,14 +97,24 @@ final class DataProcessing
     /**
      * Check for callable
      * @param  string $input
-     * @return string
+     * @return array<mixed>
      */
-    private static function checkForCallable(string $input): string
+    private static function checkForCallable(string $input): array
     {
-        if (preg_match("/^([\\\A-Za-z_]+::[A-Za-z_]+)$/", $input, $match)) {
-            return $match[0];
+        if (preg_match("/^([\\\A-Za-z_]+::[A-Za-z_]+)$|^([\\\A-Za-z_]+::[A-Za-z_]+)\((.*?)\)$/", $input, $match)) {
+            if (count($match) === 4) {
+                return [
+                    'callable' => $match[2],
+                    'attributes' => is_scalar($match[3]) ? preg_replace('/^"|"$|^\'|\'$/', '', $match[3]) : ''
+                ];
+            } else {
+                return [
+                    'callable' => $match[1],
+                    'attributes' => ''
+                ];
+            }
         }
 
-        return "";
+        return [];
     }
 }

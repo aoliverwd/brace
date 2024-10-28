@@ -111,6 +111,26 @@ final class InlineConditionsTest extends TestCase
         );
     }
 
+    public function testInlineBoolCheckFunctionCallWithAttributeTrue(): void
+    {
+        $brace = new Brace\Parser();
+
+        $this->assertEquals(
+            "success\n",
+            $brace->parseInputString('{{\ConditionTests\InlineConditionsTest::methodWithAttribute("foobar") ? "success" : "fail"}}', [], false)->return()
+        );
+    }
+
+    public function testInlineBoolCheckFunctionCallWithAttributeFalse(): void
+    {
+        $brace = new Brace\Parser();
+
+        $this->assertEquals(
+            "fail\n",
+            $brace->parseInputString('{{\ConditionTests\InlineConditionsTest::methodWithAttribute(barfoo) ? "success" : "fail"}}', [], false)->return()
+        );
+    }
+
     public static function methodTrue(): bool
     {
         return true;
@@ -119,5 +139,10 @@ final class InlineConditionsTest extends TestCase
     public static function methodFalse(): void
     {
         return;
+    }
+
+    public static function methodWithAttribute(string $test): bool
+    {
+        return $test === 'foobar' ? true : false;
     }
 }

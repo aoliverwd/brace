@@ -24,6 +24,8 @@ Inline Conditions (ConditionTests\InlineConditions)
  [x] Inline and or condition
  [x] Inline bool check function call return true
  [x] Inline bool check function call return false
+ [x] Inline bool check function call with attribute true
+ [x] Inline bool check function call with attribute false
 
 Block Conditions (ConditionTests\BlockConditions)
  [x] If block condition
