@@ -19,7 +19,6 @@ use PHPUnit\Framework\TestCase;
  */
 final class IteratorsTest extends TestCase
 {
-
     public function testNestedIteration(): void
     {
         $brace = new Brace\Parser();
@@ -210,6 +209,36 @@ final class IteratorsTest extends TestCase
                     'name_2' => 'John',
                     'name_3' => 'Barry'
                 ]
+            ], false)->return()
+        );
+    }
+
+    public function testIterationFromNumber(): void
+    {
+        $brace = new Brace\Parser();
+        $brace->template_path = __DIR__ . '/';
+
+        $this->assertEquals(
+            "11\n" .
+            "12\n" .
+            "13\n",
+            $brace->parseInputString('[@include iterator-from-number]', [
+                'names' => ['Dave', 'John', 'Barry']
+            ], false)->return()
+        );
+    }
+
+    public function testInlineIterationFromNumber(): void
+    {
+        $brace = new Brace\Parser();
+        $brace->template_path = __DIR__ . '/';
+
+        $this->assertEquals(
+            "23\n" .
+            "24\n" .
+            "25\n",
+            $brace->parseInputString('[@include inline-iterator-from-number]', [
+                'names' => ['Dave', 'John', 'Barry']
             ], false)->return()
         );
     }

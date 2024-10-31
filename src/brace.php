@@ -578,8 +578,10 @@ final class Parser
         string $block_content,
         array $dataset
     ): string {
-        $each_set = explode(" ", trim($each_statement));
+        $offset_row = explode('offset_row_id', trim($each_statement));
+        $each_set = array_filter(explode(" ", $offset_row[0]));
         $return_string = "";
+        $offset_row_id = count($offset_row) === 2 ? intval(trim(end($offset_row))) : 0;
 
         $use_data = DataProcessing::processDataChain($each_set[0], $dataset);
 
@@ -598,7 +600,7 @@ final class Parser
             $process_each_block = new Parser();
             $process_each_block->template_path = $this->template_path;
 
-            $iterator_count = 1;
+            $iterator_count = 1 + $offset_row_id;
             $row_count = count($use_data);
 
             switch (count($each_set)) {
