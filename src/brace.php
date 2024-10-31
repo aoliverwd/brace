@@ -581,7 +581,16 @@ final class Parser
         $offset_row = explode('offset_row_id', trim($each_statement));
         $each_set = array_filter(explode(" ", $offset_row[0]));
         $return_string = "";
-        $offset_row_id = count($offset_row) === 2 ? intval(trim(end($offset_row))) : 0;
+
+        $offset_row_id = count($offset_row) === 2 ? trim(end($offset_row)) : 0;
+
+        if ($offset_row_id !== 0) {
+            $offset_row_id = preg_match('/^[0-9]$+/', $offset_row_id)
+                ? intval($offset_row_id)
+                : DataProcessing::processDataChain($offset_row_id, $dataset);
+
+            $offset_row_id = is_scalar($offset_row_id) ? intval($offset_row_id) : 0;
+        }
 
         $use_data = DataProcessing::processDataChain($each_set[0], $dataset);
 

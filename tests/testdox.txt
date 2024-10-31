@@ -65,6 +65,8 @@ Iterators (ConditionTests\Iterators)
  [x] Inline iterator key value
  [x] Iteration from number
  [x] Inline iteration from number
+ [x] Iteration from variable
+ [x] Inline iteration from variable
  [x] Loop iteration standard
  [x] Loop iteration ascending
  [x] Loop iteration descending

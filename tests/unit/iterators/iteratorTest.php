@@ -243,6 +243,38 @@ final class IteratorsTest extends TestCase
         );
     }
 
+    public function testIterationFromVariable(): void
+    {
+        $brace = new Brace\Parser();
+        $brace->template_path = __DIR__ . '/';
+
+        $this->assertEquals(
+            "11\n" .
+            "12\n" .
+            "13\n",
+            $brace->parseInputString('[@include iterator-from-variable]', [
+                'names' => ['Dave', 'John', 'Barry'],
+                'offset' => 10
+            ], false)->return()
+        );
+    }
+
+    public function testInlineIterationFromVariable(): void
+    {
+        $brace = new Brace\Parser();
+        $brace->template_path = __DIR__ . '/';
+
+        $this->assertEquals(
+            "23\n" .
+            "24\n" .
+            "25\n",
+            $brace->parseInputString('[@include inline-iterator-from-variable]', [
+                'names' => ['Dave', 'John', 'Barry'],
+                'offset' => 22
+            ], false)->return()
+        );
+    }
+
     public function testLoopIterationStandard(): void
     {
         $brace = new Brace\Parser();
