@@ -37,6 +37,13 @@ final class Parser
      * @var array<mixed>
      */
     private array $shortcode_methods = [];
+
+    /**
+     * callable_methods
+     * @var array<mixed>
+     */
+    private array $callable_methods = [];
+
     /**
      * block_condition
      * @var array<mixed>
@@ -198,6 +205,38 @@ final class Parser
         } else {
             return $shortcodeSyntax;
         }
+    }
+
+    /**
+     * Register a callable method
+     *
+     * @param string $name
+     * @param callable $method
+     * @return object
+     */
+    public function registerCallable(string $name, callable $method): object
+    {
+        if (!isset($this->callable_methods[$name])) {
+            $this->callable_methods[$name] = $method;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Call a callable method
+     *
+     * @param string $method
+     * @param string $content
+     * @return string
+     */
+    private function callables(string $method, string $content): string
+    {
+        if (isset($this->callable_methods[$method])) {
+            return $this->callable_methods[$method](preg_replace(['/^"(.*?)"$/', "/^'(.*?)'$/"], '$1', $content));
+        }
+
+        return '';
     }
 
     /**
@@ -392,6 +431,16 @@ final class Parser
                         $this->callShortcode($theShortcode[0], $dataset),
                         $this_line
                     );
+            }
+        }
+
+        /** Is Callable */
+        if (preg_match_all('/([a-zA-Z0-9_-]+)\((.*?)\)/', $this_line, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $callableMethod) {
+                $this_line = str_replace($callableMethod[0], $this->callables(
+                    method: $callableMethod[1],
+                    content: $callableMethod[2]
+                ), $this_line);
             }
         }
 

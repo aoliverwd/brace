@@ -80,3 +80,9 @@ Shortcode (ConditionTests\Shortcode)
  [x] Shortcode with data variables
  [x] Shortcode with array data variables
 
+Callable (ConditionTests\Callable)
+ [x] Callable method
+ [x] Callable method with arg double quotes
+ [x] Callable method with arg single quotes
+ [x] Callable method with arg no quotes
+

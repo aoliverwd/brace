@@ -17,6 +17,9 @@
     <testsuite name="shortcodes">
       <directory>unit/shortcodes</directory>
     </testsuite>
+    <testsuite name="callables">
+      <directory>unit/callables</directory>
+    </testsuite>
   </testsuites>
   <logging>
     <testdoxText outputFile="testdox.txt"/>
