@@ -378,6 +378,7 @@ final class Parser
             preg_match_all("/\[(.*?)\]/", $this_line, $matches, PREG_SET_ORDER)
         ) {
             foreach ($matches as $theShortcode) {
+                /** @disregard */
                 $this_line = function_exists("do_shortcode")
                     ? str_replace(
                         $theShortcode[0],
@@ -585,7 +586,7 @@ final class Parser
         $offset_row_id = count($offset_row) === 2 ? trim(end($offset_row)) : 0;
 
         if ($offset_row_id !== 0) {
-            $offset_row_id = preg_match('/^[0-9]$+/', $offset_row_id)
+            $offset_row_id = preg_match('/^[0-9]+$/', $offset_row_id)
                 ? intval($offset_row_id)
                 : DataProcessing::processDataChain($offset_row_id, $dataset);
 
@@ -719,7 +720,7 @@ final class Parser
                         "condition" => $match[1],
                         "content" => "",
                     ];
-                } else {
+                } elseif (is_array($return["elseif"])) {
                     $return["elseif"][array_key_last($return["elseif"])][
                         "content"
                     ] = rtrim($split_string[0]);
