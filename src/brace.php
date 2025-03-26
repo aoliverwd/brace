@@ -303,12 +303,18 @@ final class Parser
         }
 
         if (!$this->is_js_script) {
-            /** Is comment block */
+            /** Remove comment blocks */
             if ($this->remove_comment_blocks) {
+                /** Is inline comment */
+                if (preg_match('/<!--(.*?)-->/', $this_line)) {
+                    $this_line = preg_replace('/<!--(.*?)-->/', '', $this_line);
+                }
+
+                /** Is comment block */
                 if (
                     preg_match_all(
                         "/<!--|-->/i",
-                        $this_line,
+                        (string) $this_line,
                         $matches,
                         PREG_SET_ORDER
                     ) ||
@@ -341,7 +347,7 @@ final class Parser
                 !$this->is_block &&
                 preg_match_all(
                     "/{{if (.*?)}}|{{each (.*?)}}|{{loop (.*?)}}/i",
-                    $this_line,
+                    (string) $this_line,
                     $matches,
                     PREG_SET_ORDER
                 )
@@ -366,14 +372,14 @@ final class Parser
                 }
 
                 $this->block_condition[] = $block_type;
-                $this->block_spaces = (int) strpos($this_line, "{{" . $block_type);
+                $this->block_spaces = (int) strpos((string) $this_line, "{{" . $block_type);
                 $this->is_block = true;
 
                 /** Blank line */
                 $this_line = "";
             } elseif (
                 $this->is_block &&
-                rtrim($this_line) ===
+                rtrim((string) $this_line) ===
                     str_pad(
                         "{{end}}",
                         strlen("{{end}}") + $this->block_spaces,
@@ -405,7 +411,7 @@ final class Parser
             if (
                 preg_match_all(
                     "/(\[@include )(.*?)(])/",
-                    $this_line,
+                    (string) $this_line,
                     $include_templates,
                     PREG_SET_ORDER
                 )
@@ -422,7 +428,7 @@ final class Parser
             }
 
             /** Process variables, in-line conditions and in-line iterators */
-            $this_line = $this->processVariables($this_line, $dataset);
+            $this_line = $this->processVariables((string) $this_line, $dataset);
 
             /** Is shortcode */
             if (
