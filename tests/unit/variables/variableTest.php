@@ -26,7 +26,7 @@ final class VariablesTest extends TestCase
         $brace = new Brace\Parser();
         $this->assertEquals(
             "Hello Dave\n",
-            $brace->parseInputString('Hello {{name}}', ['name' => 'Dave'], false)->return()
+            $brace->parseInputString("Hello {{name}}", ["name" => "Dave"], false)->return()
         );
     }
 
@@ -52,7 +52,7 @@ final class VariablesTest extends TestCase
         $brace = new Brace\Parser();
         $this->assertEquals(
             "Hello Dave\n",
-            $brace->parseInputString('Hello {{name || fname || "Simon"}}', ['fname' => 'Dave'], false)->return()
+            $brace->parseInputString('Hello {{name || fname || "Simon"}}', ["fname" => "Dave"], false)->return()
         );
     }
 
@@ -65,15 +65,20 @@ final class VariablesTest extends TestCase
         $brace = new Brace\Parser();
         $this->assertEquals(
             "Hello Dave\n",
-            $brace->parseInputString('Hello {{fname || name->first || "Simon"}}', [
-                'name' => [
-                    'first' => 'Dave',
-                    'last' => 'Smith'
-                ]
-            ], false)->return()
+            $brace
+                ->parseInputString(
+                    'Hello {{fname || name->first || "Simon"}}',
+                    [
+                        "name" => [
+                            "first" => "Dave",
+                            "last" => "Smith",
+                        ],
+                    ],
+                    false
+                )
+                ->return()
         );
     }
-
 
     /**
      * Test multiple or variables
@@ -97,7 +102,7 @@ final class VariablesTest extends TestCase
         $brace = new Brace\Parser();
         $this->assertEquals(
             "Hello John\n",
-            $brace->parseInputString('Hello {{name || firstname}}', ['firstname' => "John"], false)->return()
+            $brace->parseInputString("Hello {{name || firstname}}", ["firstname" => "John"], false)->return()
         );
     }
 
@@ -110,12 +115,18 @@ final class VariablesTest extends TestCase
         $brace = new Brace\Parser();
         $this->assertEquals(
             "Hello John Smith\n",
-            $brace->parseInputString('Hello {{name->first}} {{name->last}}', [
-                'name' => [
-                    'first' => 'John',
-                    'last' => 'Smith'
-                ]
-            ], false)->return()
+            $brace
+                ->parseInputString(
+                    "Hello {{name->first}} {{name->last}}",
+                    [
+                        "name" => [
+                            "first" => "John",
+                            "last" => "Smith",
+                        ],
+                    ],
+                    false
+                )
+                ->return()
         );
     }
 
@@ -128,25 +139,31 @@ final class VariablesTest extends TestCase
         $brace = new Brace\Parser();
         $this->assertEquals(
             "Hi Miss Doe\n",
-            $brace->parseInputString('Hi {{names->?first[Jane]->title}} {{names->?first[Jane]->last}}', [
-                'names' => [
-                    0 => [
-                        'title' => 'Mr',
-                        'first' => 'John',
-                        'last' => 'Smith'
+            $brace
+                ->parseInputString(
+                    "Hi {{names->?first[Jane]->title}} {{names->?first[Jane]->last}}",
+                    [
+                        "names" => [
+                            0 => [
+                                "title" => "Mr",
+                                "first" => "John",
+                                "last" => "Smith",
+                            ],
+                            1 => [
+                                "title" => "Miss",
+                                "first" => "Jane",
+                                "last" => "Doe",
+                            ],
+                            2 => [
+                                "title" => "Dr",
+                                "first" => "David",
+                                "last" => "Jones",
+                            ],
+                        ],
                     ],
-                    1 => [
-                        'title' => 'Miss',
-                        'first' => 'Jane',
-                        'last' => 'Doe'
-                    ],
-                    2 => [
-                        'title' => 'Dr',
-                        'first' => 'David',
-                        'last' => 'Jones'
-                    ]
-                ]
-            ], false)->return()
+                    false
+                )
+                ->return()
         );
     }
 
@@ -159,25 +176,44 @@ final class VariablesTest extends TestCase
         $brace = new Brace\Parser();
         $this->assertEquals(
             "\n",
-            $brace->parseInputString('{{names->?last[Brown]->first}}', [
-                'names' => [
-                    0 => [
-                        'title' => 'Mr',
-                        'first' => 'John',
-                        'last' => 'Smith'
+            $brace
+                ->parseInputString(
+                    "{{names->?last[Brown]->first}}",
+                    [
+                        "names" => [
+                            0 => [
+                                "title" => "Mr",
+                                "first" => "John",
+                                "last" => "Smith",
+                            ],
+                            1 => [
+                                "title" => "Miss",
+                                "first" => "Jane",
+                                "last" => "Doe",
+                            ],
+                            2 => [
+                                "title" => "Dr",
+                                "first" => "David",
+                                "last" => "Jones",
+                            ],
+                        ],
                     ],
-                    1 => [
-                        'title' => 'Miss',
-                        'first' => 'Jane',
-                        'last' => 'Doe'
-                    ],
-                    2 => [
-                        'title' => 'Dr',
-                        'first' => 'David',
-                        'last' => 'Jones'
-                    ]
-                ]
-            ], false)->return()
+                    false
+                )
+                ->return()
+        );
+    }
+
+    /**
+     * Test simple variable
+     * @return void
+     */
+    public function testVariablesInScriptBlock(): void
+    {
+        $brace = new Brace\Parser();
+        $this->assertEquals(
+            "<script>console.log(\"Dave\");</script>\n",
+            $brace->parseInputString('<script>console.log("{{name}}");</script>', ["name" => "Dave"], false)->return()
         );
     }
 }

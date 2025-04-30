@@ -14,6 +14,7 @@ Variables (ConditionTests\Variables)
  [x] Nested variables
  [x] Nested variables by array name
  [x] Blank return nested variable by array name
+ [x] Variables in script block
 
 Inline Conditions (ConditionTests\InlineConditions)
  [x] Inline condition

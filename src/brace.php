@@ -68,18 +68,11 @@ final class Parser
      * @param boolean $render
      * @return object
      */
-    public function parse(
-        string $templates,
-        array $dataset,
-        bool $render = true
-    ): object {
+    public function parse(string $templates, array $dataset, bool $render = true): object
+    {
         /** Process individual template files */
         foreach (explode(",", trim($templates)) as $template_file) {
-            $this->processTemplateFile(
-                trim($template_file) . "." . $this->template_ext,
-                $dataset,
-                $render
-            );
+            $this->processTemplateFile(trim($template_file) . "." . $this->template_ext, $dataset, $render);
         }
 
         return $this;
@@ -93,11 +86,8 @@ final class Parser
      * @param boolean $render
      * @return object
      */
-    public function parseInputString(
-        string $input_string,
-        array $dataset,
-        bool $render
-    ): object {
+    public function parseInputString(string $input_string, array $dataset, bool $render): object
+    {
         foreach (explode("\n", $input_string) as $this_line) {
             $this->processLine($this_line . "\n", $dataset, $render);
         }
@@ -113,11 +103,8 @@ final class Parser
      * @param array<mixed> $dataset
      * @return void
      */
-    public function compile(
-        string $templates,
-        string $compile_filename,
-        array $dataset
-    ): void {
+    public function compile(string $templates, string $compile_filename, array $dataset): void
+    {
         $this->parse($templates, $dataset, false);
         file_put_contents($compile_filename, $this->export_string);
     }
@@ -182,8 +169,7 @@ final class Parser
             /** Check is a global function */
             $is_global = is_callable($methodName)
                 ? false
-                : (isset($GLOBALS[$methodName]) &&
-                is_callable($GLOBALS[$methodName])
+                : (isset($GLOBALS[$methodName]) && is_callable($GLOBALS[$methodName])
                     ? true
                     : false);
 
@@ -237,7 +223,7 @@ final class Parser
             return $this->callable_methods[$method](preg_replace(['/^"(.*?)"$/', "/^'(.*?)'$/"], '$1', $content));
         }
 
-        return '';
+        return "";
     }
 
     /**
@@ -248,11 +234,8 @@ final class Parser
      * @param boolean $render
      * @return void
      */
-    private function processTemplateFile(
-        string $template_name,
-        array $dataset,
-        bool $render
-    ): void {
+    private function processTemplateFile(string $template_name, array $dataset, bool $render): void
+    {
         if (file_exists($this->template_path . $template_name)) {
             /** Open template file */
             $handle = fopen($this->template_path . $template_name, "r");
@@ -287,18 +270,18 @@ final class Parser
      * @param boolean $render
      * @return void
      */
-    private function processLine(
-        string $this_line,
-        array $dataset,
-        bool $render
-    ): void {
+    private function processLine(string $this_line, array $dataset, bool $render): void
+    {
         /** Check for start of JS tag */
-        if(!$this->is_js_script && preg_match('/<script(.*?)>/', $this_line)) {
+        if (!$this->is_js_script && preg_match("/<script(.*?)>/", $this_line)) {
             $this->is_js_script = true;
         }
 
+        // Still process variables, in-line conditions and in-line iterators for items in script tag
+        $this_line = $this->is_js_script ? $this->processVariables((string) $this_line, $dataset) : $this_line;
+
         // Check for end of JS script tag
-        if ($this->is_js_script && preg_match('/<\/script>/', $this_line)){
+        if ($this->is_js_script && preg_match("/<\/script>/", $this_line)) {
             $this->is_js_script = false;
         }
 
@@ -306,18 +289,13 @@ final class Parser
             /** Remove comment blocks */
             if ($this->remove_comment_blocks) {
                 /** Is inline comment */
-                if (preg_match('/<!--(.*?)-->/', $this_line)) {
-                    $this_line = preg_replace('/<!--(.*?)-->/', '', $this_line);
+                if (preg_match("/<!--(.*?)-->/", $this_line)) {
+                    $this_line = preg_replace("/<!--(.*?)-->/", "", $this_line);
                 }
 
                 /** Is comment block */
                 if (
-                    preg_match_all(
-                        "/<!--|-->/i",
-                        (string) $this_line,
-                        $matches,
-                        PREG_SET_ORDER
-                    ) ||
+                    preg_match_all("/<!--|-->/i", (string) $this_line, $matches, PREG_SET_ORDER) ||
                     $this->is_comment_block
                 ) {
                     switch (isset($matches[0]) ? $matches[0][0] : "") {
@@ -331,9 +309,7 @@ final class Parser
 
                     /** Is inline comment */
                     $this->is_comment_block =
-                        $this->is_comment_block &&
-                        isset($matches[1][0]) &&
-                        trim($matches[1][0]) === "-->"
+                        $this->is_comment_block && isset($matches[1][0]) && trim($matches[1][0]) === "-->"
                             ? false
                             : $this->is_comment_block;
 
@@ -380,19 +356,10 @@ final class Parser
             } elseif (
                 $this->is_block &&
                 rtrim((string) $this_line) ===
-                    str_pad(
-                        "{{end}}",
-                        strlen("{{end}}") + $this->block_spaces,
-                        " ",
-                        STR_PAD_LEFT
-                    )
+                    str_pad("{{end}}", strlen("{{end}}") + $this->block_spaces, " ", STR_PAD_LEFT)
             ) {
                 /** Process block */
-                $this_line = $this->processBlock(
-                    $this->block_content,
-                    $this->block_condition,
-                    $dataset
-                );
+                $this_line = $this->processBlock($this->block_content, $this->block_condition, $dataset);
 
                 /** Clear block variables */
                 $this->block_condition = [];
@@ -408,14 +375,7 @@ final class Parser
             }
 
             /** process included templates */
-            if (
-                preg_match_all(
-                    "/(\[@include )(.*?)(])/",
-                    (string) $this_line,
-                    $include_templates,
-                    PREG_SET_ORDER
-                )
-            ) {
+            if (preg_match_all("/(\[@include )(.*?)(])/", (string) $this_line, $include_templates, PREG_SET_ORDER)) {
                 foreach ($include_templates as $to_include) {
                     foreach (explode(" ", trim($to_include[2])) as $template) {
                         $template = $this->processVariables($template, $dataset);
@@ -431,35 +391,28 @@ final class Parser
             $this_line = $this->processVariables((string) $this_line, $dataset);
 
             /** Is shortcode */
-            if (
-                preg_match_all("/\[(.*?)\]/", $this_line, $matches, PREG_SET_ORDER)
-            ) {
+            if (preg_match_all("/\[(.*?)\]/", $this_line, $matches, PREG_SET_ORDER)) {
                 foreach ($matches as $theShortcode) {
                     /** @disregard */
                     $this_line = function_exists("do_shortcode")
                         ? str_replace(
                             $theShortcode[0],
-                            do_shortcode(
-                                $this->processVariables($theShortcode[0], $dataset)
-                            ),
+                            do_shortcode($this->processVariables($theShortcode[0], $dataset)),
                             $this_line
                         )
-                        : str_replace(
-                            $theShortcode[0],
-                            $this->callShortcode($theShortcode[0], $dataset),
-                            $this_line
-                        );
+                        : str_replace($theShortcode[0], $this->callShortcode($theShortcode[0], $dataset), $this_line);
                 }
             }
 
             /** Is Callable */
-            if (preg_match_all('/([a-zA-Z0-9_-]+)\((.*?)\)/', $this_line, $matches, PREG_SET_ORDER)) {
+            if (preg_match_all("/([a-zA-Z0-9_-]+)\((.*?)\)/", $this_line, $matches, PREG_SET_ORDER)) {
                 foreach ($matches as $callableMethod) {
                     if (isset($this->callable_methods[$callableMethod[1]])) {
-                        $this_line = str_replace($callableMethod[0], $this->callables(
-                            method: $callableMethod[1],
-                            content: $callableMethod[2]
-                        ), $this_line);
+                        $this_line = str_replace(
+                            $callableMethod[0],
+                            $this->callables(method: $callableMethod[1], content: $callableMethod[2]),
+                            $this_line
+                        );
                     }
                 }
             }
@@ -481,11 +434,8 @@ final class Parser
      * @param array<mixed> $dataset
      * @return string
      */
-    private function processBlock(
-        string $block_string,
-        array $conditions,
-        array $dataset
-    ): string {
+    private function processBlock(string $block_string, array $conditions, array $dataset): string
+    {
         /** Remove phantom line break */
         $block_string = explode("\n", $block_string);
         if (strlen($block_string[count($block_string) - 1]) === 0) {
@@ -508,34 +458,19 @@ final class Parser
                     $processBlock->template_path = $this->template_path;
 
                     /** Else if conditions */
-                    $else_if_content = $this->returnElseIfCondition(
-                        $block_string
-                    );
+                    $else_if_content = $this->returnElseIfCondition($block_string);
 
                     /** Process if else content block */
                     if ($this->processConditions($conditions[1], $dataset)) {
-                        $processBlock->parseInputString(
-                            $else_if_content["if"],
-                            $dataset,
-                            false
-                        );
+                        $processBlock->parseInputString($else_if_content["if"], $dataset, false);
                         $process_content = $processBlock->return();
                     } else {
                         $condition_parsed = false;
 
                         if (isset($else_if_content["elseif"])) {
-                            foreach ($else_if_content["elseif"] as $condition) :
-                                if (
-                                    $this->processConditions(
-                                        $condition["condition"],
-                                        $dataset
-                                    )
-                                ) {
-                                    $processBlock->parseInputString(
-                                        $condition["content"],
-                                        $dataset,
-                                        false
-                                    );
+                            foreach ($else_if_content["elseif"] as $condition):
+                                if ($this->processConditions($condition["condition"], $dataset)) {
+                                    $processBlock->parseInputString($condition["content"], $dataset, false);
                                     $process_content = $processBlock->return();
                                     $condition_parsed = true;
                                     break;
@@ -543,15 +478,8 @@ final class Parser
                             endforeach;
                         }
 
-                        if (
-                            !$condition_parsed &&
-                            isset($else_if_content["else"])
-                        ) {
-                            $processBlock->parseInputString(
-                                $else_if_content["else"],
-                                $dataset,
-                                false
-                            );
+                        if (!$condition_parsed && isset($else_if_content["else"])) {
+                            $processBlock->parseInputString($else_if_content["else"], $dataset, false);
                             $process_content = $processBlock->return();
                         }
                     }
@@ -561,17 +489,10 @@ final class Parser
 
                     break;
                 case "each":
-                    $process_content = $this->processEachStatement(
-                        $conditions[2],
-                        $block_string,
-                        $dataset
-                    );
+                    $process_content = $this->processEachStatement($conditions[2], $block_string, $dataset);
                     break;
                 case "loop":
-                    $process_content = $this->processLoop(
-                        $conditions[3],
-                        $block_string
-                    );
+                    $process_content = $this->processLoop($conditions[3], $block_string);
                     break;
             }
         }
@@ -585,18 +506,13 @@ final class Parser
      * @param  string $block_content
      * @return string
      */
-    private function processLoop(
-        string $loop_statement,
-        string $block_content
-    ): string {
+    private function processLoop(string $loop_statement, string $block_content): string
+    {
         $loop_components = explode(" ", trim($loop_statement));
         $return_string = "";
 
         // Check if single value was passed
-        $loop_components =
-            count($loop_components) === 1
-                ? [1, "to", intval($loop_components[0])]
-                : $loop_components;
+        $loop_components = count($loop_components) === 1 ? [1, "to", intval($loop_components[0])] : $loop_components;
 
         if (count($loop_components) === 3 && $loop_components[1] === "to") {
             $from = intval($loop_components[0]);
@@ -644,12 +560,9 @@ final class Parser
      * @param array<mixed> $dataset
      * @return string
      */
-    private function processEachStatement(
-        string $each_statement,
-        string $block_content,
-        array $dataset
-    ): string {
-        $offset_row = explode('offset_row_id', trim($each_statement));
+    private function processEachStatement(string $each_statement, string $block_content, array $dataset): string
+    {
+        $offset_row = explode("offset_row_id", trim($each_statement));
         $each_set = array_filter(explode(" ", $offset_row[0]));
         $return_string = "";
 
@@ -667,9 +580,7 @@ final class Parser
 
         if ($use_data && is_array($use_data)) {
             /** set global data array */
-            $global_data = isset($dataset["GLOBAL"])
-                ? $dataset["GLOBAL"]
-                : $dataset;
+            $global_data = isset($dataset["GLOBAL"]) ? $dataset["GLOBAL"] : $dataset;
 
             /** remove duplicate data from dataset */
             if (isset($global_data[$each_set[0]])) {
@@ -697,11 +608,7 @@ final class Parser
                             $this_row["_ROW_ID"] = $iterator_count;
                             $this_row["_KEY"] = $key;
 
-                            $process_each_block->parseInputString(
-                                $block_content,
-                                $this_row,
-                                false
-                            );
+                            $process_each_block->parseInputString($block_content, $this_row, false);
                             $return_string .= $process_each_block->return();
                             $process_each_block->export_string = "";
 
@@ -714,9 +621,7 @@ final class Parser
                     if ($each_set[1] === "as") {
                         foreach ($use_data as $key => $this_row) {
                             $row_data = [
-                                isset($each_set[3])
-                                    ? $each_set[3]
-                                    : $each_set[2] => $this_row,
+                                isset($each_set[3]) ? $each_set[3] : $each_set[2] => $this_row,
                                 "GLOBAL" => $global_data,
                                 "_ITERATION" =>
                                     $iterator_count > 1
@@ -732,11 +637,7 @@ final class Parser
                                 $row_data[$each_set[2]] = $key;
                             }
 
-                            $process_each_block->parseInputString(
-                                $block_content,
-                                $row_data,
-                                false
-                            );
+                            $process_each_block->parseInputString($block_content, $row_data, false);
                             $return_string .= $process_each_block->return();
                             $process_each_block->export_string = "";
 
@@ -766,18 +667,9 @@ final class Parser
         $return = [];
         $process_content = $else_condition[0];
 
-        if (
-            preg_match_all(
-                "/{{elseif (.*?)}}/i",
-                $process_content,
-                $matches,
-                PREG_SET_ORDER
-            )
-        ) {
+        if (preg_match_all("/{{elseif (.*?)}}/i", $process_content, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
-                $split_string = empty($match[0])
-                    ? []
-                    : explode($match[0], $process_content);
+                $split_string = empty($match[0]) ? [] : explode($match[0], $process_content);
 
                 // add first if condition to return
                 if (!$return) {
@@ -791,9 +683,7 @@ final class Parser
                         "content" => "",
                     ];
                 } elseif (is_array($return["elseif"])) {
-                    $return["elseif"][array_key_last($return["elseif"])][
-                        "content"
-                    ] = rtrim($split_string[0]);
+                    $return["elseif"][array_key_last($return["elseif"])]["content"] = rtrim($split_string[0]);
                     $return["elseif"][] = [
                         "condition" => $match[1],
                         "content" => "",
@@ -805,9 +695,7 @@ final class Parser
 
             if (isset($return["elseif"])) {
                 $last_key = array_key_last($return["elseif"]);
-                $return["elseif"][$last_key]["content"] = rtrim(
-                    $process_content
-                );
+                $return["elseif"][$last_key]["content"] = rtrim($process_content);
             }
         } else {
             // add first if condition to return
@@ -830,12 +718,7 @@ final class Parser
      */
     private function returnElseCondition(string $content): array
     {
-        $else_condition = str_pad(
-            "{{else}}",
-            strlen("{{else}}") + $this->block_spaces,
-            " ",
-            STR_PAD_LEFT
-        );
+        $else_condition = str_pad("{{else}}", strlen("{{else}}") + $this->block_spaces, " ", STR_PAD_LEFT);
         if (preg_match("/" . $else_condition . "/", $content)) {
             $content = str_replace("\r\n", "\n", $content);
             return explode("\n" . $else_condition . "\n", $content);
@@ -850,18 +733,9 @@ final class Parser
      * @param array<mixed> $dataset
      * @return string
      */
-    private function processVariables(
-        string $template_string,
-        array $dataset
-    ): string {
-        if (
-            preg_match_all(
-                "/({{)(.*?)(}})/i",
-                $template_string,
-                $variables,
-                PREG_SET_ORDER
-            )
-        ) {
+    private function processVariables(string $template_string, array $dataset): string
+    {
+        if (preg_match_all("/({{)(.*?)(}})/i", $template_string, $variables, PREG_SET_ORDER)) {
             foreach ($variables as $this_data_variable) {
                 $replace_string = $this_data_variable[0];
                 $processString = $this_data_variable[2];
@@ -873,53 +747,26 @@ final class Parser
 
                 /** Detect in-line condition, has alternative variables or singular variables */
                 if ($is_condition) {
-                    $replace_variable = $this->processInlineCondition(
-                        $processString,
-                        $dataset
-                    );
+                    $replace_variable = $this->processInlineCondition($processString, $dataset);
                 } elseif ($is_itterator) {
                     /** Processes in-line iterator */
-                    $replace_variable = $this->processInlineIterator(
-                        $processString,
-                        $dataset
-                    );
+                    $replace_variable = $this->processInlineIterator($processString, $dataset);
                 } elseif (count($has_alternative_vars) > 1) {
                     foreach ($has_alternative_vars as $this_variable) {
-                        if (
-                            $replace_variable = DataProcessing::processDataChain(
-                                $this_variable,
-                                $dataset
-                            )
-                        ) {
+                        if ($replace_variable = DataProcessing::processDataChain($this_variable, $dataset)) {
                             break;
                         }
                     }
 
-                    if (
-                        !$replace_variable &&
-                        ($content = $this->processString(
-                            $processString,
-                            $dataset
-                        ))
-                    ) {
+                    if (!$replace_variable && ($content = $this->processString($processString, $dataset))) {
                         $replace_variable = $content;
                     }
                 } else {
-                    $replace_variable = DataProcessing::processDataChain(
-                        $processString,
-                        $dataset
-                    );
+                    $replace_variable = DataProcessing::processDataChain($processString, $dataset);
                 }
 
-                $replace_variable =
-                    is_array($replace_variable) && empty($replace_variable)
-                        ? ""
-                        : $replace_variable;
-                $template_string = str_replace(
-                    $replace_string,
-                    $replace_variable,
-                    $template_string
-                );
+                $replace_variable = is_array($replace_variable) && empty($replace_variable) ? "" : $replace_variable;
+                $template_string = str_replace($replace_string, $replace_variable, $template_string);
             }
         }
 
@@ -937,29 +784,15 @@ final class Parser
     {
         /** Replace escaped double quotes */
         $dbl_quote_escape = "[DBL_QUOTE]";
-        $input_string = preg_replace(
-            '/\\\"/',
-            $dbl_quote_escape,
-            $input_string
-        );
+        $input_string = preg_replace('/\\\"/', $dbl_quote_escape, $input_string);
 
         if (preg_match('/"(.*?)"/i', (string) $input_string, $content)) {
             /** Input string has variables */
-            if (
-                preg_match_all(
-                    "/__(.*?)__/i",
-                    $content[1],
-                    $variables,
-                    PREG_SET_ORDER
-                )
-            ) {
+            if (preg_match_all("/__(.*?)__/i", $content[1], $variables, PREG_SET_ORDER)) {
                 foreach ($variables as $this_variable) {
                     $content[1] = str_replace(
                         $this_variable[0],
-                        (string) DataProcessing::processDataChain(
-                            $this_variable[1],
-                            $dataset
-                        ),
+                        (string) DataProcessing::processDataChain($this_variable[1], $dataset),
                         $content[1]
                     );
                 }
@@ -979,10 +812,8 @@ final class Parser
      * @param array<mixed> $dataset
      * @return string
      */
-    private function processInlineCondition(
-        string $condition_string,
-        array $dataset
-    ): string {
+    private function processInlineCondition(string $condition_string, array $dataset): string
+    {
         $condition = explode(" ? ", $condition_string);
         $outcome = explode(" : ", $condition[1]);
         $else = isset($outcome[1]) ? $outcome[1] : false;
@@ -1002,38 +833,20 @@ final class Parser
      * @param array<mixed> $dataset
      * @return string
      */
-    private function processInlineIterator(
-        string $iterator_string,
-        array $dataset
-    ): string {
+    private function processInlineIterator(string $iterator_string, array $dataset): string
+    {
         $iterator_split = preg_split('/^(.*?)"/', $iterator_string);
-        $processString = is_array($iterator_split)
-            ? array_values(array_filter($iterator_split))
-            : [];
+        $processString = is_array($iterator_split) ? array_values(array_filter($iterator_split)) : [];
 
         if (count($processString) === 1) {
             $processString = '"' . $processString[0];
-            $iterator_fragments = array_values(
-                array_filter(explode($processString, $iterator_string))
-            );
-            $iterator_fragments = isset($iterator_fragments[0])
-                ? trim($iterator_fragments[0])
-                : "";
+            $iterator_fragments = array_values(array_filter(explode($processString, $iterator_string)));
+            $iterator_fragments = isset($iterator_fragments[0]) ? trim($iterator_fragments[0]) : "";
 
-            $processString = (string) preg_replace(
-                "/__(.*?)__/",
-                '{{${1}}}',
-                $processString
-            );
+            $processString = (string) preg_replace("/__(.*?)__/", '{{${1}}}', $processString);
             $processString = preg_replace('/^"|"$/', "", $processString);
 
-            return trim(
-                $this->processEachStatement(
-                    $iterator_fragments,
-                    (string) $processString,
-                    $dataset
-                )
-            );
+            return trim($this->processEachStatement($iterator_fragments, (string) $processString, $dataset));
         }
 
         return "";
@@ -1052,36 +865,21 @@ final class Parser
         $and_result = true;
 
         /** And conditions */
-        foreach (explode(" && ", $condition) as $condition_set) :
+        foreach (explode(" && ", $condition) as $condition_set):
             $or_result = false;
 
             /** Or conditions */
             foreach (explode(" || ", $condition_set) as $alternative_condition) {
                 /** Replace spaces in string match */
-                if (
-                    preg_match_all(
-                        '/"(.*)"/',
-                        $alternative_condition,
-                        $matches,
-                        PREG_SET_ORDER
-                    )
-                ) {
+                if (preg_match_all('/"(.*)"/', $alternative_condition, $matches, PREG_SET_ORDER)) {
                     foreach ($matches as $this_match) {
                         $replace_spaces = str_replace(" ", "+", $this_match[0]);
-                        $alternative_condition = str_replace(
-                            $this_match[0],
-                            $replace_spaces,
-                            $alternative_condition
-                        );
+                        $alternative_condition = str_replace($this_match[0], $replace_spaces, $alternative_condition);
                     }
                 }
 
                 $or_result =
-                    !$or_result &&
-                    $this->processSingleCondition(
-                        explode(" ", $alternative_condition),
-                        $dataset
-                    )
+                    !$or_result && $this->processSingleCondition(explode(" ", $alternative_condition), $dataset)
                         ? true
                         : $or_result;
             }
@@ -1103,32 +901,17 @@ final class Parser
      * @param array<mixed> $dataset
      * @return boolean
      */
-    private function processSingleCondition(
-        array $condition,
-        array $dataset
-    ): bool {
-        $data =
-            count($condition) > 0
-                ? DataProcessing::processDataChain(
-                    trim($condition[0]),
-                    $dataset
-                )
-                : [];
+    private function processSingleCondition(array $condition, array $dataset): bool
+    {
+        $data = count($condition) > 0 ? DataProcessing::processDataChain(trim($condition[0]), $dataset) : [];
 
         if (!empty($data)) {
             $challenge = isset($condition[1]) ? $condition[1] : "EXISTS";
-            $expected = isset($condition[2])
-                ? DataProcessing::processDataChain(
-                    trim($condition[2]),
-                    $dataset
-                )
-                : false;
+            $expected = isset($condition[2]) ? DataProcessing::processDataChain(trim($condition[2]), $dataset) : false;
 
             if (!$expected) {
                 $expected = isset($condition[2]) ? trim($condition[2]) : true;
-                $expected = is_string($expected)
-                    ? str_replace(['"', "+"], ["", " "], $expected)
-                    : $expected;
+                $expected = is_string($expected) ? str_replace(['"', "+"], ["", " "], $expected) : $expected;
             }
 
             return match ($challenge) {
@@ -1138,18 +921,10 @@ final class Parser
                 "!=" => $data != $expected ? true : false, // Not Equal
                 "!!" => $data !== $expected ? true : false, // Not identical
                 "!==" => $data !== $expected ? true : false, // Not identical
-                ">" => intval($data) > intval($expected)
-                    ? true
-                    : false, // More than,
-                "<" => intval($data) < intval($expected)
-                    ? true
-                    : false, // Less than,
-                ">=" => intval($data) >= intval($expected)
-                    ? true
-                    : false, // Greater than or equal to,
-                "<=" => intval($data) <= intval($expected)
-                    ? true
-                    : false, // Less than or equal to,
+                ">" => intval($data) > intval($expected) ? true : false, // More than,
+                "<" => intval($data) < intval($expected) ? true : false, // Less than,
+                ">=" => intval($data) >= intval($expected) ? true : false, // Greater than or equal to,
+                "<=" => intval($data) <= intval($expected) ? true : false, // Less than or equal to,
                 default => false,
             };
         } elseif (count($condition) > 1) {
