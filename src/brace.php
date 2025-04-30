@@ -5,7 +5,7 @@
  *   Copyright (C) 2025 Alex Oliver
  *   @author: Alex Oliver
  *   @Repo: https://github.com/aoliverwd/brace
- *   @@license MIT
+ *   @license: MIT
  */
 
 namespace Brace;
