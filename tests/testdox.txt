@@ -86,4 +86,5 @@ Callable (ConditionTests\Callable)
  [x] Callable method with arg double quotes
  [x] Callable method with arg single quotes
  [x] Callable method with arg no quotes
+ [x] Callable method with parenthesis
 

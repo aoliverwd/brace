@@ -74,4 +74,16 @@ final class CallableTest extends TestCase
             $brace->parseInputString('foo(bar)', [], false)->return()
         );
     }
+
+    public function testCallableMethodWithParenthesis(): void
+    {
+        $brace = new Brace\Parser();
+
+        $brace->registerCallable('foo', fn($content) => $content);
+
+        $this->assertEquals(
+            "bar(foo)\n",
+            $brace->parseInputString('foo(bar(foo))', [], false)->return()
+        );
+    }
 }
