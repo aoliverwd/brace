@@ -10,8 +10,6 @@
 
 namespace Brace;
 
-use Brace\DataProcessing;
-
 // Include data processing class
 require_once __DIR__ . "/data-processing.php";
 
