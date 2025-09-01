@@ -31,15 +31,19 @@
     },
     "require-dev": {
         "phpstan/phpstan": "^1.9",
-        "phpunit/phpunit": "^9.5"
+        "phpunit/phpunit": "^9.5",
+        "laravel/pint": "^1.24"
     },
     "scripts": {
-        "test" : [
+        "test": [
             "./vendor/bin/phpstan analyse -c phpstan.neon",
             "./vendor/bin/phpunit -c ./tests/phpunit.xml"
         ],
-        "unit" : [
+        "unit": [
             "./vendor/bin/phpunit -c ./tests/phpunit.xml"
+        ],
+        "format": [
+            "./vendor/bin/pint src --preset psr12"
         ]
     }
 }

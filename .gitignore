@@ -1,5 +1,4 @@
 .DS*
 *.cache
 vendor/
-composer.lock
 .phpactor.json
