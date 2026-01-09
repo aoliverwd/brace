@@ -6,6 +6,9 @@ Include (ConditionTests\Include)
 
 Variables (ConditionTests\Variables)
  [x] Variables
+ [x] Variables with preceeding whitespace
+ [x] Variables with following whitespace
+ [x] Variables with preceeding and following whitespace
  [x] Or variables
  [x] Multiple or variable
  [x] Multiple or variable with nested data

@@ -31,6 +31,46 @@ final class VariablesTest extends TestCase
     }
 
     /**
+     * Test variable with preceding whitespace
+     * @return void
+     */
+    public function testVariablesWithPreceedingWhitespace(): void
+    {
+        $brace = new Brace\Parser();
+        $this->assertEquals(
+            "Hello Dave\n",
+            $brace->parseInputString("Hello {{ name}}", ["name" => "Dave"], false)->return()
+        );
+    }
+
+
+    /**
+     * Test variable with following whitespace
+     * @return void
+     */
+    public function testVariablesWithFollowingWhitespace(): void
+    {
+        $brace = new Brace\Parser();
+        $this->assertEquals(
+            "Hello Dave\n",
+            $brace->parseInputString("Hello {{name }}", ["name" => "Dave"], false)->return()
+        );
+    }
+
+    /**
+     * Test variable with preceding and following whitespace
+     * @return void
+     */
+    public function testVariablesWithPreceedingAndFollowingWhitespace(): void
+    {
+        $brace = new Brace\Parser();
+        $this->assertEquals(
+            "Hello Dave\n",
+            $brace->parseInputString("Hello {{ name }}", ["name" => "Dave"], false)->return()
+        );
+    }
+
+    /**
      * Test inline or condition
      * @return void
      */
@@ -117,7 +157,7 @@ final class VariablesTest extends TestCase
             "Hello John Smith\n",
             $brace
                 ->parseInputString(
-                    "Hello {{name->first}} {{name->last}}",
+                    "Hello {{ name->first }} {{ name->last }}",
                     [
                         "name" => [
                             "first" => "John",

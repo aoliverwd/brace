@@ -316,6 +316,14 @@ final class Parser
                 }
             }
 
+            /** Remove preceding and following whitespace */
+            $spacing_match = "/{{\s*(.*?)\s*}}/";
+            if (is_string($this_line) && preg_match_all($spacing_match, $this_line, $matches, PREG_SET_ORDER)) {
+                foreach ($matches as $match) {
+                    $this_line = str_replace($match[0], "{{" . $match[1] . "}}", (string) $this_line);
+                }
+            }
+
             /** Process if condition or each block */
             if (
                 !$this->is_block &&
@@ -578,7 +586,7 @@ final class Parser
 
         if ($use_data && is_array($use_data)) {
             /** set global data array */
-            $global_data = isset($dataset["GLOBAL"]) ? $dataset["GLOBAL"] : $dataset;
+            $global_data = $dataset["GLOBAL"] ?? $dataset;
 
             /** remove duplicate data from dataset */
             if (isset($global_data[$each_set[0]])) {
@@ -619,7 +627,7 @@ final class Parser
                     if ($each_set[1] === "as") {
                         foreach ($use_data as $key => $this_row) {
                             $row_data = [
-                                isset($each_set[3]) ? $each_set[3] : $each_set[2] => $this_row,
+                                $each_set[3] ?? $each_set[2] => $this_row,
                                 "GLOBAL" => $global_data,
                                 "_ITERATION" =>
                                     $iterator_count > 1
@@ -665,9 +673,9 @@ final class Parser
         $return = [];
         $process_content = $else_condition[0];
 
-        if (preg_match_all("/{{elseif (.*?)}}/i", $process_content, $matches, PREG_SET_ORDER)) {
+        if (preg_match_all("/{{elseif (.*?)}}/i", (string) $process_content, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
-                $split_string = empty($match[0]) ? [] : explode($match[0], $process_content);
+                $split_string = empty($match[0]) ? [] : explode($match[0], (string) $process_content);
 
                 // add first if condition to return
                 if (!$return) {
@@ -693,7 +701,7 @@ final class Parser
 
             if (isset($return["elseif"])) {
                 $last_key = array_key_last($return["elseif"]);
-                $return["elseif"][$last_key]["content"] = rtrim($process_content);
+                $return["elseif"][$last_key]["content"] = rtrim((string) $process_content);
             }
         } else {
             // add first if condition to return
@@ -814,7 +822,7 @@ final class Parser
     {
         $condition = explode(" ? ", $condition_string);
         $outcome = explode(" : ", $condition[1]);
-        $else = isset($outcome[1]) ? $outcome[1] : false;
+        $else = $outcome[1] ?? false;
 
         if ($this->processConditions($condition[0], $dataset)) {
             return $this->processString($outcome[0], $dataset);
@@ -901,14 +909,14 @@ final class Parser
      */
     private function processSingleCondition(array $condition, array $dataset): bool
     {
-        $data = count($condition) > 0 ? DataProcessing::processDataChain(trim($condition[0]), $dataset) : [];
+        $data = count($condition) > 0 ? DataProcessing::processDataChain(trim((string) $condition[0]), $dataset) : [];
 
         if (!empty($data)) {
-            $challenge = isset($condition[1]) ? $condition[1] : "EXISTS";
-            $expected = isset($condition[2]) ? DataProcessing::processDataChain(trim($condition[2]), $dataset) : false;
+            $challenge = $condition[1] ?? "EXISTS";
+            $expected = isset($condition[2]) ? DataProcessing::processDataChain(trim((string) $condition[2]), $dataset) : false;
 
             if (!$expected) {
-                $expected = isset($condition[2]) ? trim($condition[2]) : true;
+                $expected = isset($condition[2]) ? trim((string) $condition[2]) : true;
                 $expected = is_string($expected) ? str_replace(['"', "+"], ["", " "], $expected) : $expected;
             }
 
