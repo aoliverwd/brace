@@ -2,7 +2,7 @@ name: brace
 
 services:
     myservice:
-        type: php:8.3
+        type: php:8.4
         via: apache:2.4
         ssl: false
         webroot: .
