@@ -2,7 +2,24 @@
 
 # Brace
 
-brace is a simple template language written in PHP. Brace uses a handlebar style syntax.
+Brace is a simple template language written in PHP. Brace uses a Handlebars-style `{{double-brace}}` syntax.
+
+## Documentation
+
+Detailed documentation with code examples is available in the [`docs/`](docs/) directory:
+
+| Topic | Description |
+|-------|-------------|
+| [Getting Started](docs/getting-started.md) | Installation, basic usage, instance variables, `compile()`, `clear()`, `return()` |
+| [Variables](docs/variables.md) | Simple variables, nested paths, `\|\|` fallback operator, array lookup by value |
+| [Iterators](docs/iterators.md) | `{{each}}` blocks, aliases, key/value, nth children, offset, inline iterators |
+| [Loops](docs/loops.md) | `{{loop}}` blocks — basic, ascending, and descending |
+| [Conditionals](docs/conditionals.md) | `{{if}}`, `{{elseif}}`, `{{else}}`, inline conditions, AND/OR, static method conditions |
+| [Includes](docs/includes.md) | `[@include]` directive, multiple and dynamic includes |
+| [Shortcodes](docs/shortcodes.md) | `[shortcode attr="val"]` — registration and attribute handling |
+| [Callable Methods](docs/callables.md) | `name(content)` — registering and using callable functions |
+| [Array Counting](docs/array-counting.md) | `COUNT()` — display and compare array lengths |
+| [Comment Blocks](docs/comment-blocks.md) | Inline and multi-line HTML comment stripping |
 
 <!-- MarkdownTOC -->
 
