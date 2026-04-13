@@ -251,8 +251,8 @@ echo $brace->parseInputString(
 | `==`      | Equal (loose comparison)                                 |
 | `===`     | Identical (strict comparison)                            |
 | `!=`      | Not equal (loose comparison)                             |
-| `!!`      | Not identical                                            |
-| `!==`     | Not identical (strict, same as `!!`)                     |
+| `!!`      | Not identical (strict non-equality comparison)           |
+| `!==`     | Not identical — alias for `!!`, identical behaviour      |
 | `>`       | Greater than                                             |
 | `<`       | Less than                                                |
 | `>=`      | Greater than or equal to                                 |
