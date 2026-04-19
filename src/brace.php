@@ -151,43 +151,44 @@ final class Parser
      */
     private function callShortcode(string $shortcodeSyntax, array $dataset): string
     {
-        $sanatise_1 = str_replace("&quot;", '"', $shortcodeSyntax);
-        $sanatise_2 = str_replace(["[", "]"], "", $sanatise_1);
-        $args = explode(" ", $sanatise_2);
+        $sanatise_1 = str_replace('&quot;', '"', $shortcodeSyntax);
+        $sanatise_2 = str_replace(['[', ']'], '', $sanatise_1);
+        $args = explode(' ', $sanatise_2);
 
         $theArgs = [];
 
         /** check for registered functions */
         if (
-            $methodName =
-                isset($args[0]) && isset($this->shortcode_methods[$args[0]])
-                    ? $this->shortcode_methods[$args[0]]
-                    : false
+            $methodName = isset($args[0]) && isset($this->shortcode_methods[$args[0]])
+                ? $this->shortcode_methods[$args[0]]
+                : false
         ) {
             /** Check is a global function */
-            $is_global = is_callable($methodName)
-                ? false
-                : (isset($GLOBALS[$methodName]) && is_callable($GLOBALS[$methodName])
-                    ? true
-                    : false);
+            $is_global = is_callable($methodName) ? false : isset($GLOBALS[$methodName]);
+
+            /** Check if method is callable */
+            $method = $is_global ? $GLOBALS[$methodName] : $methodName;
+            if (!is_callable($method)) {
+                return $method . ' not found';
+            }
 
             /** Format arguments */
             array_shift($args);
-            foreach (explode('" ', implode(" ", $args)) as $thisArg) {
-                $newArg = explode("=", str_replace('"', "", $thisArg));
+            foreach (explode('" ', implode(' ', $args)) as $thisArg) {
+                $newArg = explode('=', str_replace('"', '', $thisArg));
 
                 if (count($newArg) === 2) {
                     $theArgs[trim($newArg[0])] = trim($newArg[1]);
                 }
             }
 
-            $send_data = [array_merge($theArgs, ["GLOBAL" => $dataset])];
+            /** Merge arguments with global dataset */
+            $send_data = [array_merge($theArgs, ['GLOBAL' => $dataset])];
 
             /** Execute function and return result */
-            return $is_global
-                ? call_user_func_array($GLOBALS[$methodName], $send_data)
-                : call_user_func_array($methodName, $send_data);
+            return call_user_func_array($method, $send_data);
         } else {
+            /** Return shortcode syntax if method is not callable */
             return $shortcodeSyntax;
         }
     }
