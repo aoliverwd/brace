@@ -10,14 +10,13 @@ declare(strict_types=1);
 namespace ConditionTests;
 
 use Brace;
-
 /** PHPUnit namespace */
 use PHPUnit\Framework\TestCase;
 
 /**
  * Test class
  */
-final class BlockConditionsTest extends TestCase
+final class blockconditionTest extends TestCase
 {
     public function testIfBlockCondition(): void
     {
@@ -25,12 +24,18 @@ final class BlockConditionsTest extends TestCase
         $brace->template_path = __DIR__ . '/';
         $this->assertEquals(
             "Hello John Smith\n",
-            $brace->parseInputString('[@include if-block]', [
-                'name' => [
-                    'first' => 'John',
-                    'last' => 'Smith'
-                ]
-            ], false)->return()
+            $brace
+                ->parseInputString(
+                    '[@include if-block]',
+                    [
+                        'name' => [
+                            'first' => 'John',
+                            'last' => 'Smith',
+                        ],
+                    ],
+                    false,
+                )
+                ->return(),
         );
     }
 
@@ -40,10 +45,9 @@ final class BlockConditionsTest extends TestCase
         $brace->template_path = __DIR__ . '/';
         $this->assertEquals(
             "Name does not exist\n",
-            $brace->parseInputString('[@include if-block]', [], false)->return()
+            $brace->parseInputString('[@include if-block]', [], false)->return(),
         );
     }
-
 
     public function testIfAndBlockCondition(): void
     {
@@ -51,12 +55,18 @@ final class BlockConditionsTest extends TestCase
         $brace->template_path = __DIR__ . '/';
         $this->assertEquals(
             "Hello John Smith\n",
-            $brace->parseInputString('[@include if-block]', [
-                'name' => [
-                    'first' => 'John',
-                    'last' => 'Smith'
-                ]
-            ], false)->return()
+            $brace
+                ->parseInputString(
+                    '[@include if-block]',
+                    [
+                        'name' => [
+                            'first' => 'John',
+                            'last' => 'Smith',
+                        ],
+                    ],
+                    false,
+                )
+                ->return(),
         );
     }
 
@@ -66,12 +76,18 @@ final class BlockConditionsTest extends TestCase
         $brace->template_path = __DIR__ . '/';
         $this->assertEquals(
             "Hello John Smith\n",
-            $brace->parseInputString('[@include if-is-true-block]', [
-                'name' => [
-                    'first' => 'John',
-                    'last' => 'Smith'
-                ]
-            ], false)->return()
+            $brace
+                ->parseInputString(
+                    '[@include if-is-true-block]',
+                    [
+                        'name' => [
+                            'first' => 'John',
+                            'last' => 'Smith',
+                        ],
+                    ],
+                    false,
+                )
+                ->return(),
         );
     }
 
@@ -81,11 +97,17 @@ final class BlockConditionsTest extends TestCase
         $brace->template_path = __DIR__ . '/';
         $this->assertEquals(
             "\nHello John\n",
-            $brace->parseInputString('[@include if-else-block]', [
-                'name' => [
-                    'first' => 'John'
-                ]
-            ], false)->return()
+            $brace
+                ->parseInputString(
+                    '[@include if-else-block]',
+                    [
+                        'name' => [
+                            'first' => 'John',
+                        ],
+                    ],
+                    false,
+                )
+                ->return(),
         );
     }
 
@@ -95,11 +117,17 @@ final class BlockConditionsTest extends TestCase
         $brace->template_path = __DIR__ . '/';
         $this->assertEquals(
             "\nHello Mr Smith\n",
-            $brace->parseInputString('[@include multiple-if-else-block]', [
-                'name' => [
-                    'last' => 'Smith'
-                ]
-            ], false)->return()
+            $brace
+                ->parseInputString(
+                    '[@include multiple-if-else-block]',
+                    [
+                        'name' => [
+                            'last' => 'Smith',
+                        ],
+                    ],
+                    false,
+                )
+                ->return(),
         );
     }
 
@@ -108,10 +136,7 @@ final class BlockConditionsTest extends TestCase
         $brace = new Brace\Parser();
         $brace->template_path = __DIR__ . '/';
 
-        $this->assertEquals(
-            "success\n",
-            $brace->Parse('inline-method-check-true', [], false)->return()
-        );
+        $this->assertEquals("success\n", $brace->Parse('inline-method-check-true', [], false)->return());
     }
 
     public function testBoolCheckFunctionCallReturnFalse(): void
@@ -119,10 +144,7 @@ final class BlockConditionsTest extends TestCase
         $brace = new Brace\Parser();
         $brace->template_path = __DIR__ . '/';
 
-        $this->assertEquals(
-            "fail\n",
-            $brace->Parse('inline-method-check-false', [], false)->return()
-        );
+        $this->assertEquals("fail\n", $brace->Parse('inline-method-check-false', [], false)->return());
     }
 
     public static function methodTrue(): bool

@@ -1,6 +1,11 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" colors="true" testdox="true" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
-  <coverage/>
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpunit
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    colors="true"
+    testdox="true"
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+>
+  <coverage />
   <testsuites>
     <testsuite name="includes">
       <directory>unit/includes</directory>
@@ -22,6 +27,6 @@
     </testsuite>
   </testsuites>
   <logging>
-    <testdoxText outputFile="testdox.txt"/>
+    <testdoxText outputFile="testdox.txt" />
   </logging>
 </phpunit>
