@@ -37,8 +37,11 @@
     },
     "scripts": {
         "test": [
-            "./vendor/bin/phpstan analyse -c phpstan.neon",
-            "./vendor/bin/phpunit -c ./tests/phpunit.xml"
+            "@static",
+            "@unit"
+        ],
+        "static": [
+            "./vendor/bin/phpstan analyse -c phpstan.neon"
         ],
         "unit": [
             "./vendor/bin/phpunit -c ./tests/phpunit.xml"
