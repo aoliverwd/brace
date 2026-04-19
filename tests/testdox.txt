@@ -1,45 +1,9 @@
-Include (ConditionTests\Include)
- [x] Include template
- [x] Include multiple templates
- [x] Include multiple includes
- [x] Include from parent path
-
-Variables (ConditionTests\Variables)
- [x] Variables
- [x] Variables with preceeding whitespace
- [x] Variables with following whitespace
- [x] Variables with preceeding and following whitespace
- [x] Or variables
- [x] Multiple or variable
- [x] Multiple or variable with nested data
- [x] Multiple or variable string
- [x] Alternate variable
- [x] Nested variables
- [x] Nested variables by array name
- [x] Blank return nested variable by array name
- [x] Variables in script block
-
-Inline Conditions (ConditionTests\InlineConditions)
- [x] Inline condition
- [x] Inline condition with doulbe quotes
- [x] Inline else condition
- [x] Inline or condition
- [x] Inline and condition
- [x] Inline and or condition
- [x] Inline bool check function call return true
- [x] Inline bool check function call return false
- [x] Inline bool check function call with attribute true
- [x] Inline bool check function call with attribute false
-
-Block Conditions (ConditionTests\BlockConditions)
- [x] If block condition
- [x] If else block condition
- [x] If and block condition
- [x] If is true block condition
- [x] If else condition
- [x] Multiple if else condition
- [x] Bool check function call return true
- [x] Bool check function call return false
+Callable (ConditionTests\Callable)
+ [x] Callable method
+ [x] Callable method with arg double quotes
+ [x] Callable method with arg single quotes
+ [x] Callable method with arg no quotes
+ [x] Callable method with parenthesis
 
 Conditions (ConditionTests\Conditions)
  [x] Equals
@@ -55,7 +19,44 @@ Conditions (ConditionTests\Conditions)
  [x] Not exists
  [x] Count
 
-Iterators (ConditionTests\Iterators)
+Include (ConditionTests\Include)
+ [x] Include template
+ [x] Include multiple templates
+ [x] Include multiple includes
+ [x] Include from parent path
+
+Inlinecondition (ConditionTests\Inlinecondition)
+ [x] Inline condition
+ [x] Inline condition with doulbe quotes
+ [x] Inline else condition
+ [x] Inline or condition
+ [x] Inline and condition
+ [x] Inline and or condition
+ [x] Inline bool check function call return true
+ [x] Inline bool check function call return false
+ [x] Inline bool check function call with attribute true
+ [x] Inline bool check function call with attribute false
+
+Shortcode (ConditionTests\Shortcode)
+ [x] Shortcode
+ [x] Shortcode include template
+ [x] Shortcode include template via variable
+ [x] Shortcode arrow function
+ [x] Shortcode arrow function year
+ [x] Shortcode with data variables
+ [x] Shortcode with array data variables
+
+blockcondition (ConditionTests\blockcondition)
+ [x] If block condition
+ [x] If else block condition
+ [x] If and block condition
+ [x] If is true block condition
+ [x] If else condition
+ [x] Multiple if else condition
+ [x] Bool check function call return true
+ [x] Bool check function call return false
+
+iterator (ConditionTests\iterator)
  [x] Nested iteration
  [x] As nested iteration
  [x] As iteration
@@ -75,19 +76,18 @@ Iterators (ConditionTests\Iterators)
  [x] Loop iteration ascending
  [x] Loop iteration descending
 
-Shortcode (ConditionTests\Shortcode)
- [x] Shortcode
- [x] Shortcode include template
- [x] Shortcode include template via variable
- [x] Shortcode arrow function
- [x] Shortcode arrow function year
- [x] Shortcode with data variables
- [x] Shortcode with array data variables
-
-Callable (ConditionTests\Callable)
- [x] Callable method
- [x] Callable method with arg double quotes
- [x] Callable method with arg single quotes
- [x] Callable method with arg no quotes
- [x] Callable method with parenthesis
+variable (ConditionTests\variable)
+ [x] Variables
+ [x] Variables with preceeding whitespace
+ [x] Variables with following whitespace
+ [x] Variables with preceeding and following whitespace
+ [x] Or variables
+ [x] Multiple or variable
+ [x] Multiple or variable with nested data
+ [x] Multiple or variable string
+ [x] Alternate variable
+ [x] Nested variables
+ [x] Nested variables by array name
+ [x] Blank return nested variable by array name
+ [x] Variables in script block
 
