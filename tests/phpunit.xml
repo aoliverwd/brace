@@ -25,6 +25,9 @@
     <testsuite name="callables">
       <directory>unit/callables</directory>
     </testsuite>
+    <testsuite name="filters">
+      <directory>unit/filters</directory>
+    </testsuite>
   </testsuites>
   <logging>
     <testdoxText outputFile="testdox.txt" />
