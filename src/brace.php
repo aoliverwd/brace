@@ -2,7 +2,7 @@
 
 /**
  *   Brace
- *   Copyright (C) 2025 Alex Oliver
+ *   Copyright (C) 2026 Alex Oliver
  *   @author: Alex Oliver
  *   @Repo: https://github.com/aoliverwd/brace
  *   @license: MIT
@@ -42,6 +42,12 @@ final class Parser
      * @var array<mixed>
      */
     private array $callable_methods = [];
+
+    /**
+     * Filters
+     * @var array<mixed>
+     */
+    private array $filters = [];
 
     /**
      * block_condition
@@ -191,6 +197,22 @@ final class Parser
             /** Return shortcode syntax if method is not callable */
             return $shortcodeSyntax;
         }
+    }
+
+    /**
+     * Register a filter
+     *
+     * @param string $name
+     * @param callable $filter
+     * @return object
+     */
+    public function registerFilter(string $name, callable $filter): object
+    {
+        if (!isset($this->filters[$name]) && is_callable($filter)) {
+            $this->filters[$name] = $filter;
+        }
+
+        return $this;
     }
 
     /**
@@ -732,6 +754,23 @@ final class Parser
     }
 
     /**
+     * Get variable and filter from variable string
+     *
+     * @param string $variable
+     * @return array<int, string|false>
+     */
+    private function variableFilter(string $variable): array
+    {
+        // Match variable and filter {{ variable|filter }}
+        if (preg_match('/([\w\d\-\_]+)\|([\w\d\-\_]+)/s', $variable, $matches)) {
+            $is_filter = isset($this->filters[$matches[2]]) && is_callable($this->filters[$matches[2]]);
+            return [$matches[1], $is_filter ? $matches[2] : false];
+        }
+
+        return [$variable, false];
+    }
+
+    /**
      * Process variables
      *
      * @param string $template_string
@@ -749,6 +788,7 @@ final class Parser
                 $is_itterator = preg_match_all('/ as /', $processString);
                 $has_alternative_vars = explode(' || ', $processString);
                 $replace_variable = '';
+                $filter = '';
 
                 /** Detect in-line condition, has alternative variables or singular variables */
                 if ($is_condition) {
@@ -758,7 +798,8 @@ final class Parser
                     $replace_variable = $this->processInlineIterator($processString, $dataset);
                 } elseif (count($has_alternative_vars) > 1) {
                     foreach ($has_alternative_vars as $this_variable) {
-                        if ($replace_variable = DataProcessing::processDataChain($this_variable, $dataset)) {
+                        $filter = $this->variableFilter($this_variable);
+                        if ($replace_variable = DataProcessing::processDataChain((string) $filter[0], $dataset)) {
                             break;
                         }
                     }
@@ -767,10 +808,19 @@ final class Parser
                         $replace_variable = $content;
                     }
                 } else {
-                    $replace_variable = DataProcessing::processDataChain($processString, $dataset);
+                    $filter = $this->variableFilter($processString);
+                    $replace_variable = DataProcessing::processDataChain((string) $filter[0], $dataset);
                 }
 
+                // Check if variable is an array and empty, replace with empty string
                 $replace_variable = is_array($replace_variable) && empty($replace_variable) ? '' : $replace_variable;
+
+                // Check if variable has a filter, apply filter if available
+                if ($filter[1] ?? false) {
+                    $replace_variable = call_user_func($this->filters[$filter[1]], $replace_variable);
+                }
+
+                // Replace variable in template string
                 $template_string = str_replace($replace_string, $replace_variable, $template_string);
             }
         }
