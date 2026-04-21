@@ -762,7 +762,7 @@ final class Parser
     private function variableFilter(string $variable): array
     {
         // Match variable and filter {{ variable|filter }}
-        if (preg_match('/([\w\d\-\_]+)\|([\w\d\-\_]+)/s', $variable, $matches)) {
+        if (preg_match('/([\w\d\-\_>]+)\|([\w\d\-\_]+)/s', $variable, $matches)) {
             $is_filter = isset($this->filters[$matches[2]]) && is_callable($this->filters[$matches[2]]);
             return [$matches[1], $is_filter ? $matches[2] : false];
         }
