@@ -21,6 +21,8 @@ Conditions (ConditionTests\Conditions)
 
 Filter (ConditionTests\Filter)
  [x] Filter int
+ [x] Filter nested
+ [x] Filter inline condition
 
 Include (ConditionTests\Include)
  [x] Include template
