@@ -2,8 +2,11 @@
 
 namespace Brace;
 
-final class DataProcessing
+trait DataProcessing
 {
+    /** Use Filters trait */
+    use Filters;
+
     /**
      * Process data chain
      *
@@ -11,51 +14,45 @@ final class DataProcessing
      * @param array<mixed> $dataset
      * @return mixed
      */
-    public static function processDataChain(
-        string $string,
-        array $dataset
-    ): mixed {
+    private function processDataChain(string $string, array $dataset): mixed
+    {
+        // Check for filter
+        $filter = $this->variableFilter($string);
+
         // Check for search by array value
-        $array_value_seratch = explode("->?", $string);
+        $array_value_seratch = explode('->?', (string) $filter[0]);
 
         if (count($array_value_seratch) > 1) {
             foreach ($array_value_seratch as $thisVar) {
-                if (
-                    preg_match('/^(.*?)\[(.*?)\](.*)$/', $thisVar, $matches) &&
-                    is_array($dataset)
-                ) {
+                if (preg_match('/^(.*?)\[(.*?)\](.*)$/', $thisVar, $matches) && is_array($dataset)) {
                     foreach ($dataset as $row) {
-                        if (
-                            isset($row[$matches[1]]) &&
-                            $row[$matches[1]] === $matches[2]
-                        ) {
-                            return self::processChain(
-                                (string) preg_replace("/^->/", "", $matches[3]),
-                                $row
-                            );
+                        if (isset($row[$matches[1]]) && $row[$matches[1]] === $matches[2]) {
+                            return $this->processChain((string) preg_replace('/^->/', '', $matches[3]), $row, '');
                         }
                     }
                 }
 
                 $dataset = !empty(trim($thisVar))
-                    ? self::processChain(
-                        $thisVar,
-                        is_array($dataset) ? $dataset : []
-                    )
+                    ? self::processChain($thisVar, is_array($dataset) ? $dataset : [], '')
                     : $dataset;
             }
         }
 
-        return self::processChain($string, is_array($dataset) ? $dataset : []);
+        return self::processChain(
+            (string) $filter[0],
+            is_array($dataset) ? $dataset : [],
+            $filter[1] ? (string) $filter[1] : '',
+        );
     }
 
     /**
      * Process chain
      * @param  string $input
      * @param  array<mixed> $dataset
+     * @param  string $filter
      * @return mixed
      */
-    private static function processChain(string $input, array $dataset): mixed
+    private function processChain(string $input, array $dataset, string $filter): mixed
     {
         $return = [];
 
@@ -68,16 +65,16 @@ final class DataProcessing
 
         $input = !empty($is_count) ? $is_count : $input;
 
-        foreach (explode("->", $input) as $thisVar) {
+        foreach (explode('->', $input) as $thisVar) {
             if (is_array($dataset) && isset($dataset[$thisVar])) {
                 $dataset = $dataset[$thisVar];
                 $return = !empty($is_count) ? count($dataset) : $dataset;
             } else {
-                return "";
+                return '';
             }
         }
 
-        return $return;
+        return $this->processFilter($filter, $return);
     }
 
     /**
@@ -91,7 +88,7 @@ final class DataProcessing
             return $match[1];
         }
 
-        return "";
+        return '';
     }
 
     /**
@@ -105,12 +102,12 @@ final class DataProcessing
             if (count($match) === 4) {
                 return [
                     'callable' => $match[2],
-                    'attributes' => is_scalar($match[3]) ? preg_replace('/^"|"$|^\'|\'$/', '', $match[3]) : ''
+                    'attributes' => is_scalar($match[3]) ? preg_replace('/^"|"$|^\'|\'$/', '', $match[3]) : '',
                 ];
             } else {
                 return [
                     'callable' => $match[1],
-                    'attributes' => ''
+                    'attributes' => '',
                 ];
             }
         }

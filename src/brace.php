@@ -12,12 +12,16 @@ namespace Brace;
 
 // Include data processing class
 require_once __DIR__ . '/data-processing.php';
+require_once __DIR__ . '/filters.php';
 
 /**
  * Core parser class
  */
 final class Parser
 {
+    /** Use DataProcessing trait */
+    use DataProcessing;
+
     /** Public variables */
     public bool $remove_comment_blocks = true;
     public string $template_path = __DIR__ . '/';
@@ -42,12 +46,6 @@ final class Parser
      * @var array<mixed>
      */
     private array $callable_methods = [];
-
-    /**
-     * Filters
-     * @var array<mixed>
-     */
-    private array $filters = [];
 
     /**
      * block_condition
@@ -197,22 +195,6 @@ final class Parser
             /** Return shortcode syntax if method is not callable */
             return $shortcodeSyntax;
         }
-    }
-
-    /**
-     * Register a filter
-     *
-     * @param string $name
-     * @param callable $filter
-     * @return object
-     */
-    public function registerFilter(string $name, callable $filter): object
-    {
-        if (!isset($this->filters[$name]) && is_callable($filter)) {
-            $this->filters[$name] = $filter;
-        }
-
-        return $this;
     }
 
     /**
@@ -604,12 +586,12 @@ final class Parser
         if ($offset_row_id !== 0) {
             $offset_row_id = preg_match('/^[0-9]+$/', $offset_row_id)
                 ? intval($offset_row_id)
-                : DataProcessing::processDataChain($offset_row_id, $dataset);
+                : $this->processDataChain($offset_row_id, $dataset);
 
             $offset_row_id = is_scalar($offset_row_id) ? intval($offset_row_id) : 0;
         }
 
-        $use_data = DataProcessing::processDataChain($each_set[0], $dataset);
+        $use_data = $this->processDataChain($each_set[0], $dataset);
 
         if ($use_data && is_array($use_data)) {
             /** set global data array */
@@ -754,23 +736,6 @@ final class Parser
     }
 
     /**
-     * Get variable and filter from variable string
-     *
-     * @param string $variable
-     * @return array<int, string|false>
-     */
-    private function variableFilter(string $variable): array
-    {
-        // Match variable and filter {{ variable|filter }}
-        if (preg_match('/([\w\d\-\_>]+)\|([\w\d\-\_]+)/s', $variable, $matches)) {
-            $is_filter = isset($this->filters[$matches[2]]) && is_callable($this->filters[$matches[2]]);
-            return [$matches[1], $is_filter ? $matches[2] : false];
-        }
-
-        return [$variable, false];
-    }
-
-    /**
      * Process variables
      *
      * @param string $template_string
@@ -798,8 +763,7 @@ final class Parser
                     $replace_variable = $this->processInlineIterator($processString, $dataset);
                 } elseif (count($has_alternative_vars) > 1) {
                     foreach ($has_alternative_vars as $this_variable) {
-                        $filter = $this->variableFilter($this_variable);
-                        if ($replace_variable = DataProcessing::processDataChain((string) $filter[0], $dataset)) {
+                        if ($replace_variable = $this->processDataChain($this_variable, $dataset)) {
                             break;
                         }
                     }
@@ -808,17 +772,11 @@ final class Parser
                         $replace_variable = $content;
                     }
                 } else {
-                    $filter = $this->variableFilter($processString);
-                    $replace_variable = DataProcessing::processDataChain((string) $filter[0], $dataset);
+                    $replace_variable = $this->processDataChain($processString, $dataset);
                 }
 
                 // Check if variable is an array and empty, replace with empty string
                 $replace_variable = is_array($replace_variable) && empty($replace_variable) ? '' : $replace_variable;
-
-                // Check if variable has a filter, apply filter if available
-                if ($filter[1] ?? false) {
-                    $replace_variable = call_user_func($this->filters[$filter[1]], $replace_variable);
-                }
 
                 // Replace variable in template string
                 $template_string = str_replace($replace_string, $replace_variable, $template_string);
@@ -847,7 +805,7 @@ final class Parser
                 foreach ($variables as $this_variable) {
                     $content[1] = str_replace(
                         $this_variable[0],
-                        (string) DataProcessing::processDataChain($this_variable[1], $dataset),
+                        (string) $this->processDataChain($this_variable[1], $dataset),
                         $content[1],
                     );
                 }
@@ -920,7 +878,7 @@ final class Parser
         $and_result = true;
 
         /** And conditions */
-        foreach (explode(' && ', $condition) as $condition_set):
+        foreach (explode(' && ', $condition) as $condition_set) {
             $or_result = false;
 
             /** Or conditions */
@@ -944,7 +902,7 @@ final class Parser
                 $result = false;
                 break;
             }
-        endforeach;
+        }
 
         return $result;
     }
@@ -958,13 +916,11 @@ final class Parser
      */
     private function processSingleCondition(array $condition, array $dataset): bool
     {
-        $data = count($condition) > 0 ? DataProcessing::processDataChain(trim((string) $condition[0]), $dataset) : [];
+        $data = count($condition) > 0 ? $this->processDataChain(trim((string) $condition[0]), $dataset) : [];
 
         if (!empty($data)) {
             $challenge = $condition[1] ?? 'EXISTS';
-            $expected = isset($condition[2])
-                ? DataProcessing::processDataChain(trim((string) $condition[2]), $dataset)
-                : false;
+            $expected = isset($condition[2]) ? $this->processDataChain(trim((string) $condition[2]), $dataset) : false;
 
             if (!$expected) {
                 $expected = isset($condition[2]) ? trim((string) $condition[2]) : true;
