@@ -19,7 +19,7 @@ trait Filters
      */
     public function registerFilter(string $name, callable $filter): object
     {
-        if (!isset($this->filters[$name]) && is_callable($filter)) {
+        if (!isset($this->filters[$name])) {
             $this->filters[$name] = $filter;
         }
 

@@ -102,7 +102,7 @@ trait DataProcessing
             if (count($match) === 4) {
                 return [
                     'callable' => $match[2],
-                    'attributes' => is_scalar($match[3]) ? preg_replace('/^"|"$|^\'|\'$/', '', $match[3]) : '',
+                    'attributes' => preg_replace('/^"|"$|^\'|\'$/', '', $match[3]),
                 ];
             } else {
                 return [
