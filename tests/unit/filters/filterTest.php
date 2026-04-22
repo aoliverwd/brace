@@ -41,6 +41,10 @@ final class FilterTest extends TestCase
         );
     }
 
+    /**
+     * Test filter nested
+     * @return void
+     */
     public function testFilterNested(): void
     {
         $brace = new Brace\Parser();
@@ -62,6 +66,10 @@ final class FilterTest extends TestCase
         );
     }
 
+    /**
+     * Test filter inline condition
+     * @return void
+     */
     public function testFilterInlineCondition(): void
     {
         $brace = new Brace\Parser();

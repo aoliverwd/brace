@@ -10,10 +10,6 @@
 
 namespace Brace;
 
-// Include data processing class
-require_once __DIR__ . '/data-processing.php';
-require_once __DIR__ . '/filters.php';
-
 /**
  * Core parser class
  */

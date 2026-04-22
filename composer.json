@@ -22,12 +22,9 @@
         "php": ">=8.4"
     },
     "autoload": {
-        "classmap": [
-            "src/"
-        ],
-        "files": [
-            "src/brace.php"
-        ]
+        "psr-4": {
+            "Brace\\": "src/"
+        }
     },
     "require-dev": {
         "phpstan/phpstan": "^1.9",
