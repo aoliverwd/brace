@@ -17,6 +17,5 @@ jobs:
                   php-version: 8.4
 
             - run: |
-                  composer install
-                  ./vendor/bin/phpstan analyse -c phpstan.neon
-                  ./vendor/bin/phpunit -c ./tests/phpunit.xml
+                  composer update
+                  composer test
