@@ -24,7 +24,10 @@
     "autoload": {
         "psr-4": {
             "Brace\\": "src/"
-        }
+        },
+        "classmap": [
+            "src/"
+        ]
     },
     "require-dev": {
         "phpstan/phpstan": "^2.1",
