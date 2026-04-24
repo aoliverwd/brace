@@ -19,6 +19,7 @@ brace is a simple template language written in PHP. Brace uses a handlebar style
         - In-line "or" operator
         - Multiple In-line "or" operators
         - Return variable values by an array index value
+        - Filters
     - Iterators
         - In-line Iterators
     - Nth children
@@ -125,11 +126,11 @@ $brace->compile('example', 'example.html', [
 
 ## Instance variables
 
-| Variable                     | Description                                    | Default value                         |
-|------------------------------|------------------------------------------------|---------------------------------------|
-| ```remove_comment_blocks```  | Keep or remove comment blocks from templates   | \[Boolean\] ```true```                |
-| ```template_path```          | Set directory to load template files from      | \[String\] Current working directory  |
-| ```template_ext```           | Template file extension                        | \[String\] ```tpl```                  |
+| Variable                | Description                                  | Default value                        |
+| ----------------------- | -------------------------------------------- | ------------------------------------ |
+| `remove_comment_blocks` | Keep or remove comment blocks from templates | \[Boolean\] `true`                   |
+| `template_path`         | Set directory to load template files from    | \[String\] Current working directory |
+| `template_ext`          | Template file extension                      | \[String\] `tpl`                     |
 
 # Template Reference
 
@@ -201,6 +202,41 @@ Result:
 <p>Hi Miss Doe</p>
 ```
 
+### Filters
+
+Brace allows you to register and use filters to modify variable values dynamically. Filters can be applied to variables using the `|` operator.
+
+#### Registering Filters
+
+Filters are registered using the `registerFilter` method. For example:
+
+```php
+$brace = new Brace\Parser();
+$brace->registerFilter('int', fn($content) => (int) $content);
+```
+
+#### Using Filters
+
+Filters can be applied to variables in templates. Examples:
+
+##### 1. Basic Filter Usage:
+
+`{{ number|int }}`
+
+Converts the `number` variable to an integer.
+
+##### 2.Nested Filters:
+
+`{{ number->one|int }}`
+
+Applies the `int` filter to a nested variable.
+
+##### 2.Inline Conditions with Filters:
+
+`{{ number->one|number === 1,123.0 ? "true" : "false" }}`
+
+Formats the `number` variable and evaluates an inline condition.
+
 ## Iterators
 
 ```php
@@ -236,24 +272,24 @@ $brace->Parse('example',[
 
 ```html
 <ul>
-{{each products}}
+    {{each products}}
     <li>{{title}}</li>
-{{end}}
+    {{end}}
 </ul>
 ```
 
 ```html
 <ul>
-{{each products as product}}
+    {{each products as product}}
     <li>
         {{product->title}}
         <ul>
-        {{each product->categories as category}}
+            {{each product->categories as category}}
             <li>{{category}}</li>
-        {{end}}
+            {{end}}
         </ul>
     </li>
-{{end}}
+    {{end}}
 </ul>
 ```
 
@@ -271,7 +307,7 @@ $brace->Parse('example',[
 
 ```html
 {{each names as name}}
-    <p>{{name}}</p>
+<p>{{name}}</p>
 {{end}}
 ```
 
@@ -291,7 +327,9 @@ $brace->Parse('example',[
 
 ```html
 <ul>
-    {{names as name "<li>__name__</li>"}}
+    {{names as name "
+    <li>__name__</li>
+    "}}
 </ul>
 ```
 
@@ -299,7 +337,9 @@ Or
 
 ```html
 <ul>
-    {{names as key value "<li data-key="__key__">__value__</li>"}}
+    {{names as key value "
+    <li data-key="__key__">__value__</li>
+    "}}
 </ul>
 ```
 
@@ -362,7 +402,7 @@ $brace->Parse('example',[
 
 ```html
 {{each names as name}}
-    <span data-key="{{_KEY}}">{{name}}</span>
+<span data-key="{{_KEY}}">{{name}}</span>
 {{end}}
 ```
 
@@ -370,7 +410,7 @@ Or
 
 ```html
 {{each names as key value}}
-    <span data-key="{{key}}">{{value}}</span>
+<span data-key="{{key}}">{{value}}</span>
 {{end}}
 ```
 
@@ -378,13 +418,12 @@ Or
 
 Variables that are added to each iteration.
 
-| ID          | Description                                                         | Type    |
-|-------------|---------------------------------------------------------------------|---------|
-| \_ITERATION | Iteration value (is\_first\_item, is\_last\_item, 2, 3 etc)         | String  |
-| \_ROW_ID    | Record/Row ID (1,2,3, etc)                                          | Integer |
-| \_KEY       | Record/Row key                                                      | Mixed   |
-| GLOBAL      | An array of external record data that is accessible to all rows     | Array   |
-
+| ID          | Description                                                     | Type    |
+| ----------- | --------------------------------------------------------------- | ------- |
+| \_ITERATION | Iteration value (is_first_item, is_last_item, 2, 3 etc)         | String  |
+| \_ROW_ID    | Record/Row ID (1,2,3, etc)                                      | Integer |
+| \_KEY       | Record/Row key                                                  | Mixed   |
+| GLOBAL      | An array of external record data that is accessible to all rows | Array   |
 
 ## Loops
 
@@ -424,10 +463,9 @@ $brace->Parse('example',[]);
 
 Variables that are added to each iteration.
 
-| ID          | Description                                                         | Type    |
-|-------------|---------------------------------------------------------------------|---------|
-| \_KEY       | Row key                                                             | Integer |
-
+| ID    | Description | Type    |
+| ----- | ----------- | ------- |
+| \_KEY | Row key     | Integer |
 
 ## Conditional Statements
 
@@ -448,15 +486,15 @@ $brace->Parse('example',[
 
 ```html
 {{if first_name EXISTS}}
-    <p>Hello {{first_name}}</p>
+<p>Hello {{first_name}}</p>
 {{end}}
 ```
 
 ```html
 {{if first_name EXISTS && first_name == "John"}}
-    <p>My first name is {{first_name}}</p>
+<p>My first name is {{first_name}}</p>
 {{else}}
-    <p>Please enter your first name</p>
+<p>Please enter your first name</p>
 {{end}}
 ```
 
@@ -475,17 +513,15 @@ $brace->Parse('example',[
 ```
 
 ```html
-{{each names as name}}
-    {{if _ITERATION === "is_first_item"}}
-        <span class="first_item" data-rowid="{{_ROW_ID}}">{{name}}</span>
-    {{elseif _ITERATION === "is_last_item"}}
-        <span class="last_item" data-rowid="{{_ROW_ID}}">{{name}}</span>
-    {{elseif _ITERATION == 2}}
-        <span class="second_item" data-rowid="{{_ROW_ID}}">{{name}}</span>
-    {{else}}
-        <span data-rowid="{{_ROW_ID}}">{{name}}</span>
-    {{end}}
-{{end}}
+{{each names as name}} {{if _ITERATION === "is_first_item"}}
+<span class="first_item" data-rowid="{{_ROW_ID}}">{{name}}</span>
+{{elseif _ITERATION === "is_last_item"}}
+<span class="last_item" data-rowid="{{_ROW_ID}}">{{name}}</span>
+{{elseif _ITERATION == 2}}
+<span class="second_item" data-rowid="{{_ROW_ID}}">{{name}}</span>
+{{else}}
+<span data-rowid="{{_ROW_ID}}">{{name}}</span>
+{{end}} {{end}}
 ```
 
 ### In-line conditions
@@ -514,20 +550,19 @@ Name is "John"
 
 ### Conditions
 
-| Condition  | Description                                                        |
-|------------|--------------------------------------------------------------------|
-| ==         | Is equal to (Loose equality comparison)                            |
-| ===        | Is equal to (Strict equality comparison)                           |
-| >=         | More than or equal to                                              |
-| <=         | Less than or equal to                                              |
-| >          | More than                                                          |
-| <          | Less than                                                          |
-| !=         | Is not equal (Loose non equality comparison)                       |
-| !!         | Is not                                                             |
-| !==        | Is not equal (Same as !! operator, strict non equality comparison  |
-| EXISTS     | Exists                                                             |
-| !EXISTS    | Does not exist                                                     |
-
+| Condition | Description                                                       |
+| --------- | ----------------------------------------------------------------- |
+| ==        | Is equal to (Loose equality comparison)                           |
+| ===       | Is equal to (Strict equality comparison)                          |
+| >=        | More than or equal to                                             |
+| <=        | Less than or equal to                                             |
+| >         | More than                                                         |
+| <         | Less than                                                         |
+| !=        | Is not equal (Loose non equality comparison)                      |
+| !!        | Is not                                                            |
+| !==       | Is not equal (Same as !! operator, strict non equality comparison |
+| EXISTS    | Exists                                                            |
+| !EXISTS   | Does not exist                                                    |
 
 ## Including Templates
 
@@ -544,7 +579,6 @@ Name is "John"
 ```
 
 ## Shortcodes
-
 
 ### PHP Implementation Example
 
@@ -565,7 +599,6 @@ $brace->regShortcode('button', 'button_function');
 /** Process content template */
 $brace->Parse('content', []);
 ```
-
 
 ### Content Template
 
@@ -656,4 +689,4 @@ Running PHPStan and PHPUnit tests can be achieved with the following commands
 ./vendor/bin/phpunit -c ./tests/phpunit.xml
 ```
 
-Or by running via composer ```composer test```
+Or by running via composer `composer test`
