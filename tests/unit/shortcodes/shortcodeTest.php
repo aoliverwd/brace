@@ -10,19 +10,19 @@ declare(strict_types=1);
 namespace ConditionTests;
 
 use Brace;
-
 /** PHPUnit namespace */
 use PHPUnit\Framework\TestCase;
-
 
 /**
  * [$bar description]
  * @var [type]
  */
-$bar = function () {
+function bar()
+{
     return 'foo bar';
-};
+}
 
+;
 
 /**
  * ShortcodeTest
@@ -37,14 +37,10 @@ final class ShortcodeTest extends TestCase
     {
         $brace = new Brace\Parser();
 
-        $brace->regShortcode('foo', 'bar');
+        $brace->regShortcode('foo', 'ConditionTests\bar');
 
-        $this->assertEquals(
-            "foo bar\n",
-            $brace->parseInputString('[foo]', [], false)->return()
-        );
+        $this->assertEquals("foo bar\n", $brace->parseInputString('[foo]', [], false)->return());
     }
-
 
     /**
      * [testShortcodeIncludeTemplate description]
@@ -55,12 +51,9 @@ final class ShortcodeTest extends TestCase
         $brace = new Brace\Parser();
         $brace->template_path = __DIR__ . '/';
 
-        $brace->regShortcode('foo', 'bar');
+        $brace->regShortcode('foo', 'ConditionTests\bar');
 
-        $this->assertEquals(
-            "foo bar",
-            $brace->parseInputString('[@include include-file]', [], false)->return()
-        );
+        $this->assertEquals('foo bar', $brace->parseInputString('[@include include-file]', [], false)->return());
     }
 
     /**
@@ -72,13 +65,19 @@ final class ShortcodeTest extends TestCase
         $brace = new Brace\Parser();
         $brace->template_path = __DIR__ . '/';
 
-        $brace->regShortcode('foo', 'bar');
+        $brace->regShortcode('foo', 'ConditionTests\bar');
 
         $this->assertEquals(
-            "foo bar",
-            $brace->parseInputString('[@include {{file}}]', [
-                'file' => 'include-file'
-            ], false)->return()
+            'foo bar',
+            $brace
+                ->parseInputString(
+                    '[@include {{file}}]',
+                    [
+                        'file' => 'include-file',
+                    ],
+                    false,
+                )
+                ->return(),
         );
     }
 
@@ -92,10 +91,7 @@ final class ShortcodeTest extends TestCase
 
         $brace->regShortcode('foo', fn() => 'foo bar');
 
-        $this->assertEquals(
-            "foo bar\n",
-            $brace->parseInputString('[foo]', [], false)->return()
-        );
+        $this->assertEquals("foo bar\n", $brace->parseInputString('[foo]', [], false)->return());
     }
 
     /**
@@ -108,10 +104,7 @@ final class ShortcodeTest extends TestCase
 
         $brace->regShortcode('year', fn() => date('Y', strtotime('2024-01-01')));
 
-        $this->assertEquals(
-            "2024\n",
-            $brace->parseInputString('[year]', [], false)->return()
-        );
+        $this->assertEquals("2024\n", $brace->parseInputString('[year]', [], false)->return());
     }
 
     public function testShortcodeWithDataVariables(): void
@@ -122,12 +115,17 @@ final class ShortcodeTest extends TestCase
 
         $this->assertEquals(
             "2024\n",
-            $brace->parseInputString('[year date="{{date}}"]', [
-                'date' => '2024-01-01'
-            ], false)->return()
+            $brace
+                ->parseInputString(
+                    '[year date="{{date}}"]',
+                    [
+                        'date' => '2024-01-01',
+                    ],
+                    false,
+                )
+                ->return(),
         );
     }
-
 
     public function testShortcodeWithArrayDataVariables(): void
     {
@@ -138,14 +136,20 @@ final class ShortcodeTest extends TestCase
         $names = [
             0 => 'Alex',
             1 => 'John',
-            2 => 'Andre'
+            2 => 'Andre',
         ];
 
         $this->assertEquals(
             "Alex\nJohn\nAndre\n",
-            $brace->Parse('data-variables', [
-                'names' => $names
-            ], false)->return()
+            $brace
+                ->Parse(
+                    'data-variables',
+                    [
+                        'names' => $names,
+                    ],
+                    false,
+                )
+                ->return(),
         );
     }
 }

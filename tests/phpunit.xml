@@ -1,12 +1,17 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" colors="true" testdox="true" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
-  <coverage/>
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpunit
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    colors="true"
+    testdox="true"
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+>
+  <coverage />
   <testsuites>
+    <testsuite name="variables">
+        <directory>unit/variables</directory>
+    </testsuite>
     <testsuite name="includes">
       <directory>unit/includes</directory>
-    </testsuite>
-    <testsuite name="variables">
-      <directory>unit/variables</directory>
     </testsuite>
     <testsuite name="conditions">
       <directory>unit/conditions</directory>
@@ -20,8 +25,11 @@
     <testsuite name="callables">
       <directory>unit/callables</directory>
     </testsuite>
+    <testsuite name="filters">
+      <directory>unit/filters</directory>
+    </testsuite>
   </testsuites>
   <logging>
-    <testdoxText outputFile="testdox.txt"/>
+    <testdoxText outputFile="testdox.txt" />
   </logging>
 </phpunit>

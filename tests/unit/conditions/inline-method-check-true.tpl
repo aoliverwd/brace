@@ -1,4 +1,4 @@
-{{if \ConditionTests\BlockConditionsTest::methodTrue}}
+{{if \ConditionTests\blockconditionTest::methodTrue}}
 success
 {{else}}
 fail

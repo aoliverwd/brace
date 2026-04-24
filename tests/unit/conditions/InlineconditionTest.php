@@ -10,14 +10,13 @@ declare(strict_types=1);
 namespace ConditionTests;
 
 use Brace;
-
 /** PHPUnit namespace */
 use PHPUnit\Framework\TestCase;
 
 /**
  * Test class
  */
-final class InlineConditionsTest extends TestCase
+final class InlineconditionTest extends TestCase
 {
     /**
      * [testInlineCondition description]
@@ -28,7 +27,7 @@ final class InlineConditionsTest extends TestCase
         $brace = new Brace\Parser();
         $this->assertEquals(
             "Hello Dave\n",
-            $brace->parseInputString('{{name EXISTS ? "Hello __name__"}}', ['name' => 'Dave'], false)->return()
+            $brace->parseInputString('{{name EXISTS ? "Hello __name__"}}', ['name' => 'Dave'], false)->return(),
         );
     }
 
@@ -37,7 +36,7 @@ final class InlineConditionsTest extends TestCase
         $brace = new Brace\Parser();
         $this->assertEquals(
             "Hello \"Dave\"\n",
-            $brace->parseInputString('{{name EXISTS ? "Hello \"__name__\""}}', ['name' => 'Dave'], false)->return()
+            $brace->parseInputString('{{name EXISTS ? "Hello \"__name__\""}}', ['name' => 'Dave'], false)->return(),
         );
     }
 
@@ -50,7 +49,7 @@ final class InlineConditionsTest extends TestCase
         $brace = new Brace\Parser();
         $this->assertEquals(
             "No name\n",
-            $brace->parseInputString('{{name EXISTS ? "Hello __name__" : "No name"}}', [], false)->return()
+            $brace->parseInputString('{{name EXISTS ? "Hello __name__" : "No name"}}', [], false)->return(),
         );
     }
 
@@ -63,7 +62,13 @@ final class InlineConditionsTest extends TestCase
         $brace = new Brace\Parser();
         $this->assertEquals(
             "Hello Simon\n",
-            $brace->parseInputString('{{name === "Dave" || name === "Simon"  ? "Hello __name__" : "No name"}}', ['name' => 'Simon'], false)->return()
+            $brace
+                ->parseInputString(
+                    '{{name === "Dave" || name === "Simon"  ? "Hello __name__" : "No name"}}',
+                    ['name' => 'Simon'],
+                    false,
+                )
+                ->return(),
         );
     }
 
@@ -76,7 +81,13 @@ final class InlineConditionsTest extends TestCase
         $brace = new Brace\Parser();
         $this->assertEquals(
             "My name is Simon and im 21 years old\n",
-            $brace->parseInputString('{{name EXISTS && age >= 21 ? "My name is __name__ and im __age__ years old"}}', ['name' => 'Simon', 'age' => 21], false)->return()
+            $brace
+                ->parseInputString(
+                    '{{name EXISTS && age >= 21 ? "My name is __name__ and im __age__ years old"}}',
+                    ['name' => 'Simon', 'age' => 21],
+                    false,
+                )
+                ->return(),
         );
     }
 
@@ -89,7 +100,13 @@ final class InlineConditionsTest extends TestCase
         $brace = new Brace\Parser();
         $this->assertEquals(
             "My name is Simon and im older then 21 years old\n",
-            $brace->parseInputString('{{name && age === 21 || age > 18 ? "My name is __name__ and im older then 21 years old" : "You are __age__ years old"}}', ['name' => 'Simon', 'age' => 25], false)->return()
+            $brace
+                ->parseInputString(
+                    '{{name && age === 21 || age > 18 ? "My name is __name__ and im older then 21 years old" : "You are __age__ years old"}}',
+                    ['name' => 'Simon', 'age' => 25],
+                    false,
+                )
+                ->return(),
         );
     }
 
@@ -98,7 +115,13 @@ final class InlineConditionsTest extends TestCase
         $brace = new Brace\Parser();
         $this->assertEquals(
             "success\n",
-            $brace->parseInputString('{{\ConditionTests\InlineConditionsTest::methodTrue ? "success" : "fail"}}', [], false)->return()
+            $brace
+                ->parseInputString(
+                    '{{\ConditionTests\InlineconditionTest::methodTrue ? "success" : "fail"}}',
+                    [],
+                    false,
+                )
+                ->return(),
         );
     }
 
@@ -107,7 +130,13 @@ final class InlineConditionsTest extends TestCase
         $brace = new Brace\Parser();
         $this->assertEquals(
             "fail\n",
-            $brace->parseInputString('{{\ConditionTests\InlineConditionsTest::methodFalse ? "success" : "fail"}}', [], false)->return()
+            $brace
+                ->parseInputString(
+                    '{{\ConditionTests\InlineconditionTest::methodFalse ? "success" : "fail"}}',
+                    [],
+                    false,
+                )
+                ->return(),
         );
     }
 
@@ -117,7 +146,13 @@ final class InlineConditionsTest extends TestCase
 
         $this->assertEquals(
             "success\n",
-            $brace->parseInputString('{{\ConditionTests\InlineConditionsTest::methodWithAttribute("foobar") ? "success" : "fail"}}', [], false)->return()
+            $brace
+                ->parseInputString(
+                    '{{\ConditionTests\InlineconditionTest::methodWithAttribute("foobar") ? "success" : "fail"}}',
+                    [],
+                    false,
+                )
+                ->return(),
         );
     }
 
@@ -127,7 +162,13 @@ final class InlineConditionsTest extends TestCase
 
         $this->assertEquals(
             "fail\n",
-            $brace->parseInputString('{{\ConditionTests\InlineConditionsTest::methodWithAttribute(barfoo) ? "success" : "fail"}}', [], false)->return()
+            $brace
+                ->parseInputString(
+                    '{{\ConditionTests\InlineconditionTest::methodWithAttribute(barfoo) ? "success" : "fail"}}',
+                    [],
+                    false,
+                )
+                ->return(),
         );
     }
 
