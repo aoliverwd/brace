@@ -19,6 +19,11 @@ Conditions (ConditionTests\Conditions)
  [x] Not exists
  [x] Count
 
+Filter (ConditionTests\Filter)
+ [x] Filter int
+ [x] Filter nested
+ [x] Filter inline condition
+
 Include (ConditionTests\Include)
  [x] Include template
  [x] Include multiple templates

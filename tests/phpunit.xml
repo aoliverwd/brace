@@ -7,11 +7,11 @@
 >
   <coverage />
   <testsuites>
+    <testsuite name="variables">
+        <directory>unit/variables</directory>
+    </testsuite>
     <testsuite name="includes">
       <directory>unit/includes</directory>
-    </testsuite>
-    <testsuite name="variables">
-      <directory>unit/variables</directory>
     </testsuite>
     <testsuite name="conditions">
       <directory>unit/conditions</directory>
@@ -24,6 +24,9 @@
     </testsuite>
     <testsuite name="callables">
       <directory>unit/callables</directory>
+    </testsuite>
+    <testsuite name="filters">
+      <directory>unit/filters</directory>
     </testsuite>
   </testsuites>
   <logging>
