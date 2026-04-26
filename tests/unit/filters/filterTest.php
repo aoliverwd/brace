@@ -95,7 +95,7 @@ final class FilterTest extends TestCase
      * Test filter value by array index value
      * @return void
      */
-    public function testFilterValueBuyArrayIndexValue(): void
+    public function testFilterValueByArrayIndexValue(): void
     {
         $brace = new Brace\Parser();
 
