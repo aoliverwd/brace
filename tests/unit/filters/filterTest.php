@@ -92,7 +92,7 @@ final class FilterTest extends TestCase
     }
 
     /**
-     * Test filter value by array index value
+     * Test filter value by searching an array row by field value
      * @return void
      */
     public function testFilterValueByArrayIndexValue(): void
