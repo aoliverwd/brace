@@ -90,4 +90,44 @@ final class FilterTest extends TestCase
                 ->return(),
         );
     }
+
+    /**
+     * Test filter value by searching an array row by field value
+     * @return void
+     */
+    public function testFilterValueByArrayIndexValue(): void
+    {
+        $brace = new Brace\Parser();
+
+        $brace->registerFilter('esc_html', fn($content) => strip_tags($content));
+
+        $this->assertEquals(
+            'Hi Miss Foo Doe' . PHP_EOL,
+            $brace
+                ->parseInputString(
+                    'Hi {{names->?first[Jane]->title|esc_html}} {{names->?first[Jane]->last|esc_html}}',
+                    [
+                        'names' => [
+                            0 => [
+                                'title' => 'Mr',
+                                'first' => 'John',
+                                'last' => 'Smith',
+                            ],
+                            1 => [
+                                'title' => 'Miss <p>Foo</p>',
+                                'first' => 'Jane',
+                                'last' => 'Doe',
+                            ],
+                            2 => [
+                                'title' => 'Dr',
+                                'first' => 'David',
+                                'last' => 'Jones',
+                            ],
+                        ],
+                    ],
+                    false,
+                )
+                ->return(),
+        );
+    }
 }
