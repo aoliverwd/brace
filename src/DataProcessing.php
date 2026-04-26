@@ -27,7 +27,11 @@ trait DataProcessing
                 if (preg_match('/^(.*?)\[(.*?)\](.*)$/', $thisVar, $matches) && is_array($dataset)) {
                     foreach ($dataset as $row) {
                         if (isset($row[$matches[1]]) && $row[$matches[1]] === $matches[2]) {
-                            return $this->processChain((string) preg_replace('/^->/', '', $matches[3]), $row, '');
+                            return $this->processChain(
+                                (string) preg_replace('/^->/', '', $matches[3]),
+                                $row,
+                                $filter[1] ? (string) $filter[1] : '',
+                            );
                         }
                     }
                 }
