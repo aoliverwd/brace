@@ -10,6 +10,8 @@
 
 namespace Brace;
 
+use Brace\Exceptions\SyntaxError;
+
 /**
  * Core parser class
  */
@@ -30,6 +32,8 @@ final class Parser
     private int $block_spaces = 0;
     private bool $is_block = false;
     private bool $is_js_script = false;
+    private string $current_template = '';
+    private int $current_line = 0;
 
     /**
      * shortcode_methods
@@ -240,6 +244,9 @@ final class Parser
             $handle = fopen($this->template_path . $template_name, 'r');
 
             if (is_resource($handle)) {
+                /** Set current template path */
+                $this->current_template = $this->template_path . $template_name;
+
                 /** Run through each line */
                 while (($this_line = fgets($handle, 4096)) !== false) {
                     /** Convert tabs to spaces */
@@ -254,8 +261,11 @@ final class Parser
 
                 /** If block has not been closed */
                 if ($this->is_block) {
-                    trigger_error('IF/EACH block has not been closed');
-                    exit();
+                    throw new SyntaxError(
+                        message: 'Missing closing tag for block',
+                        line: $this->current_line,
+                        file: $this->current_template,
+                    );
                 }
             }
         }
@@ -271,6 +281,9 @@ final class Parser
      */
     private function processLine(string $this_line, array $dataset, bool $render): void
     {
+        /** Increment current line counter */
+        $this->current_line += 1;
+
         /** Check for start of JS tag */
         if (!$this->is_js_script && preg_match('/<script(.*?)>/', $this_line)) {
             $this->is_js_script = true;
@@ -335,6 +348,15 @@ final class Parser
                     PREG_SET_ORDER,
                 )
             ) {
+                // Check if block is an inline block with {{end}}
+                if (strpos((string) $this_line, '{{end}}') !== false) {
+                    throw new SyntaxError(
+                        message: 'Blocks must not be inline',
+                        line: $this->current_line,
+                        file: $this->current_template,
+                    );
+                }
+
                 /** Set block variables */
                 $this->block_condition = $matches[0];
 
