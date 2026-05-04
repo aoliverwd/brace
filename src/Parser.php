@@ -892,7 +892,6 @@ final class Parser
      */
     private function processConditions(string $condition, array $dataset): bool
     {
-        $result = true;
         $and_result = true;
 
         /** And conditions */
@@ -911,18 +910,16 @@ final class Parser
 
                 $or_result = !$or_result
                 && $this->processSingleCondition(explode(' ', $alternative_condition), $dataset)
-                    ? true
-                    : $or_result;
+                ?: $or_result;
             }
 
             $and_result = $or_result;
             if (!$and_result) {
-                $result = false;
-                break;
+                return false;
             }
         }
 
-        return $result;
+        return true;
     }
 
     /**
