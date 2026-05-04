@@ -960,6 +960,6 @@ final class Parser
             };
         }
 
-        return isset($condition[1]) && $condition[1] === '!EXISTS' ? true : false;
+        return isset($condition[1]) && $condition[1] === '!EXISTS' ?: false;
     }
 }
