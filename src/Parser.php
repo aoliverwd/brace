@@ -945,17 +945,17 @@ final class Parser
                 $expected = is_string($expected) ? str_replace(['"', '+'], ['', ' '], $expected) : $expected;
             }
 
-            return match ($challenge) {
+            return (bool) match ($challenge) {
                 'EXISTS' => true,
-                '==' => $data == $expected ? true : false, // Equal
-                '===' => $data === $expected ? true : false, // Identical
-                '!=' => $data != $expected ? true : false, // Not Equal
-                '!!' => $data !== $expected ? true : false, // Not identical
-                '!==' => $data !== $expected ? true : false, // Not identical
-                '>' => intval($data) > intval($expected) ? true : false, // More than,
-                '<' => intval($data) < intval($expected) ? true : false, // Less than,
-                '>=' => intval($data) >= intval($expected) ? true : false, // Greater than or equal to,
-                '<=' => intval($data) <= intval($expected) ? true : false, // Less than or equal to,
+                '==' => $data == $expected ?: false, // Equal
+                '===' => $data === $expected ?: false, // Identical
+                '!=' => $data != $expected ?: false, // Not Equal
+                '!!' => $data !== $expected ?: false, // Not identical
+                '!==' => $data !== $expected ?: false, // Not identical
+                '>' => intval($data) > intval($expected) ?: false, // More than,
+                '<' => intval($data) < intval($expected) ?: false, // Less than,
+                '>=' => intval($data) >= intval($expected) ?: false, // Greater than or equal to,
+                '<=' => intval($data) <= intval($expected) ?: false, // Less than or equal to,
                 default => false,
             };
         } elseif (count($condition) > 1) {
