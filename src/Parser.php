@@ -958,13 +958,8 @@ final class Parser
                 '<=' => intval($data) <= intval($expected) ?: false, // Less than or equal to,
                 default => false,
             };
-        } elseif (count($condition) > 1) {
-            switch ($condition[1]) {
-                case '!EXISTS':
-                    return true;
-            }
         }
 
-        return false;
+        return isset($condition[1]) && $condition[1] === '!EXISTS' ? true : false;
     }
 }
