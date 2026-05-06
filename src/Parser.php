@@ -68,9 +68,9 @@ final class Parser
      * @param string $templates
      * @param array<mixed> $dataset
      * @param boolean $render
-     * @return object
+     * @return Parser
      */
-    public function parse(string $templates, array $dataset, bool $render = true): object
+    public function parse(string $templates, array $dataset, bool $render = true): Parser
     {
         /** Process individual template files */
         foreach (explode(',', trim($templates)) as $template_file) {
@@ -86,9 +86,9 @@ final class Parser
      * @param string $input_string
      * @param array<mixed> $dataset
      * @param boolean $render
-     * @return object
+     * @return Parser
      */
-    public function parseInputString(string $input_string, array $dataset, bool $render): object
+    public function parseInputString(string $input_string, array $dataset, bool $render): Parser
     {
         foreach (explode("\n", $input_string) as $this_line) {
             $this->processLine($this_line . "\n", $dataset, $render);
@@ -123,9 +123,9 @@ final class Parser
 
     /**
      * Clear export_string and return brace object
-     * @return object
+     * @return Parser
      */
-    public function clear(): object
+    public function clear(): Parser
     {
         $this->export_string = '';
         return $this;
@@ -135,9 +135,9 @@ final class Parser
      * Register shortcode
      * @param  string $name
      * @param  string|callable $theMethod
-     * @return object
+     * @return Parser
      */
-    public function regShortcode(string $name, string|callable $theMethod): object
+    public function regShortcode(string $name, string|callable $theMethod): Parser
     {
         if (!isset($this->shortcode_methods[$name])) {
             $this->shortcode_methods[$name] = $theMethod;
@@ -202,9 +202,9 @@ final class Parser
      *
      * @param string $name
      * @param callable $method
-     * @return object
+     * @return Parser
      */
-    public function registerCallable(string $name, callable $method): object
+    public function registerCallable(string $name, callable $method): Parser
     {
         if (!isset($this->callable_methods[$name])) {
             $this->callable_methods[$name] = $method;
