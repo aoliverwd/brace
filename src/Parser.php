@@ -37,13 +37,13 @@ final class Parser
 
     /**
      * shortcode_methods
-     * @var array<mixed>
+     * @var array<string, string|callable>
      */
     private array $shortcode_methods = [];
 
     /**
      * callable_methods
-     * @var array<mixed>
+     * @var array<string, callable>
      */
     private array $callable_methods = [];
 
@@ -159,25 +159,27 @@ final class Parser
         $sanatise_2 = str_replace(['[', ']'], '', $sanatise_1);
         $args = explode(' ', $sanatise_2);
 
-        $theArgs = [];
+        /** Get method name from args */
+        $methodName = isset($args[0]) && isset($this->shortcode_methods[$args[0]])
+            ? $this->shortcode_methods[$args[0]]
+            : false;
 
-        /** check for registered functions */
-        if (
-            $methodName = isset($args[0]) && isset($this->shortcode_methods[$args[0]])
-                ? $this->shortcode_methods[$args[0]]
-                : false
-        ) {
+        /** Check for registered functions */
+        if ($methodName) {
             /** Check is a global function */
-            $is_global = is_callable($methodName) ? false : isset($GLOBALS[$methodName]);
+            $is_global = is_callable($methodName) ? false : is_string($methodName) && isset($GLOBALS[$methodName]);
 
             /** Check if method is callable */
             $method = $is_global ? $GLOBALS[$methodName] : $methodName;
+
             if (!is_callable($method)) {
                 return $method . ' not found';
             }
 
             /** Format arguments */
             array_shift($args);
+            $theArgs = [];
+
             foreach (explode('" ', implode(' ', $args)) as $thisArg) {
                 $newArg = explode('=', str_replace('"', '', $thisArg));
 
