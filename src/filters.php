@@ -2,6 +2,8 @@
 
 namespace Brace;
 
+use Brace\Parser;
+
 trait Filters
 {
     /**
@@ -15,9 +17,9 @@ trait Filters
      *
      * @param string $name
      * @param callable $filter
-     * @return object
+     * @return Parser
      */
-    public function registerFilter(string $name, callable $filter): object
+    public function registerFilter(string $name, callable $filter): Parser
     {
         if (!isset($this->filters[$name])) {
             $this->filters[$name] = $filter;
