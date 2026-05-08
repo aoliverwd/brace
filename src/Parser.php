@@ -489,8 +489,7 @@ final class Parser
             switch ($block_type) {
                 case 'if':
                     /** new core parser class instance */
-                    $processBlock = new Parser();
-                    $processBlock->template_path = $this->template_path;
+                    $processBlock = $this->newParserInstance();
 
                     /** Else if conditions */
                     $else_if_content = $this->returnElseIfCondition($block_string);
@@ -554,8 +553,7 @@ final class Parser
             $to = intval($loop_components[2]);
 
             /** new core parser class instance */
-            $process_each_block = new Parser();
-            $process_each_block->template_path = $this->template_path;
+            $process_each_block = $this->newParserInstance();
 
             if ($from < $to) {
                 for ($i = $from; $i <= $to; $i += 1) {
@@ -623,29 +621,7 @@ final class Parser
             }
 
             /** new core parser class instance */
-            $process_each_block = new Parser();
-            $process_each_block->template_path = $this->template_path;
-
-            /** Register filters on new parser instance */
-            if ($this->filters) {
-                foreach ($this->filters as $name => $callable) {
-                    $process_each_block->registerFilter($name, $callable);
-                }
-            }
-
-            /** Register callable methods on new parser instance */
-            if ($this->callable_methods) {
-                foreach ($this->callable_methods as $name => $callable) {
-                    $process_each_block->registerCallable($name, $callable);
-                }
-            }
-
-            /** Register shortcode methods on new parser instance */
-            if ($this->shortcode_methods) {
-                foreach ($this->shortcode_methods as $name => $callable) {
-                    $process_each_block->regShortcode($name, $callable);
-                }
-            }
+            $process_each_block = $this->newParserInstance();
 
             $iterator_count = 1 + $offset_row_id;
             $row_count = count($use_data);
@@ -981,5 +957,39 @@ final class Parser
         }
 
         return isset($condition[1]) && $condition[1] === '!EXISTS' ?: false;
+    }
+
+    /**
+     * Create a new parser instance with registered filters, callable methods, and shortcode methods.
+     *
+     * @return Parser
+     */
+    private function newParserInstance(): Parser
+    {
+        $parser = new Parser();
+        $parser->template_path = $this->template_path;
+
+        /** Register filters on new parser instance */
+        if ($this->filters) {
+            foreach ($this->filters as $name => $callable) {
+                $parser->registerFilter($name, $callable);
+            }
+        }
+
+        /** Register callable methods on new parser instance */
+        if ($this->callable_methods) {
+            foreach ($this->callable_methods as $name => $callable) {
+                $parser->registerCallable($name, $callable);
+            }
+        }
+
+        /** Register shortcode methods on new parser instance */
+        if ($this->shortcode_methods) {
+            foreach ($this->shortcode_methods as $name => $callable) {
+                $parser->regShortcode($name, $callable);
+            }
+        }
+
+        return $parser;
     }
 }
