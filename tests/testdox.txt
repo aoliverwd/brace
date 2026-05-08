@@ -24,6 +24,7 @@ Filter (ConditionTests\Filter)
  [x] Filter nested
  [x] Filter inline condition
  [x] Filter value by array index value
+ [x] Filter each block
 
 Include (ConditionTests\Include)
  [x] Include template

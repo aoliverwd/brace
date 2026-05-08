@@ -130,4 +130,24 @@ final class FilterTest extends TestCase
                 ->return(),
         );
     }
+
+    public function testFilterEachBlock(): void
+    {
+        $brace = new Brace\Parser();
+        $brace->template_path = __DIR__ . '/';
+        $brace->registerFilter('uppercase', fn($content) => strtoupper($content));
+
+        $this->assertEquals(
+            'DAVE' . PHP_EOL . 'BARRY' . PHP_EOL . 'JOHN' . PHP_EOL,
+            $brace
+                ->parse(
+                    'eachblock',
+                    [
+                        'names' => ['dave', 'barry', 'john'],
+                    ],
+                    false,
+                )
+                ->return(),
+        );
+    }
 }
