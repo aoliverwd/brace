@@ -626,6 +626,27 @@ final class Parser
             $process_each_block = new Parser();
             $process_each_block->template_path = $this->template_path;
 
+            /** Register filters on new parser instance */
+            if ($this->filters) {
+                foreach ($this->filters as $name => $callable) {
+                    $process_each_block->registerFilter($name, $callable);
+                }
+            }
+
+            /** Register callable methods on new parser instance */
+            if ($this->callable_methods) {
+                foreach ($this->callable_methods as $name => $callable) {
+                    $process_each_block->registerCallable($name, $callable);
+                }
+            }
+
+            /** Register shortcode methods on new parser instance */
+            if ($this->shortcode_methods) {
+                foreach ($this->shortcode_methods as $name => $callable) {
+                    $process_each_block->regShortcode($name, $callable);
+                }
+            }
+
             $iterator_count = 1 + $offset_row_id;
             $row_count = count($use_data);
 
