@@ -246,8 +246,9 @@ final class Parser
             $handle = fopen($this->template_path . $template_name, 'r');
 
             if (is_resource($handle)) {
-                /** Set current template path */
+                /** Set current template path and reset line counter */
                 $this->current_template = $this->template_path . $template_name;
+                $this->current_line = 0;
 
                 /** Run through each line */
                 while (($this_line = fgets($handle, 4096)) !== false) {
