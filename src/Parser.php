@@ -179,7 +179,7 @@ final class Parser
             $method = $is_global ? $GLOBALS[$methodName] : $methodName;
 
             if (!is_callable($method)) {
-                return $method . ' not found';
+                return (string) $method . ' not found';
             }
 
             /** Check if attributes are valid */
