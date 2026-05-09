@@ -33,7 +33,8 @@
         "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^13.1",
         "laravel/pint": "^1.29",
-        "rector/rector": "^2.4"
+        "rector/rector": "^2.4",
+        "captainhook/captainhook-phar": "^5.29"
     },
     "scripts": {
         "test": [
@@ -49,5 +50,10 @@
         "format": [
             "./vendor/bin/pint src --preset psr12"
         ]
+    },
+    "config": {
+        "allow-plugins": {
+            "captainhook/captainhook-phar": true
+        }
     }
 }

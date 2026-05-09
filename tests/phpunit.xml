@@ -28,6 +28,9 @@
     <testsuite name="filters">
       <directory>unit/filters</directory>
     </testsuite>
+    <testsuite name="exceptions">
+      <directory>unit/exceptions</directory>
+    </testsuite>
   </testsuites>
   <logging>
     <testdoxText outputFile="testdox.txt" />

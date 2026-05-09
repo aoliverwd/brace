@@ -24,6 +24,7 @@ Filter (ConditionTests\Filter)
  [x] Filter nested
  [x] Filter inline condition
  [x] Filter value by array index value
+ [x] Filter each block
 
 Include (ConditionTests\Include)
  [x] Include template
@@ -51,6 +52,10 @@ Shortcode (ConditionTests\Shortcode)
  [x] Shortcode arrow function year
  [x] Shortcode with data variables
  [x] Shortcode with array data variables
+
+Syntax (ConditionTests\Syntax)
+ [x] Inline condition block syntax error
+ [x] Inline for each block syntax error
 
 blockcondition (ConditionTests\blockcondition)
  [x] If block condition

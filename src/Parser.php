@@ -10,6 +10,8 @@
 
 namespace Brace;
 
+use Brace\Exceptions\SyntaxError;
+
 /**
  * Core parser class
  */
@@ -30,16 +32,18 @@ final class Parser
     private int $block_spaces = 0;
     private bool $is_block = false;
     private bool $is_js_script = false;
+    private string $current_template = '';
+    private int $current_line = 0;
 
     /**
      * shortcode_methods
-     * @var array<mixed>
+     * @var array<string, string|callable>
      */
     private array $shortcode_methods = [];
 
     /**
      * callable_methods
-     * @var array<mixed>
+     * @var array<string, callable>
      */
     private array $callable_methods = [];
 
@@ -64,9 +68,9 @@ final class Parser
      * @param string $templates
      * @param array<mixed> $dataset
      * @param boolean $render
-     * @return object
+     * @return Parser
      */
-    public function parse(string $templates, array $dataset, bool $render = true): object
+    public function parse(string $templates, array $dataset, bool $render = true): Parser
     {
         /** Process individual template files */
         foreach (explode(',', trim($templates)) as $template_file) {
@@ -82,9 +86,9 @@ final class Parser
      * @param string $input_string
      * @param array<mixed> $dataset
      * @param boolean $render
-     * @return object
+     * @return Parser
      */
-    public function parseInputString(string $input_string, array $dataset, bool $render): object
+    public function parseInputString(string $input_string, array $dataset, bool $render): Parser
     {
         foreach (explode("\n", $input_string) as $this_line) {
             $this->processLine($this_line . "\n", $dataset, $render);
@@ -119,9 +123,9 @@ final class Parser
 
     /**
      * Clear export_string and return brace object
-     * @return object
+     * @return Parser
      */
-    public function clear(): object
+    public function clear(): Parser
     {
         $this->export_string = '';
         return $this;
@@ -131,9 +135,9 @@ final class Parser
      * Register shortcode
      * @param  string $name
      * @param  string|callable $theMethod
-     * @return object
+     * @return Parser
      */
-    public function regShortcode(string $name, string|callable $theMethod): object
+    public function regShortcode(string $name, string|callable $theMethod): Parser
     {
         if (!isset($this->shortcode_methods[$name])) {
             $this->shortcode_methods[$name] = $theMethod;
@@ -155,25 +159,27 @@ final class Parser
         $sanatise_2 = str_replace(['[', ']'], '', $sanatise_1);
         $args = explode(' ', $sanatise_2);
 
-        $theArgs = [];
+        /** Get method name from args */
+        $methodName = isset($args[0]) && isset($this->shortcode_methods[$args[0]])
+            ? $this->shortcode_methods[$args[0]]
+            : false;
 
-        /** check for registered functions */
-        if (
-            $methodName = isset($args[0]) && isset($this->shortcode_methods[$args[0]])
-                ? $this->shortcode_methods[$args[0]]
-                : false
-        ) {
+        /** Check for registered functions */
+        if ($methodName) {
             /** Check is a global function */
-            $is_global = is_callable($methodName) ? false : isset($GLOBALS[$methodName]);
+            $is_global = is_callable($methodName) ? false : is_string($methodName) && isset($GLOBALS[$methodName]);
 
             /** Check if method is callable */
             $method = $is_global ? $GLOBALS[$methodName] : $methodName;
+
             if (!is_callable($method)) {
                 return $method . ' not found';
             }
 
             /** Format arguments */
             array_shift($args);
+            $theArgs = [];
+
             foreach (explode('" ', implode(' ', $args)) as $thisArg) {
                 $newArg = explode('=', str_replace('"', '', $thisArg));
 
@@ -198,9 +204,9 @@ final class Parser
      *
      * @param string $name
      * @param callable $method
-     * @return object
+     * @return Parser
      */
-    public function registerCallable(string $name, callable $method): object
+    public function registerCallable(string $name, callable $method): Parser
     {
         if (!isset($this->callable_methods[$name])) {
             $this->callable_methods[$name] = $method;
@@ -240,6 +246,10 @@ final class Parser
             $handle = fopen($this->template_path . $template_name, 'r');
 
             if (is_resource($handle)) {
+                /** Set current template path and reset line counter */
+                $this->current_template = $this->template_path . $template_name;
+                $this->current_line = 0;
+
                 /** Run through each line */
                 while (($this_line = fgets($handle, 4096)) !== false) {
                     /** Convert tabs to spaces */
@@ -254,8 +264,11 @@ final class Parser
 
                 /** If block has not been closed */
                 if ($this->is_block) {
-                    trigger_error('IF/EACH block has not been closed');
-                    exit();
+                    throw new SyntaxError(
+                        message: 'Missing closing tag for block',
+                        line: $this->current_line,
+                        file: $this->current_template,
+                    );
                 }
             }
         }
@@ -271,6 +284,9 @@ final class Parser
      */
     private function processLine(string $this_line, array $dataset, bool $render): void
     {
+        /** Increment current line counter */
+        $this->current_line += 1;
+
         /** Check for start of JS tag */
         if (!$this->is_js_script && preg_match('/<script(.*?)>/', $this_line)) {
             $this->is_js_script = true;
@@ -335,6 +351,15 @@ final class Parser
                     PREG_SET_ORDER,
                 )
             ) {
+                // Check if block is an inline block with {{end}}
+                if (strpos((string) $this_line, '{{end}}') !== false) {
+                    throw new SyntaxError(
+                        message: 'Blocks must not be inline',
+                        line: $this->current_line,
+                        file: $this->current_template,
+                    );
+                }
+
                 /** Set block variables */
                 $this->block_condition = $matches[0];
 
@@ -465,8 +490,7 @@ final class Parser
             switch ($block_type) {
                 case 'if':
                     /** new core parser class instance */
-                    $processBlock = new Parser();
-                    $processBlock->template_path = $this->template_path;
+                    $processBlock = $this->newParserInstance();
 
                     /** Else if conditions */
                     $else_if_content = $this->returnElseIfCondition($block_string);
@@ -530,8 +554,7 @@ final class Parser
             $to = intval($loop_components[2]);
 
             /** new core parser class instance */
-            $process_each_block = new Parser();
-            $process_each_block->template_path = $this->template_path;
+            $process_each_block = $this->newParserInstance();
 
             if ($from < $to) {
                 for ($i = $from; $i <= $to; $i += 1) {
@@ -599,8 +622,7 @@ final class Parser
             }
 
             /** new core parser class instance */
-            $process_each_block = new Parser();
-            $process_each_block->template_path = $this->template_path;
+            $process_each_block = $this->newParserInstance();
 
             $iterator_count = 1 + $offset_row_id;
             $row_count = count($use_data);
@@ -870,7 +892,6 @@ final class Parser
      */
     private function processConditions(string $condition, array $dataset): bool
     {
-        $result = true;
         $and_result = true;
 
         /** And conditions */
@@ -889,18 +910,16 @@ final class Parser
 
                 $or_result = !$or_result
                 && $this->processSingleCondition(explode(' ', $alternative_condition), $dataset)
-                    ? true
-                    : $or_result;
+                ?: $or_result;
             }
 
             $and_result = $or_result;
             if (!$and_result) {
-                $result = false;
-                break;
+                return false;
             }
         }
 
-        return $result;
+        return true;
     }
 
     /**
@@ -923,26 +942,55 @@ final class Parser
                 $expected = is_string($expected) ? str_replace(['"', '+'], ['', ' '], $expected) : $expected;
             }
 
-            return match ($challenge) {
+            return (bool) match ($challenge) {
                 'EXISTS' => true,
-                '==' => $data == $expected ? true : false, // Equal
-                '===' => $data === $expected ? true : false, // Identical
-                '!=' => $data != $expected ? true : false, // Not Equal
-                '!!' => $data !== $expected ? true : false, // Not identical
-                '!==' => $data !== $expected ? true : false, // Not identical
-                '>' => intval($data) > intval($expected) ? true : false, // More than,
-                '<' => intval($data) < intval($expected) ? true : false, // Less than,
-                '>=' => intval($data) >= intval($expected) ? true : false, // Greater than or equal to,
-                '<=' => intval($data) <= intval($expected) ? true : false, // Less than or equal to,
+                '==' => $data == $expected ?: false, // Equal
+                '===' => $data === $expected ?: false, // Identical
+                '!=' => $data != $expected ?: false, // Not Equal
+                '!!' => $data !== $expected ?: false, // Not identical
+                '!==' => $data !== $expected ?: false, // Not identical
+                '>' => intval($data) > intval($expected) ?: false, // More than,
+                '<' => intval($data) < intval($expected) ?: false, // Less than,
+                '>=' => intval($data) >= intval($expected) ?: false, // Greater than or equal to,
+                '<=' => intval($data) <= intval($expected) ?: false, // Less than or equal to,
                 default => false,
             };
-        } elseif (count($condition) > 1) {
-            switch ($condition[1]) {
-                case '!EXISTS':
-                    return true;
+        }
+
+        return isset($condition[1]) && $condition[1] === '!EXISTS' ?: false;
+    }
+
+    /**
+     * Create a new parser instance with registered filters, callable methods, and shortcode methods.
+     *
+     * @return Parser
+     */
+    private function newParserInstance(): Parser
+    {
+        $parser = new Parser();
+        $parser->template_path = $this->template_path;
+
+        /** Register filters on new parser instance */
+        if ($this->filters) {
+            foreach ($this->filters as $name => $callable) {
+                $parser->registerFilter($name, $callable);
             }
         }
 
-        return false;
+        /** Register callable methods on new parser instance */
+        if ($this->callable_methods) {
+            foreach ($this->callable_methods as $name => $callable) {
+                $parser->registerCallable($name, $callable);
+            }
+        }
+
+        /** Register shortcode methods on new parser instance */
+        if ($this->shortcode_methods) {
+            foreach ($this->shortcode_methods as $name => $callable) {
+                $parser->regShortcode($name, $callable);
+            }
+        }
+
+        return $parser;
     }
 }
