@@ -19,14 +19,32 @@ use PHPUnit\Framework\TestCase;
 final class SyntaxTest extends TestCase
 {
     /**
-     * Test syntax error
+     * Test inline condition block syntax error
      * @return void
      */
-    public function testSyntaxError(): void
+    public function testInlineConditionBlockSyntaxError(): void
     {
         $this->expectException(SyntaxError::class);
 
         $brace = new Parser();
         $brace->parseInputString('{{if number === 1}}true{{else}}false{{end}}', ['number' => '1'], false);
+    }
+
+    /**
+     * Test inline for each block syntax error
+     * @return void
+     */
+    public function testInlineForEachBlockSyntaxError(): void
+    {
+        $this->expectException(SyntaxError::class);
+
+        $brace = new Parser();
+        $brace->parseInputString(
+            '{{each names as name}}{{name}}{{end}}',
+            [
+                'names' => ['ted', 'john', 'dave'],
+            ],
+            false,
+        );
     }
 }
