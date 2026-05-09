@@ -155,14 +155,20 @@ final class Parser
      */
     private function callShortcode(string $shortcodeSyntax, array $dataset): string
     {
-        $sanatise_1 = str_replace('&quot;', '"', $shortcodeSyntax);
-        $sanatise_2 = str_replace(['[', ']'], '', $sanatise_1);
-        $args = explode(' ', $sanatise_2);
+        preg_match('/^\[(.*?)\s+(.*?)\s*\]$|^\[(.*?)\]$/', $shortcodeSyntax, $args);
+        $args = array_values(array_filter($args));
+
+        /** Check args are valid */
+        if (!$args || count($args) < 2) {
+            return $shortcodeSyntax;
+        }
 
         /** Get method name from args */
-        $methodName = isset($args[0]) && isset($this->shortcode_methods[$args[0]])
-            ? $this->shortcode_methods[$args[0]]
-            : false;
+        $methodName = isset($this->shortcode_methods[$args[1]]) ? $this->shortcode_methods[$args[1]] : false;
+
+        // Get attributes from args
+        $args[2] = isset($args[2]) ? $args[2] : '';
+        preg_match_all('/(.*?)="(.*?)"/', $args[2], $attributes, PREG_SET_ORDER);
 
         /** Check for registered functions */
         if ($methodName) {
@@ -173,30 +179,26 @@ final class Parser
             $method = $is_global ? $GLOBALS[$methodName] : $methodName;
 
             if (!is_callable($method)) {
-                return $method . ' not found';
+                return (string) $method . ' not found';
             }
 
-            /** Format arguments */
-            array_shift($args);
-            $theArgs = [];
-
-            foreach (explode('" ', implode(' ', $args)) as $thisArg) {
-                $newArg = explode('=', str_replace('"', '', $thisArg));
-
-                if (count($newArg) === 2) {
-                    $theArgs[trim($newArg[0])] = trim($newArg[1]);
+            /** Check if attributes are valid */
+            if ($attributes) {
+                foreach ($attributes as $key => $attribute) {
+                    $attributes[trim($attribute[1])] = trim($attribute[2]);
+                    unset($attributes[$key]);
                 }
             }
 
             /** Merge arguments with global dataset */
-            $send_data = [array_merge($theArgs, ['GLOBAL' => $dataset])];
+            $send_data = [array_merge($attributes ?: [], ['GLOBAL' => $dataset])];
 
             /** Execute function and return result */
             return call_user_func_array($method, $send_data);
-        } else {
-            /** Return shortcode syntax if method is not callable */
-            return $shortcodeSyntax;
         }
+
+        /** Return shortcode syntax if method is not callable */
+        return $shortcodeSyntax;
     }
 
     /**
