@@ -53,6 +53,9 @@ Shortcode (ConditionTests\Shortcode)
  [x] Shortcode with data variables
  [x] Shortcode with array data variables
 
+Syntax (ConditionTests\Syntax)
+ [x] Syntax error
+
 blockcondition (ConditionTests\blockcondition)
  [x] If block condition
  [x] If else block condition
