@@ -485,12 +485,13 @@ final class Parser
             }
         }
 
-        /** Output current line */
-        if ($render) {
-            echo $this_line;
-        } else {
+        // Check if line should not be rendered
+        if (!$render) {
             $this->export_string .= $this_line;
+            return;
         }
+
+        echo $this_line;
     }
 
     /**
