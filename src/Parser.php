@@ -588,29 +588,18 @@ final class Parser
             /** new core parser class instance */
             $process_each_block = $this->newParserInstance();
 
-            if ($from < $to) {
-                for ($i = $from; $i <= $to; $i += 1) {
-                    $process_each_block->parseInputString(
-                        $block_content,
-                        [
-                            '_KEY' => $i,
-                        ],
-                        false,
-                    );
-                    $return_string .= $process_each_block->return();
-                    $process_each_block->export_string = '';
-                }
-            } else {
-                for ($i = $from; $i >= $to; $i -= 1) {
-                    $process_each_block->parseInputString(
-                        $block_content,
-                        [
-                            '_KEY' => $i,
-                        ],
-                        false,
-                    );
-                    $return_string .= $process_each_block->return();
-                    $process_each_block->export_string = '';
+            /** Determine the step size based on the loop direction */
+            $step = $from < $to ? 1 : -1;
+
+            /** Loop through the range of values */
+            for ($index = $from;; $index += $step) {
+                $process_each_block->parseInputString($block_content, ['_KEY' => $index], false);
+                $return_string .= $process_each_block->return();
+                $process_each_block->clear();
+
+                // Check if we've reached the end of the loop
+                if ($index === $to) {
+                    break;
                 }
             }
         }
