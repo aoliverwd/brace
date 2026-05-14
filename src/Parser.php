@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  *   Brace
  *   Copyright (C) 2026 Alex Oliver
@@ -818,7 +820,9 @@ final class Parser
                 }
 
                 // Check if variable is an array and empty, replace with empty string
-                $replace_variable = is_array($replace_variable) && empty($replace_variable) ? '' : $replace_variable;
+                $replace_variable = is_array($replace_variable) && empty($replace_variable)
+                    ? ''
+                    : (string) $replace_variable;
 
                 // Replace variable in template string
                 $template_string = str_replace($replace_string, $replace_variable, $template_string);
