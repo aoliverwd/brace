@@ -602,6 +602,9 @@ final class Parser
                     break;
                 }
             }
+
+            /** Unset the parser instance to free up memory */
+            unset($process_each_block);
         }
 
         return $return_string;
