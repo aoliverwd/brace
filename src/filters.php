@@ -1,8 +1,8 @@
 <?php
 
-namespace Brace;
+declare(strict_types=1);
 
-use Brace\Parser;
+namespace Brace;
 
 trait Filters
 {
