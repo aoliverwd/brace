@@ -150,4 +150,32 @@ final class FilterTest extends TestCase
                 ->return(),
         );
     }
+
+    public function testFilterWithArrayDataNestedVariables(): void
+    {
+        $brace = new Brace\Parser();
+        $brace->template_path = __DIR__ . '/';
+
+        $brace->regShortcode('name', fn($attributes) => $attributes['name']);
+        $brace->registerFilter('uppercase', fn($content) => strtoupper($content));
+
+        $names = [
+            0 => ['first_name' => 'Alex'],
+            1 => ['first_name' => 'John'],
+            2 => ['first_name' => 'Andre'],
+        ];
+
+        $this->assertEquals(
+            "ALEX\nJOHN\nANDRE\n",
+            $brace
+                ->Parse(
+                    'data-nested-variables',
+                    [
+                        'names' => $names,
+                    ],
+                    false,
+                )
+                ->return(),
+        );
+    }
 }
