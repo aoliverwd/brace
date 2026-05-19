@@ -90,7 +90,7 @@ trait DataProcessing
      */
     private static function checkForCount(string $input): string
     {
-        if (preg_match("/^COUNT\((.*?)\)/", $input, $match)) {
+        if (str_contains($input, 'COUNT(') && preg_match("/^COUNT\((.*?)\)/", $input, $match)) {
             return $match[1];
         }
 
