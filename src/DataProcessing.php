@@ -104,7 +104,10 @@ trait DataProcessing
      */
     private static function checkForCallable(string $input): array
     {
-        if (preg_match("/^([\\\A-Za-z_]+::[A-Za-z_]+)$|^([\\\A-Za-z_]+::[A-Za-z_]+)\((.*?)\)$/", $input, $match)) {
+        if (
+            str_contains($input, '::')
+            && preg_match("/^([\\\A-Za-z_]+::[A-Za-z_]+)$|^([\\\A-Za-z_]+::[A-Za-z_]+)\((.*?)\)$/", $input, $match)
+        ) {
             if (count($match) === 4) {
                 return [
                     'callable' => $match[2],
