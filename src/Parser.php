@@ -512,12 +512,7 @@ final class Parser
     private function processBlock(string $block_string, array $conditions, array $dataset): string
     {
         /** Remove phantom line break */
-        $block_string = explode("\n", $block_string);
-        if (strlen($block_string[count($block_string) - 1]) === 0) {
-            array_pop($block_string);
-        }
-
-        $block_string = implode("\n", $block_string);
+        $block_string = rtrim($block_string, "\n");
 
         $process_content = '';
 
