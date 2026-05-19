@@ -28,7 +28,6 @@ final class Parser
     public string $template_ext = 'tpl';
 
     /** Internal variables */
-    private string $export_string = '';
     private bool $is_comment_block = false;
     private string $block_content = '';
     private int $block_spaces = 0;
@@ -36,6 +35,12 @@ final class Parser
     private bool $is_js_script = false;
     private string $current_template = '';
     private int $current_line = 0;
+
+    /**
+     * Holds the parsed output string
+     * @var array<int, string>
+     */
+    private array $export_string = [];
 
     /**
      * shortcode_methods
@@ -110,7 +115,7 @@ final class Parser
     public function compile(string $templates, string $compile_filename, array $dataset): void
     {
         $this->parse($templates, $dataset, false);
-        file_put_contents($compile_filename, $this->export_string);
+        file_put_contents($compile_filename, implode('', $this->export_string));
     }
 
     /**
@@ -120,7 +125,7 @@ final class Parser
      */
     public function return(): string
     {
-        return $this->export_string;
+        return implode('', $this->export_string);
     }
 
     /**
@@ -129,7 +134,7 @@ final class Parser
      */
     public function clear(): Parser
     {
-        $this->export_string = '';
+        $this->export_string = [];
         return $this;
     }
 
@@ -489,7 +494,7 @@ final class Parser
 
         // Check if line should not be rendered
         if (!$render) {
-            $this->export_string .= $this_line;
+            $this->export_string[] = $this_line;
             return;
         }
 
@@ -666,7 +671,7 @@ final class Parser
 
                             $process_each_block->parseInputString($block_content, $this_row, false);
                             $return_string .= $process_each_block->return();
-                            $process_each_block->export_string = '';
+                            $process_each_block->export_string = [];
 
                             $iterator_count += 1;
                         }
@@ -692,7 +697,7 @@ final class Parser
 
                             $process_each_block->parseInputString($block_content, $row_data, false);
                             $return_string .= $process_each_block->return();
-                            $process_each_block->export_string = '';
+                            $process_each_block->export_string = [];
 
                             $iterator_count += 1;
                         }
