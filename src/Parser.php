@@ -668,7 +668,7 @@ final class Parser
 
                             $process_each_block->parseInputString($block_content, $this_row, false);
                             $return_string .= $process_each_block->return();
-                            $process_each_block->export_string = [];
+                            $process_each_block->clear();
 
                             $iterator_count += 1;
                         }
@@ -694,7 +694,7 @@ final class Parser
 
                             $process_each_block->parseInputString($block_content, $row_data, false);
                             $return_string .= $process_each_block->return();
-                            $process_each_block->export_string = [];
+                            $process_each_block->clear();
 
                             $iterator_count += 1;
                         }
