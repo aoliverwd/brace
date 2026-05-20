@@ -795,11 +795,10 @@ final class Parser
                 $replace_string = $this_data_variable[0];
                 $processString = $this_data_variable[2];
 
-                $is_condition = preg_match_all("/ \? /", $processString);
-                $is_itterator = preg_match_all('/ as /', $processString);
-                $has_alternative_vars = explode(' || ', $processString);
+                $is_condition = str_contains($processString, ' ? ') ? preg_match_all("/ \? /", $processString) : false;
+                $is_itterator = str_contains($processString, ' as ') ? preg_match_all('/ as /', $processString) : false;
+                $has_alternative_vars = str_contains($processString, ' || ') ? explode(' || ', $processString) : [];
                 $replace_variable = '';
-                $filter = '';
 
                 /** Detect in-line condition, has alternative variables or singular variables */
                 if ($is_condition) {
