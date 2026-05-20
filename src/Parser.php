@@ -459,11 +459,13 @@ final class Parser
                 /** Process variables, in-line conditions and in-line iterators */
                 $this_line = $this->processVariables((string) $this_line, $dataset);
 
+                /** Check if WP do_shortcode function exists */
+                $is_wp_shortcode = function_exists('do_shortcode');
+
                 /** Is shortcode */
                 if (preg_match_all("/\[(.*?)\]/", $this_line, $matches, PREG_SET_ORDER)) {
                     foreach ($matches as $theShortcode) {
-                        /** @disregard */
-                        $this_line = function_exists('do_shortcode')
+                        $this_line = $is_wp_shortcode
                             ? str_replace(
                                 $theShortcode[0],
                                 do_shortcode($this->processVariables($theShortcode[0], $dataset)),
