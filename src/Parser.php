@@ -313,182 +313,173 @@ final class Parser
         /** Increment current line counter */
         $this->current_line += 1;
 
+        /** Check for start of inline JS tag */
+        if (!$this->is_js_script && preg_match('/<script(.*?)>/', $this_line)) {
+            $this->is_js_script = true;
+        }
+
+        // Still process variables, in-line conditions and in-line iterators for items in script tag
+        if ($this->is_js_script) {
+            $this_line = $this->processVariables((string) $this_line, $dataset);
+        }
+
+        // Check for end of inline JS script tag
+        if ($this->is_js_script && preg_match("/<\/script>/", $this_line)) {
+            $this->is_js_script = false;
+        }
+
         // Check if line should be processed
-        if ($this->shouldProcessLine($this_line)) {
-            /** Check for start of inline JS tag */
-            if (!$this->is_js_script && preg_match('/<script(.*?)>/', $this_line)) {
-                $this->is_js_script = true;
-            }
-
-            // Still process variables, in-line conditions and in-line iterators for items in script tag
-            $this_line = $this->is_js_script ? $this->processVariables((string) $this_line, $dataset) : $this_line;
-
-            // Check for end of inline JS script tag
-            if ($this->is_js_script && preg_match("/<\/script>/", $this_line)) {
-                $this->is_js_script = false;
-            }
-
-            if (!$this->is_js_script) {
-                /** Remove comment blocks */
-                if ($this->remove_comment_blocks) {
-                    /** Is inline comment */
-                    if (preg_match('/<!--(.*?)-->/', $this_line)) {
-                        $this_line = preg_replace('/<!--(.*?)-->/', '', $this_line);
-                    }
-
-                    /** Is comment block */
-                    if (
-                        preg_match_all('/<!--|-->/i', (string) $this_line, $matches, PREG_SET_ORDER)
-                        || $this->is_comment_block
-                    ) {
-                        switch (isset($matches[0]) ? $matches[0][0] : '') {
-                            case '<!--':
-                                $this->is_comment_block = true;
-                                break;
-                            case '-->':
-                                $this->is_comment_block = false;
-                                break;
-                        }
-
-                        /** Is inline comment */
-                        $this->is_comment_block =
-                            $this->is_comment_block && isset($matches[1][0]) && trim($matches[1][0]) === '-->'
-                                ? false
-                                : $this->is_comment_block;
-
-                        /** Blank line */
-                        $this_line = '';
-                    }
+        if (!$this->is_js_script && $this->shouldProcessLine($this_line)) {
+            /** Remove comment blocks */
+            if ($this->remove_comment_blocks) {
+                /** Is inline comment */
+                if (preg_match('/<!--(.*?)-->/', $this_line)) {
+                    $this_line = preg_replace('/<!--(.*?)-->/', '', $this_line);
                 }
 
-                /** Remove preceding and following whitespace */
-                $spacing_match = "/{{\s*(.*?)\s*}}/";
-                if (is_string($this_line) && preg_match_all($spacing_match, $this_line, $matches, PREG_SET_ORDER)) {
-                    foreach ($matches as $match) {
-                        $this_line = str_replace($match[0], '{{' . $match[1] . '}}', (string) $this_line);
-                    }
-                }
-
-                /** Process if condition or each block */
+                /** Is comment block */
                 if (
-                    !$this->is_block
-                    && preg_match_all(
-                        '/{{if (.*?)}}|{{each (.*?)}}|{{loop (.*?)}}/i',
-                        (string) $this_line,
-                        $matches,
-                        PREG_SET_ORDER,
-                    )
+                    preg_match_all('/<!--|-->/i', (string) $this_line, $matches, PREG_SET_ORDER)
+                    || $this->is_comment_block
                 ) {
-                    // Check if block is an inline block with {{end}}
-                    if (strpos((string) $this_line, '{{end}}') !== false) {
-                        throw new SyntaxError(
-                            message: 'Blocks must not be inline',
-                            line: $this->current_line,
-                            file: $this->current_template,
-                        );
+                    switch (isset($matches[0]) ? $matches[0][0] : '') {
+                        case '<!--':
+                            $this->is_comment_block = true;
+                            break;
+                        case '-->':
+                            $this->is_comment_block = false;
+                            break;
                     }
 
-                    /** Set block variables */
-                    $this->block_condition = $matches[0];
-
-                    /** Set condition type */
-                    $condition_type = $this->block_condition[0];
-
-                    preg_match('/{{(.*?) /', $condition_type, $match_types);
-                    $block_type = '';
-
-                    if (isset($match_types[1])) {
-                        switch ($match_types[1]) {
-                            case 'if':
-                            case 'each':
-                            case 'loop':
-                                $block_type = $match_types[1];
-                                break;
-                        }
-                    }
-
-                    $this->block_condition[] = $block_type;
-                    $this->block_spaces = (int) strpos((string) $this_line, '{{' . $block_type);
-                    $this->is_block = true;
-
-                    /** Blank line */
-                    $this_line = '';
-                } elseif (
-                    $this->is_block
-                    && rtrim((string) $this_line) === str_pad(
-                        '{{end}}',
-                        strlen('{{end}}') + $this->block_spaces,
-                        ' ',
-                        STR_PAD_LEFT,
-                    )
-                ) {
-                    /** Process block */
-                    $this_line = $this->processBlock($this->block_content, $this->block_condition, $dataset);
-
-                    /** Clear block variables */
-                    $this->block_condition = [];
-                    $this->block_content = '';
-                    $this->is_block = false;
-                    $this->block_spaces = 0;
-                } elseif ($this->is_block) {
-                    /** Add current line to block content */
-                    $this->block_content .= $this_line;
+                    /** Is inline comment */
+                    $this->is_comment_block =
+                        $this->is_comment_block && isset($matches[1][0]) && trim($matches[1][0]) === '-->'
+                            ? false
+                            : $this->is_comment_block;
 
                     /** Blank line */
                     $this_line = '';
                 }
+            }
 
-                /** process included templates */
-                if (preg_match_all(
-                    "/(\[@include )(.*?)(])/",
+            /** Remove preceding and following whitespace */
+            $spacing_match = "/{{\s*(.*?)\s*}}/";
+            if (is_string($this_line) && preg_match_all($spacing_match, $this_line, $matches, PREG_SET_ORDER)) {
+                foreach ($matches as $match) {
+                    $this_line = str_replace($match[0], '{{' . $match[1] . '}}', (string) $this_line);
+                }
+            }
+
+            /** Process if condition or each block */
+            if (
+                !$this->is_block
+                && preg_match_all(
+                    '/{{if (.*?)}}|{{each (.*?)}}|{{loop (.*?)}}/i',
                     (string) $this_line,
-                    $include_templates,
+                    $matches,
                     PREG_SET_ORDER,
-                )) {
-                    foreach ($include_templates as $to_include) {
-                        foreach (explode(' ', trim($to_include[2])) as $template) {
-                            $template = $this->processVariables($template, $dataset);
-                            $this->parse($template, $dataset, $render);
-                        }
-                    }
-
-                    /** Blank line */
-                    $this_line = '';
+                )
+            ) {
+                // Check if block is an inline block with {{end}}
+                if (strpos((string) $this_line, '{{end}}') !== false) {
+                    throw new SyntaxError(
+                        message: 'Blocks must not be inline',
+                        line: $this->current_line,
+                        file: $this->current_template,
+                    );
                 }
 
-                /** Process variables, in-line conditions and in-line iterators */
-                $this_line = $this->processVariables((string) $this_line, $dataset);
+                /** Set block variables */
+                $this->block_condition = $matches[0];
 
-                /** Check if WP do_shortcode function exists */
-                $is_wp_shortcode = function_exists('do_shortcode');
+                /** Set condition type */
+                $condition_type = $this->block_condition[0];
 
-                /** Is shortcode */
-                if (preg_match_all("/\[(.*?)\]/", $this_line, $matches, PREG_SET_ORDER)) {
-                    foreach ($matches as $theShortcode) {
-                        $this_line = $is_wp_shortcode
-                            ? str_replace(
-                                $theShortcode[0],
-                                do_shortcode($this->processVariables($theShortcode[0], $dataset)),
-                                $this_line,
-                            )
-                            : str_replace(
-                                $theShortcode[0],
-                                $this->callShortcode($theShortcode[0], $dataset),
-                                $this_line,
-                            );
+                preg_match('/{{(.*?) /', $condition_type, $match_types);
+                $block_type = '';
+
+                if (isset($match_types[1])) {
+                    switch ($match_types[1]) {
+                        case 'if':
+                        case 'each':
+                        case 'loop':
+                            $block_type = $match_types[1];
+                            break;
                     }
                 }
 
-                /** Is Callable */
-                if (preg_match_all("/([a-zA-Z0-9_-]+)\((.*?)\)/", $this_line, $matches, PREG_SET_ORDER)) {
-                    foreach ($matches as $callableMethod) {
-                        if (isset($this->callable_methods[$callableMethod[1]])) {
-                            $this_line = str_replace(
-                                $callableMethod[0],
-                                $this->callables(method: $callableMethod[1], content: $callableMethod[2]),
-                                $this_line,
-                            );
-                        }
+                $this->block_condition[] = $block_type;
+                $this->block_spaces = (int) strpos((string) $this_line, '{{' . $block_type);
+                $this->is_block = true;
+
+                /** Blank line */
+                $this_line = '';
+            } elseif (
+                $this->is_block
+                && rtrim((string) $this_line) === str_pad(
+                    '{{end}}',
+                    strlen('{{end}}') + $this->block_spaces,
+                    ' ',
+                    STR_PAD_LEFT,
+                )
+            ) {
+                /** Process block */
+                $this_line = $this->processBlock($this->block_content, $this->block_condition, $dataset);
+
+                /** Clear block variables */
+                $this->block_condition = [];
+                $this->block_content = '';
+                $this->is_block = false;
+                $this->block_spaces = 0;
+            } elseif ($this->is_block) {
+                /** Add current line to block content */
+                $this->block_content .= $this_line;
+
+                /** Blank line */
+                $this_line = '';
+            }
+
+            /** process included templates */
+            if (preg_match_all("/(\[@include )(.*?)(])/", (string) $this_line, $include_templates, PREG_SET_ORDER)) {
+                foreach ($include_templates as $to_include) {
+                    foreach (explode(' ', trim($to_include[2])) as $template) {
+                        $template = $this->processVariables($template, $dataset);
+                        $this->parse($template, $dataset, $render);
+                    }
+                }
+
+                /** Blank line */
+                $this_line = '';
+            }
+
+            /** Process variables, in-line conditions and in-line iterators */
+            $this_line = $this->processVariables((string) $this_line, $dataset);
+
+            /** Check if WP do_shortcode function exists */
+            $is_wp_shortcode = function_exists('do_shortcode');
+
+            /** Is shortcode */
+            if (preg_match_all("/\[(.*?)\]/", $this_line, $matches, PREG_SET_ORDER)) {
+                foreach ($matches as $theShortcode) {
+                    $this_line = $is_wp_shortcode
+                        ? str_replace(
+                            $theShortcode[0],
+                            do_shortcode($this->processVariables($theShortcode[0], $dataset)),
+                            $this_line,
+                        )
+                        : str_replace($theShortcode[0], $this->callShortcode($theShortcode[0], $dataset), $this_line);
+                }
+            }
+
+            /** Is Callable */
+            if (preg_match_all("/([a-zA-Z0-9_-]+)\((.*?)\)/", $this_line, $matches, PREG_SET_ORDER)) {
+                foreach ($matches as $callableMethod) {
+                    if (isset($this->callable_methods[$callableMethod[1]])) {
+                        $this_line = str_replace(
+                            $callableMethod[0],
+                            $this->callables(method: $callableMethod[1], content: $callableMethod[2]),
+                            $this_line,
+                        );
                     }
                 }
             }
