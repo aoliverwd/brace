@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  *   Brace
  *   Copyright (C) 2026 Alex Oliver
@@ -26,7 +28,6 @@ final class Parser
     public string $template_ext = 'tpl';
 
     /** Internal variables */
-    private string $export_string = '';
     private bool $is_comment_block = false;
     private string $block_content = '';
     private int $block_spaces = 0;
@@ -34,6 +35,12 @@ final class Parser
     private bool $is_js_script = false;
     private string $current_template = '';
     private int $current_line = 0;
+
+    /**
+     * Holds the parsed output string
+     * @var array<int, string>
+     */
+    private array $export_string = [];
 
     /**
      * shortcode_methods
@@ -108,7 +115,7 @@ final class Parser
     public function compile(string $templates, string $compile_filename, array $dataset): void
     {
         $this->parse($templates, $dataset, false);
-        file_put_contents($compile_filename, $this->export_string);
+        file_put_contents($compile_filename, implode('', $this->export_string));
     }
 
     /**
@@ -118,7 +125,7 @@ final class Parser
      */
     public function return(): string
     {
-        return $this->export_string;
+        return implode('', $this->export_string);
     }
 
     /**
@@ -127,7 +134,7 @@ final class Parser
      */
     public function clear(): Parser
     {
-        $this->export_string = '';
+        $this->export_string = [];
         return $this;
     }
 
@@ -276,6 +283,23 @@ final class Parser
         }
     }
 
+    // Check if line should be processed
+    private function shouldProcessLine(string $this_line): bool
+    {
+        // Check if line is empty
+        if (trim($this_line) === '') {
+            return false;
+        }
+
+        // Check if line is part of a comment block or is part of a block
+        if ($this->is_comment_block || $this->is_block) {
+            return true;
+        }
+
+        // Check contains template functionality
+        return (bool) preg_match('/{{|}}|<!--|-->|\[|]|([a-zA-Z0-9_-]+)\((.*?)\)/s', $this_line);
+    }
+
     /**
      * Process single line
      *
@@ -289,20 +313,23 @@ final class Parser
         /** Increment current line counter */
         $this->current_line += 1;
 
-        /** Check for start of JS tag */
+        /** Check for start of inline JS tag */
         if (!$this->is_js_script && preg_match('/<script(.*?)>/', $this_line)) {
             $this->is_js_script = true;
         }
 
         // Still process variables, in-line conditions and in-line iterators for items in script tag
-        $this_line = $this->is_js_script ? $this->processVariables((string) $this_line, $dataset) : $this_line;
+        if ($this->is_js_script) {
+            $this_line = $this->processVariables((string) $this_line, $dataset);
+        }
 
-        // Check for end of JS script tag
+        // Check for end of inline JS script tag
         if ($this->is_js_script && preg_match("/<\/script>/", $this_line)) {
             $this->is_js_script = false;
         }
 
-        if (!$this->is_js_script) {
+        // Check if line should be processed
+        if (!$this->is_js_script && $this->shouldProcessLine($this_line)) {
             /** Remove comment blocks */
             if ($this->remove_comment_blocks) {
                 /** Is inline comment */
@@ -428,11 +455,13 @@ final class Parser
             /** Process variables, in-line conditions and in-line iterators */
             $this_line = $this->processVariables((string) $this_line, $dataset);
 
+            /** Check if WP do_shortcode function exists */
+            $is_wp_shortcode = function_exists('do_shortcode');
+
             /** Is shortcode */
             if (preg_match_all("/\[(.*?)\]/", $this_line, $matches, PREG_SET_ORDER)) {
                 foreach ($matches as $theShortcode) {
-                    /** @disregard */
-                    $this_line = function_exists('do_shortcode')
+                    $this_line = $is_wp_shortcode
                         ? str_replace(
                             $theShortcode[0],
                             do_shortcode($this->processVariables($theShortcode[0], $dataset)),
@@ -456,12 +485,13 @@ final class Parser
             }
         }
 
-        /** Output current line */
-        if ($render) {
-            echo $this_line;
-        } else {
-            $this->export_string .= $this_line;
+        // Check if line should not be rendered
+        if (!$render) {
+            $this->export_string[] = $this_line;
+            return;
         }
+
+        echo $this_line;
     }
 
     /**
@@ -475,12 +505,7 @@ final class Parser
     private function processBlock(string $block_string, array $conditions, array $dataset): string
     {
         /** Remove phantom line break */
-        $block_string = explode("\n", $block_string);
-        if (strlen($block_string[count($block_string) - 1]) === 0) {
-            array_pop($block_string);
-        }
-
-        $block_string = implode("\n", $block_string);
+        $block_string = rtrim($block_string, "\n");
 
         $process_content = '';
 
@@ -558,31 +583,23 @@ final class Parser
             /** new core parser class instance */
             $process_each_block = $this->newParserInstance();
 
-            if ($from < $to) {
-                for ($i = $from; $i <= $to; $i += 1) {
-                    $process_each_block->parseInputString(
-                        $block_content,
-                        [
-                            '_KEY' => $i,
-                        ],
-                        false,
-                    );
-                    $return_string .= $process_each_block->return();
-                    $process_each_block->export_string = '';
-                }
-            } else {
-                for ($i = $from; $i >= $to; $i -= 1) {
-                    $process_each_block->parseInputString(
-                        $block_content,
-                        [
-                            '_KEY' => $i,
-                        ],
-                        false,
-                    );
-                    $return_string .= $process_each_block->return();
-                    $process_each_block->export_string = '';
+            /** Determine the step size based on the loop direction */
+            $step = $from < $to ? 1 : -1;
+
+            /** Loop through the range of values */
+            for ($index = $from;; $index += $step) {
+                $process_each_block->parseInputString($block_content, ['_KEY' => $index], false);
+                $return_string .= $process_each_block->return();
+                $process_each_block->clear();
+
+                // Check if we've reached the end of the loop
+                if ($index === $to) {
+                    break;
                 }
             }
+
+            /** Unset the parser instance to free up memory */
+            unset($process_each_block);
         }
 
         return $return_string;
@@ -642,7 +659,7 @@ final class Parser
 
                             $process_each_block->parseInputString($block_content, $this_row, false);
                             $return_string .= $process_each_block->return();
-                            $process_each_block->export_string = '';
+                            $process_each_block->clear();
 
                             $iterator_count += 1;
                         }
@@ -668,7 +685,7 @@ final class Parser
 
                             $process_each_block->parseInputString($block_content, $row_data, false);
                             $return_string .= $process_each_block->return();
-                            $process_each_block->export_string = '';
+                            $process_each_block->clear();
 
                             $iterator_count += 1;
                         }
@@ -769,11 +786,10 @@ final class Parser
                 $replace_string = $this_data_variable[0];
                 $processString = $this_data_variable[2];
 
-                $is_condition = preg_match_all("/ \? /", $processString);
-                $is_itterator = preg_match_all('/ as /', $processString);
-                $has_alternative_vars = explode(' || ', $processString);
+                $is_condition = str_contains($processString, ' ? ') ? preg_match_all("/ \? /", $processString) : false;
+                $is_itterator = str_contains($processString, ' as ') ? preg_match_all('/ as /', $processString) : false;
+                $has_alternative_vars = str_contains($processString, ' || ') ? explode(' || ', $processString) : [];
                 $replace_variable = '';
-                $filter = '';
 
                 /** Detect in-line condition, has alternative variables or singular variables */
                 if ($is_condition) {
@@ -796,7 +812,9 @@ final class Parser
                 }
 
                 // Check if variable is an array and empty, replace with empty string
-                $replace_variable = is_array($replace_variable) && empty($replace_variable) ? '' : $replace_variable;
+                $replace_variable = is_array($replace_variable) && empty($replace_variable)
+                    ? ''
+                    : (is_array($replace_variable) ? $replace_variable : (string) $replace_variable);
 
                 // Replace variable in template string
                 $template_string = str_replace($replace_string, $replace_variable, $template_string);

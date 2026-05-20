@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brace;
 
 trait DataProcessing
@@ -88,7 +90,7 @@ trait DataProcessing
      */
     private static function checkForCount(string $input): string
     {
-        if (preg_match("/^COUNT\((.*?)\)/", $input, $match)) {
+        if (str_contains($input, 'COUNT(') && preg_match("/^COUNT\((.*?)\)/", $input, $match)) {
             return $match[1];
         }
 
@@ -102,7 +104,10 @@ trait DataProcessing
      */
     private static function checkForCallable(string $input): array
     {
-        if (preg_match("/^([\\\A-Za-z_]+::[A-Za-z_]+)$|^([\\\A-Za-z_]+::[A-Za-z_]+)\((.*?)\)$/", $input, $match)) {
+        if (
+            str_contains($input, '::')
+            && preg_match("/^([\\\A-Za-z_]+::[A-Za-z_]+)$|^([\\\A-Za-z_]+::[A-Za-z_]+)\((.*?)\)$/", $input, $match)
+        ) {
             if (count($match) === 4) {
                 return [
                     'callable' => $match[2],

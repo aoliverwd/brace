@@ -152,4 +152,30 @@ final class ShortcodeTest extends TestCase
                 ->return(),
         );
     }
+
+    public function testShortcodeWithArrayDataNestedVariables(): void
+    {
+        $brace = new Brace\Parser();
+        $brace->template_path = __DIR__ . '/';
+
+        $brace->regShortcode('name', fn($attributes) => $attributes['name']);
+        $names = [
+            0 => ['first_name' => 'Alex'],
+            1 => ['first_name' => 'John'],
+            2 => ['first_name' => 'Andre'],
+        ];
+
+        $this->assertEquals(
+            "Alex\nJohn\nAndre\n",
+            $brace
+                ->Parse(
+                    'data-nested-variables',
+                    [
+                        'names' => $names,
+                    ],
+                    false,
+                )
+                ->return(),
+        );
+    }
 }
