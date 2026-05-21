@@ -781,7 +781,7 @@ final class Parser
      */
     private function processVariables(string $template_string, array $dataset): string
     {
-        if (preg_match_all('/({{)(.*?)(}})/i', $template_string, $variables, PREG_SET_ORDER)) {
+        if (preg_match_all('/({{)\s*(.*?)\s*(}})/i', $template_string, $variables, PREG_SET_ORDER)) {
             foreach ($variables as $this_data_variable) {
                 $replace_string = $this_data_variable[0];
                 $processString = $this_data_variable[2];
