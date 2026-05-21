@@ -1,692 +1,133 @@
 ![PHPUnit](https://github.com/aoliverwd/brace/actions/workflows/ci.yml/badge.svg) [![Latest Stable Version](https://poser.pugx.org/alexoliverwd/brace/v)](//packagist.org/packages/alexoliverwd/brace) [![License](https://poser.pugx.org/alexoliverwd/brace/license)](//packagist.org/packages/alexoliverwd/brace)
 
+<img src="https://github.com/aoliverwd/brace/wiki/branding/brace.svg" alt="Brace Logo" width="100">
+
 # Brace
 
-brace is a simple template language written in PHP. Brace uses a handlebar style syntax.
+Brace is a lightweight templating syntax for PHP that uses a familiar `{{ double-brace }}` syntax. It shares similarities with popular templating engines such as [Mustache](https://mustache.github.io/), [Twig](https://twig.symfony.com/), [Smarty](https://www.smarty.net/), and [Latte](https://latte.nette.org/).
 
-<!-- MarkdownTOC -->
+Designed to be simple and easy to adopt, Brace focuses on a low learning curve while remaining flexible enough for most templating needs. It provides essential functionality out of the box without requiring additional dependencies.
 
-- Requirements
-- Installation
-    - Via composer
-    - Or Including the brace class
-- Usage
-    - Returning processes templates as a string
-    - Compiling to an external file
-    - Instance variables
-- Template Reference
-    - Variables
-        - In-line "or" operator
-        - Multiple In-line "or" operators
-        - Return variable values by an array index value
-        - Filters
-    - Iterators
-        - In-line Iterators
-    - Nth children
-    - Row keys
-    - Iteration data variables
-    - Loops
-        - Increasing
-        - Decreasing
-    - Loop data variables
-    - Conditional Statements
-        - Condition Blocks
-    - Else If Statements
-        - In-line conditions
-        - Conditions
-    - Including Templates
-    - Shortcodes
-        - PHP Implementation Example
-        - Content Template
-    - Array Counting
-        - Display Count:
-        - Check Count
-    - Comment Blocks
-        - In-line Comment Block
-        - Multiple Line Comment Block
-    - Clearing cached process string
-    - Running Tests
+## Key Features:
 
-<!-- /MarkdownTOC -->
+1. [Variables](https://github.com/aoliverwd/brace/wiki/variables)
+2. [Filters](https://github.com/aoliverwd/brace/wiki/filters)
+3. [Conditional Statements](https://github.com/aoliverwd/brace/wiki/conditionals)
+4. [Iterators](https://github.com/aoliverwd/brace/wiki/Iterators)
+5. [Loops](https://github.com/aoliverwd/brace/wiki/loops)
+6. [Function Hooks](https://github.com/aoliverwd/brace/wiki/callables)
+7. [Shortcodes](https://github.com/aoliverwd/brace/wiki/shortcodes)
+8. [Includes](https://github.com/aoliverwd/brace/wiki/includes)
 
-# Requirements
+## Syntax
 
-Brace requires PHP version 8.1 or later.
-
-# Installation
-
-## Via composer
-
-```
-composer require alexoliverwd/brace
-```
-
-## Or Including the brace class
-
-```php
-/** Include brace */
-include __DIR__.'/src/brace.php';
-```
-
-# Usage
+By default, Brace loads `.tpl` files from the current directory. The following example loads multiple templates, `document-header.tpl`, `template.tpl`, and `document-footer.tpl`, and outputs them as a single HTML file.
 
 ```php
 <?php
 
-/** New brace instance */
-$brace = new Brace\Parser();
+use Brace\Parser;
 
-/** Set instance variables (Optional) */
-$brace->remove_comment_blocks = false;
-$brace->template_path = __DIR__.'/';
-$brace->template_ext = 'tpl';
+$brace = new Parser();
 
-/** Process template and echo out */
-$brace->Parse('example',[
-    'name' => [
-        'first' => 'John',
-        'last' => 'Doe'
-    ]
-]);
-```
+// Register filters
+$brace->registerFilter('int', fn($content) => (int) $content);
+$brace->registerFilter('decimal', fn($number) => number_format($number, 2));
+$brace->registerFilter('uppercase', fn($content) => strtoupper($content));
+$brace->registerFilter('titlecase', fn($content) => ucwords($content));
+$brace->registerFilter('striptags', fn($content) => strip_tags($content));
 
-## Returning processes templates as a string
+// Register shortcode
+$brace->regShortcode('add_to_basket_button', fn($attrs) => sprintf(
+    '<button id="%d">Add to basket</button>',
+    $attrs['product_id'],
+));
 
-```php
-<?php
-
-/** New brace instance */
-$brace = new Brace\Parser();
-
-/** Process template and return string */
-$template_string = $brace->Parse('example',[
-    'name' => [
-        'first' => 'John',
-        'last' => 'Doe'
-    ]
-], false)->return();
-```
-
-## Compiling to an external file
-
-```php
-<?php
-
-/** New brace instance */
-$brace = new Brace\Parser();
-
-/** Process template and compile to external file */
-$brace->compile('example', 'example.html', [
-    'name' => [
-        'first' => 'John',
-        'last' => 'Doe'
-    ]
-]);
-```
-
-## Instance variables
-
-| Variable                | Description                                  | Default value                        |
-| ----------------------- | -------------------------------------------- | ------------------------------------ |
-| `remove_comment_blocks` | Keep or remove comment blocks from templates | \[Boolean\] `true`                   |
-| `template_path`         | Set directory to load template files from    | \[String\] Current working directory |
-| `template_ext`          | Template file extension                      | \[String\] `tpl`                     |
-
-# Template Reference
-
-## Variables
-
-```php
-<?php
-
-/** New brace instance */
-$brace = new Brace\Parser();
-
-/** Process template and echo out */
-$brace->Parse('example',[
-    'firstname' => 'John Doe'
-]);
-```
-
-```html
-<p>{{firstname}}</p>
-```
-
-### In-line "or" operator
-
-```html
-<p>{{firstname || "No first name found"}}</p>
-```
-
-### Multiple In-line "or" operators
-
-```html
-<p>{{firstname || fname || "No first name found"}}</p>
-```
-
-### Return variable values by an array index value
-
-```html
-<p>Hi {{names->?first[Jane]->title}} {{names->?first[Jane]->last}}</p>
-```
-
-```php
-/** New brace instance */
-$brace = new Brace\Parser();
-
-/** Process template and echo out */
-$brace->Parse('example',[
-    'names' => [
+$brace->parse('template, document-footer', [
+    'name' => 'Jane Doe',
+    'products' => [
         0 => [
-            'title' => 'Mr',
-            'first' => 'John',
-            'last' => 'Smith'
+            'id' => 1154,
+            'price' => 22.66,
+            'title' => 'Product Number One',
+            'description' => 'This is a product description',
         ],
         1 => [
-            'title' => 'Miss',
-            'first' => 'Jane',
-            'last' => 'Doe'
+            'id' => 1156,
+            'price' => 16,
+            'title' => 'Product Number Two',
+            'description' => 'This is another product description',
         ],
-        2 => [
-            'title' => 'Dr',
-            'first' => 'David',
-            'last' => 'Jones'
-        ]
-    ]
+    ],
 ]);
+```
+
+Template:
+
+```html
+<!-- Simple HTML template -->
+[@include document-header]
+
+<main>
+    <p>Hello World. My name is {{ name|titlecase || "John Doe" }}</p>
+
+    <h1>Product List:</h1>
+    {{ if products }}
+    <p>Showing {{ COUNT(products) }} item(s)</p>
+    <ul>
+        {{ each products as product }}
+        <li>
+            <span>{{ product->title|uppercase }}</span>
+            <span> {{ product->currancy_symbol || "&pound;" }}{{ product->price|decimal }} </span>
+            <p>{{ product->description|striptags }}</p>
+
+            [add_to_basket_button product_id="{{ product->id|int }}"]
+        </li>
+        {{ end }}
+    </ul>
+    {{ else }}
+    <p>No products to list</p>
+    {{ end }}
+</main>
 ```
 
 Result:
 
 ```html
-<p>Hi Miss Doe</p>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Brace Examples</title>
+    </head>
+    <body>
+        <main>
+            <p>Hello World. My name is Jane Doe</p>
+
+            <h1>Product List:</h1>
+            <p>Showing 2 item(s)</p>
+            <ul>
+                <li>
+                    <span>PRODUCT NUMBER ONE</span>
+                    <span> &pound;22.66 </span>
+                    <p>This is a product description</p>
+
+                    <button id="1154">Add to basket</button>
+                </li>
+                <li>
+                    <span>PRODUCT NUMBER TWO</span>
+                    <span> &pound;16.00 </span>
+                    <p>This is another product description</p>
+
+                    <button id="1156">Add to basket</button>
+                </li>
+            </ul>
+        </main>
+    </body>
+</html>
 ```
 
-### Filters
+## Next Steps
 
-Brace allows you to register and use filters to modify variable values dynamically. Filters can be applied to variables using the `|` operator.
-
-#### Registering Filters
-
-Filters are registered using the `registerFilter` method. For example:
-
-```php
-$brace = new Brace\Parser();
-$brace->registerFilter('int', fn($content) => (int) $content);
-```
-
-#### Using Filters
-
-Filters can be applied to variables in templates. Examples:
-
-##### 1. Basic Filter Usage:
-
-`{{ number|int }}`
-
-Converts the `number` variable to an integer.
-
-##### 2.Nested Filters:
-
-`{{ number->one|int }}`
-
-Applies the `int` filter to a nested variable.
-
-##### 2.Inline Conditions with Filters:
-
-`{{ number->one|number === 1,123.0 ? "true" : "false" }}`
-
-Formats the `number` variable and evaluates an inline condition.
-
-## Iterators
-
-```php
-<?php
-
-/** New brace instance */
-$brace = new Brace\Parser();
-
-/** Process template and echo out */
-$brace->Parse('example',[
-    'products' => [
-        0 => [
-            'title' => 'Product 1',
-            'price' => 22.99,
-            'stock' => 15,
-            'categories' => ['Textile','Cloths']
-        ],
-        1 => [
-            'title' => 'Product 2',
-            'price' => 10.00,
-            'stock' => 62,
-            'categories' => ['Electronics','PC','Hardware']
-        ],
-        2 => [
-            'title' => 'Product 3',
-            'price' => 89.98,
-            'stock' => 120,
-            'categories' => ['PC Game']
-        ]
-    ]
-]);
-```
-
-```html
-<ul>
-    {{each products}}
-    <li>{{title}}</li>
-    {{end}}
-</ul>
-```
-
-```html
-<ul>
-    {{each products as product}}
-    <li>
-        {{product->title}}
-        <ul>
-            {{each product->categories as category}}
-            <li>{{category}}</li>
-            {{end}}
-        </ul>
-    </li>
-    {{end}}
-</ul>
-```
-
-```php
-<?php
-
-/** New brace instance */
-$brace = new Brace\Parser();
-
-/** Process template and echo out */
-$brace->Parse('example',[
-    'names' => ['John','Steve','Bert']
-]);
-```
-
-```html
-{{each names as name}}
-<p>{{name}}</p>
-{{end}}
-```
-
-### In-line Iterators
-
-```php
-<?php
-
-/** New brace instance */
-$brace = new Brace\Parser();
-
-/** Process template and echo out */
-$brace->Parse('example',[
-    'names' => ['John','Steve','Bert']
-]);
-```
-
-```html
-<ul>
-    {{names as name "
-    <li>__name__</li>
-    "}}
-</ul>
-```
-
-Or
-
-```html
-<ul>
-    {{names as key value "
-    <li data-key="__key__">__value__</li>
-    "}}
-</ul>
-```
-
-```html
-<ul>
-    <li>John</li>
-    <li>Steve</li>
-    <li>Bert</li>
-</ul>
-```
-
-## Nth children
-
-```php
-<?php
-
-/** New brace instance */
-$brace = new Brace\Parser();
-
-/** Process template and echo out */
-$brace->Parse('example',[
-    'names' => ['John','Steve','Bert','Fred','Cindy']
-]);
-```
-
-```html
-<!-- Is first item -->
-{{each names as name}}
-    <span{{_ITERATION === "is_first_item" ? " class=\"is_first\""}}>{{name}}</span>
-{{end}}
-
-<!-- Is last item -->
-{{each names as name}}
-    <span{{_ITERATION === "is_last_item" ? " class=\"is_last\""}}>{{name}}</span>
-{{end}}
-
-<!-- Is second item -->
-{{each names as name}}
-    <span{{_ITERATION == 2 ? " class=\"is_second_item\""}}>{{name}}</span>
-{{end}}
-```
-
-## Row keys
-
-```php
-<?php
-
-/** New brace instance */
-$brace = new Brace\Parser();
-
-/** Process template and echo out */
-$brace->Parse('example',[
-    'names' => [
-        'name_1' => 'Dave',
-        'name_2' => 'John',
-        'name_3' => 'Barry'
-    ]
-]);
-```
-
-```html
-{{each names as name}}
-<span data-key="{{_KEY}}">{{name}}</span>
-{{end}}
-```
-
-Or
-
-```html
-{{each names as key value}}
-<span data-key="{{key}}">{{value}}</span>
-{{end}}
-```
-
-## Iteration data variables
-
-Variables that are added to each iteration.
-
-| ID          | Description                                                     | Type    |
-| ----------- | --------------------------------------------------------------- | ------- |
-| \_ITERATION | Iteration value (is_first_item, is_last_item, 2, 3 etc)         | String  |
-| \_ROW_ID    | Record/Row ID (1,2,3, etc)                                      | Integer |
-| \_KEY       | Record/Row key                                                  | Mixed   |
-| GLOBAL      | An array of external record data that is accessible to all rows | Array   |
-
-## Loops
-
-```php
-<?php
-
-/** New brace instance */
-$brace = new Brace\Parser();
-
-/** Process template and echo out */
-$brace->Parse('example',[]);
-```
-
-```html
-{{loop 3}}
-<li>{{_KEY}}</li>
-{{end}}
-```
-
-### Increasing
-
-```html
-{{loop 1 to 3}}
-<li>{{_KEY}}</li>
-{{end}}
-```
-
-### Decreasing
-
-```html
-{{loop 3 to 1}}
-<li>{{_KEY}}</li>
-{{end}}
-```
-
-## Loop data variables
-
-Variables that are added to each iteration.
-
-| ID    | Description | Type    |
-| ----- | ----------- | ------- |
-| \_KEY | Row key     | Integer |
-
-## Conditional Statements
-
-### Condition Blocks
-
-```php
-<?php
-
-/** New brace instance */
-$brace = new Brace\Parser();
-
-/** Process template and echo out */
-$brace->Parse('example',[
-    'first_name' => 'John',
-    'last_name' => 'Doe'
-]);
-```
-
-```html
-{{if first_name EXISTS}}
-<p>Hello {{first_name}}</p>
-{{end}}
-```
-
-```html
-{{if first_name EXISTS && first_name == "John"}}
-<p>My first name is {{first_name}}</p>
-{{else}}
-<p>Please enter your first name</p>
-{{end}}
-```
-
-## Else If Statements
-
-```php
-<?php
-
-/** New brace instance */
-$brace = new Brace\Parser();
-
-/** Process template and echo out */
-$brace->Parse('example',[
-    'names' => ['John','Steve','Bert','Fred','Cindy']
-]);
-```
-
-```html
-{{each names as name}} {{if _ITERATION === "is_first_item"}}
-<span class="first_item" data-rowid="{{_ROW_ID}}">{{name}}</span>
-{{elseif _ITERATION === "is_last_item"}}
-<span class="last_item" data-rowid="{{_ROW_ID}}">{{name}}</span>
-{{elseif _ITERATION == 2}}
-<span class="second_item" data-rowid="{{_ROW_ID}}">{{name}}</span>
-{{else}}
-<span data-rowid="{{_ROW_ID}}">{{name}}</span>
-{{end}} {{end}}
-```
-
-### In-line conditions
-
-```html
-<p>{{first_name !== "test" ? "__first_name__" : "is test"}}</p>
-```
-
-```html
-<p>{{first_name EXISTS ? "__first_name__" : "is test"}}</p>
-```
-
-```html
-<p>{{first_name EXISTS ? "my first name is __first_name__"}}</p>
-```
-
-Escaping quotations
-
-```html
-<p>{{first_name !== "test" ? "Name is \"__first_name__\"" : "is test"}}</p>
-```
-
-```txt
-Name is "John"
-```
-
-### Conditions
-
-| Condition | Description                                                       |
-| --------- | ----------------------------------------------------------------- |
-| ==        | Is equal to (Loose equality comparison)                           |
-| ===       | Is equal to (Strict equality comparison)                          |
-| >=        | More than or equal to                                             |
-| <=        | Less than or equal to                                             |
-| >         | More than                                                         |
-| <         | Less than                                                         |
-| !=        | Is not equal (Loose non equality comparison)                      |
-| !!        | Is not                                                            |
-| !==       | Is not equal (Same as !! operator, strict non equality comparison |
-| EXISTS    | Exists                                                            |
-| !EXISTS   | Does not exist                                                    |
-
-## Including Templates
-
-```html
-[@include sections/footer]
-```
-
-```html
-[@include header footer]
-```
-
-```html
-[@include {{section}}]
-```
-
-## Shortcodes
-
-### PHP Implementation Example
-
-```php
-<?php
-
-/** New brace parser */
-$brace = new Brace\Parser();
-
-/** Return HTML link */
-$button_function = function ($attributes){
-    return '<a href="'.$attributes['url'].'" alt="'.$attributes['alt'].'" target="'.$attributes['target'].'" rel="noreferrer noopener">'.$attributes['title'].'</a>';
-};
-
-/** Register shortcode */
-$brace->regShortcode('button', 'button_function');
-
-/** Process content template */
-$brace->Parse('content', []);
-```
-
-### Content Template
-
-```html
-<!-- Button shortcode -->
-[button title="Hello world" url="https://hello.world" alt="Hello world button" target="_blank"]
-```
-
-## Array Counting
-
-Ability to check and display array item counts
-
-### Display Count:
-
-```html
-<p>Total items is: {{COUNT(items)}}</p>
-```
-
-```txt
-Total items is: 3
-```
-
-### Check Count
-
-```html
-{{if COUNT(items) == 3}}
-<p>There are three items</p>
-{{end}}
-```
-
-```txt
-There are three items
-```
-
-## Comment Blocks
-
-### In-line Comment Block
-
-```html
-<!-- Inline comment block -->
-```
-
-### Multiple Line Comment Block
-
-```html
-<!--
-    Comment block over multiple lines
--->
-```
-
-## Clearing cached process string
-
-The --clear-- method is useful when needing to processes multiple templates with differing data using the same brace instance.
-
-By default brace does not clear a processed string at the end of executing a template/string parse.
-
-```php
-<?php
-
-// Init brace
-$brace = new Brace\Parser();
-$brace->template_path = __DIR__.'/';
-
-// Process first template
-$brace->Parse('example',[
-    'name' => [
-      'first' => 'John',
-      'last' => 'Doe'
-    ]
-]);
-
-// Process second template using the same brace instance
-$brace->clear()->parse('example_two',[
-    'name' => [
-      'first' => 'Dave',
-      'last' => 'Smith'
-    ]
-]);
-
-```
-
-## Running Tests
-
-Running PHPStan and PHPUnit tests can be achieved with the following commands
-
-```bash
-./vendor/bin/phpstan analyse -c phpstan.neon
-./vendor/bin/phpunit -c ./tests/phpunit.xml
-```
-
-Or by running via composer `composer test`
+[Getting Started](https://github.com/aoliverwd/brace/wiki/getting-started)
