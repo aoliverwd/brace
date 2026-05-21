@@ -252,7 +252,9 @@ final class variableTest extends TestCase
         $brace = new Brace\Parser();
         $this->assertEquals(
             "<script>console.log(\"Dave\");</script>\n",
-            $brace->parseInputString('<script>console.log("{{name}}");</script>', ['name' => 'Dave'], false)->return(),
+            $brace
+                ->parseInputString('<script>console.log("{{ name }}");</script>', ['name' => 'Dave'], false)
+                ->return(),
         );
     }
 }
