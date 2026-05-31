@@ -15,7 +15,9 @@
         }
     ],
     "support": {
-        "issues": "https://github.com/aoliverwd/brace/issues"
+        "issues": "https://github.com/aoliverwd/brace/issues",
+        "source": "https://github.com/aoliverwd/brace",
+        "docs": "https://github.com/aoliverwd/brace/wiki"
     },
     "prefer-stable": true,
     "require": {
