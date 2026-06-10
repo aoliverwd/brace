@@ -22,6 +22,9 @@ final class Parser
     /** Use DataProcessing trait */
     use DataProcessing;
 
+    /** Use Callables trait */
+    use Callables;
+
     /** Public variables */
     public bool $remove_comment_blocks = true;
     public string $template_path = __DIR__ . '/';
@@ -47,12 +50,6 @@ final class Parser
      * @var array<string, string|callable>
      */
     private array $shortcode_methods = [];
-
-    /**
-     * callable_methods
-     * @var array<string, callable>
-     */
-    private array $callable_methods = [];
 
     /**
      * block_condition
@@ -206,38 +203,6 @@ final class Parser
 
         /** Return shortcode syntax if method is not callable */
         return $shortcodeSyntax;
-    }
-
-    /**
-     * Register a callable method
-     *
-     * @param string $name
-     * @param callable $method
-     * @return Parser
-     */
-    public function registerCallable(string $name, callable $method): Parser
-    {
-        if (!isset($this->callable_methods[$name])) {
-            $this->callable_methods[$name] = $method;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Call a callable method
-     *
-     * @param string $method
-     * @param string $content
-     * @return string
-     */
-    private function callables(string $method, string $content): string
-    {
-        if (isset($this->callable_methods[$method])) {
-            return $this->callable_methods[$method](preg_replace(['/^"(.*?)"$/', "/^'(.*?)'$/"], '$1', $content));
-        }
-
-        return '';
     }
 
     /**
@@ -472,17 +437,7 @@ final class Parser
             }
 
             /** Is Callable */
-            if (preg_match_all("/([a-zA-Z0-9_-]+)\((.*?)\)/", $this_line, $matches, PREG_SET_ORDER)) {
-                foreach ($matches as $callableMethod) {
-                    if (isset($this->callable_methods[$callableMethod[1]])) {
-                        $this_line = str_replace(
-                            $callableMethod[0],
-                            $this->callables(method: $callableMethod[1], content: $callableMethod[2]),
-                            $this_line,
-                        );
-                    }
-                }
-            }
+            $this_line = $this->processCallables($this_line);
         }
 
         // Check if line should not be rendered
