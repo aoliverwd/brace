@@ -6,8 +6,11 @@ namespace Brace;
 
 trait DataProcessing
 {
-    /** Use Filters trait */
+    // Use Filters trait
     use Filters;
+
+    // Use Callables trait
+    use Callables;
 
     /**
      * Process data chain
@@ -23,7 +26,6 @@ trait DataProcessing
 
         // Check for search by array value
         $array_value_seratch = explode('->?', (string) $filter[0]);
-
         if (count($array_value_seratch) > 1) {
             foreach ($array_value_seratch as $thisVar) {
                 if (preg_match('/^(.*?)\[(.*?)\](.*)$/', $thisVar, $matches) && is_array($dataset)) {
@@ -44,6 +46,7 @@ trait DataProcessing
             }
         }
 
+        // Process chain
         return self::processChain(
             (string) $filter[0],
             is_array($dataset) ? $dataset : [],
@@ -69,6 +72,11 @@ trait DataProcessing
         // Check for count
         $is_count = self::checkForCount($input);
         $input = !empty($is_count) ? $is_count : $input;
+
+        // Process callables
+        if ($this->matchCallable($input)) {
+            return $this->processFilter($filter, $this->processCallables($input));
+        }
 
         // Process nested variables
         $return = [];

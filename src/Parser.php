@@ -746,11 +746,11 @@ final class Parser
                 $has_alternative_vars = str_contains($processString, ' || ') ? explode(' || ', $processString) : [];
                 $replace_variable = '';
 
-                /** Detect in-line condition, has alternative variables or singular variables */
+                // Detect in-line condition, has alternative variables or singular variables
                 if ($is_condition) {
                     $replace_variable = $this->processInlineCondition($processString, $dataset);
                 } elseif ($is_itterator) {
-                    /** Processes in-line iterator */
+                    // Processes in-line iterator
                     $replace_variable = $this->processInlineIterator($processString, $dataset);
                 } elseif (count($has_alternative_vars) > 1) {
                     foreach ($has_alternative_vars as $this_variable) {

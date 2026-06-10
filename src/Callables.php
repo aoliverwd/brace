@@ -13,6 +13,11 @@ trait Callables
     private array $callable_methods = [];
 
     /**
+     * The pattern used to match callable methods in the content
+     */
+    private string $callable_pattern = '/([a-zA-Z0-9_-]+)\((.*?)\)/';
+
+    /**
      * Register a callable method
      *
      * @param string $name
@@ -45,6 +50,17 @@ trait Callables
     }
 
     /**
+     * Match a callable method in the line
+     *
+     * @param string $line
+     * @return bool
+     */
+    private function matchCallable(string $line): bool
+    {
+        return (bool) preg_match($this->callable_pattern, $line);
+    }
+
+    /**
      * Check if the line contains callable methods
      *
      * @param string $line
@@ -52,7 +68,7 @@ trait Callables
      */
     private function hasCallables(string $line): array|false
     {
-        if (preg_match_all('/([a-zA-Z0-9_-]+)\((.*?)\)/', $line, $matches, PREG_SET_ORDER)) {
+        if (preg_match_all($this->callable_pattern, $line, $matches, PREG_SET_ORDER)) {
             return $matches;
         }
 
