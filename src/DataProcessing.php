@@ -60,17 +60,18 @@ trait DataProcessing
      */
     private function processChain(string $input, array $dataset, string $filter): mixed
     {
-        $return = [];
-
-        $is_count = self::checkForCount($input);
+        // Check for boolean callable
         $is_a_callable = self::checkForCallable($input);
-
         if (!empty($is_a_callable) && is_callable($is_a_callable['callable'])) {
             return boolval(call_user_func($is_a_callable['callable'], $is_a_callable['attributes']));
         }
 
+        // Check for count
+        $is_count = self::checkForCount($input);
         $input = !empty($is_count) ? $is_count : $input;
 
+        // Process nested variables
+        $return = [];
         foreach (explode('->', $input) as $thisVar) {
             if (is_array($dataset) && isset($dataset[$thisVar])) {
                 $dataset = $dataset[$thisVar];
