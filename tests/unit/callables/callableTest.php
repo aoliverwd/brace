@@ -86,4 +86,20 @@ final class CallableTest extends TestCase
             $brace->parseInputString('foo(bar(foo))', [], false)->return()
         );
     }
+
+    /**
+     * callable method
+     * @return void
+     */
+    public function testCallableMethodWithBraces(): void
+    {
+        $brace = new Brace\Parser();
+
+        $brace->registerCallable('foo', fn() => 'bar');
+
+        $this->assertEquals(
+            "bar\n",
+            $brace->parseInputString('{{ foo() }}', [], false)->return()
+        );
+    }
 }
