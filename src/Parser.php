@@ -36,7 +36,7 @@ final class Parser
     private int $block_spaces = 0;
     private bool $is_block = false;
     private bool $is_js_script = false;
-    private string $current_template = '';
+    private string $current_template = 'inline';
     private int $current_line = 0;
 
     /**
@@ -436,8 +436,12 @@ final class Parser
                 }
             }
 
-            /** Is Callable */
-            $this_line = $this->processCallables($this_line);
+            // Callables without {{ }} will be removed in future versions
+            if ($this->matchCallable($this_line)) {
+                $error_message = sprintf('Callables without {{ }} will be removed in a future release. Use {{ function_name() }} instead. File: %s, Line: %d', $this->current_template, $this->current_line);
+                trigger_error($error_message, E_USER_DEPRECATED);
+                $this_line = $this->processCallables($this_line);
+            }
         }
 
         // Check if line should not be rendered
