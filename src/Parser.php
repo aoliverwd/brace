@@ -288,11 +288,6 @@ final class Parser
             $this_line = $this->processVariables((string) $this_line, $dataset);
         }
 
-        // Check for end of inline JS script tag
-        if ($this->is_js_script && preg_match("/<\/script>/", $this_line)) {
-            $this->is_js_script = false;
-        }
-
         // Check if line should be processed
         if (!$this->is_js_script && $this->shouldProcessLine($this_line)) {
             /** Remove comment blocks */
@@ -442,6 +437,11 @@ final class Parser
                 trigger_error($error_message, E_USER_DEPRECATED);
                 $this_line = $this->processCallables($this_line);
             }
+        }
+
+        // Check for end of inline JS script tag
+        if ($this->is_js_script && preg_match("/<\/script>/", $this_line)) {
+            $this->is_js_script = false;
         }
 
         // Check if line should not be rendered
