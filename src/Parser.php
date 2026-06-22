@@ -22,6 +22,9 @@ final class Parser
     /** Use DataProcessing trait */
     use DataProcessing;
 
+    /** Use Callables trait */
+    use Callables;
+
     /** Public variables */
     public bool $remove_comment_blocks = true;
     public string $template_path = __DIR__ . '/';
@@ -33,7 +36,7 @@ final class Parser
     private int $block_spaces = 0;
     private bool $is_block = false;
     private bool $is_js_script = false;
-    private string $current_template = '';
+    private string $current_template = 'inline';
     private int $current_line = 0;
 
     /**
@@ -47,12 +50,6 @@ final class Parser
      * @var array<string, string|callable>
      */
     private array $shortcode_methods = [];
-
-    /**
-     * callable_methods
-     * @var array<string, callable>
-     */
-    private array $callable_methods = [];
 
     /**
      * block_condition
@@ -209,38 +206,6 @@ final class Parser
     }
 
     /**
-     * Register a callable method
-     *
-     * @param string $name
-     * @param callable $method
-     * @return Parser
-     */
-    public function registerCallable(string $name, callable $method): Parser
-    {
-        if (!isset($this->callable_methods[$name])) {
-            $this->callable_methods[$name] = $method;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Call a callable method
-     *
-     * @param string $method
-     * @param string $content
-     * @return string
-     */
-    private function callables(string $method, string $content): string
-    {
-        if (isset($this->callable_methods[$method])) {
-            return $this->callable_methods[$method](preg_replace(['/^"(.*?)"$/', "/^'(.*?)'$/"], '$1', $content));
-        }
-
-        return '';
-    }
-
-    /**
      * Process a individual template file
      *
      * @param string $template_name
@@ -321,11 +286,6 @@ final class Parser
         // Still process variables, in-line conditions and in-line iterators for items in script tag
         if ($this->is_js_script) {
             $this_line = $this->processVariables((string) $this_line, $dataset);
-        }
-
-        // Check for end of inline JS script tag
-        if ($this->is_js_script && preg_match("/<\/script>/", $this_line)) {
-            $this->is_js_script = false;
         }
 
         // Check if line should be processed
@@ -471,18 +431,17 @@ final class Parser
                 }
             }
 
-            /** Is Callable */
-            if (preg_match_all("/([a-zA-Z0-9_-]+)\((.*?)\)/", $this_line, $matches, PREG_SET_ORDER)) {
-                foreach ($matches as $callableMethod) {
-                    if (isset($this->callable_methods[$callableMethod[1]])) {
-                        $this_line = str_replace(
-                            $callableMethod[0],
-                            $this->callables(method: $callableMethod[1], content: $callableMethod[2]),
-                            $this_line,
-                        );
-                    }
-                }
+            // Callables without {{ }} will be removed in future versions
+            if ($this->matchCallable($this_line)) {
+                $error_message = sprintf('Callables without {{ }} will be removed in a future release. Use {{ function_name() }} instead. File: %s, Line: %d', $this->current_template, $this->current_line);
+                trigger_error($error_message, E_USER_DEPRECATED);
+                $this_line = $this->processCallables($this_line);
             }
+        }
+
+        // Check for end of inline JS script tag
+        if ($this->is_js_script && preg_match("/<\/script>/", $this_line)) {
+            $this->is_js_script = false;
         }
 
         // Check if line should not be rendered
@@ -791,11 +750,11 @@ final class Parser
                 $has_alternative_vars = str_contains($processString, ' || ') ? explode(' || ', $processString) : [];
                 $replace_variable = '';
 
-                /** Detect in-line condition, has alternative variables or singular variables */
+                // Detect in-line condition, has alternative variables or singular variables
                 if ($is_condition) {
                     $replace_variable = $this->processInlineCondition($processString, $dataset);
                 } elseif ($is_itterator) {
-                    /** Processes in-line iterator */
+                    // Processes in-line iterator
                     $replace_variable = $this->processInlineIterator($processString, $dataset);
                 } elseif (count($has_alternative_vars) > 1) {
                     foreach ($has_alternative_vars as $this_variable) {

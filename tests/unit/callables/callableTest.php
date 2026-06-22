@@ -86,4 +86,74 @@ final class CallableTest extends TestCase
             $brace->parseInputString('foo(bar(foo))', [], false)->return()
         );
     }
+
+
+    /**
+     * callable method
+     * @return void
+     */
+    public function testCallableMethodWithBraces(): void
+    {
+        $brace = new Brace\Parser();
+
+        $brace->registerCallable('foo', fn() => 'bar');
+
+        $this->assertEquals(
+            "bar\n",
+            $brace->parseInputString('{{ foo() }}', [], false)->return()
+        );
+    }
+
+    /**
+     * callable method with argument
+     * @return void
+     */
+    public function testCallableMethodWithArgDoubleQuotesWithBraces(): void
+    {
+        $brace = new Brace\Parser();
+
+        $brace->registerCallable('foo', fn($content) => $content);
+
+        $this->assertEquals(
+            "bar\n",
+            $brace->parseInputString('{{ foo("bar") }}', [], false)->return()
+        );
+    }
+
+    public function testCallableMethodWithArgSingleQuotesWithBraces(): void
+    {
+        $brace = new Brace\Parser();
+
+        $brace->registerCallable('foo', fn($content) => $content);
+
+        $this->assertEquals(
+            "bar\n",
+            $brace->parseInputString("{{ foo('bar') }}", [], false)->return()
+        );
+    }
+
+    public function testCallableMethodWithArgNoQuotesWithBraces(): void
+    {
+        $brace = new Brace\Parser();
+
+        $brace->registerCallable('foo', fn($content) => $content);
+
+        $this->assertEquals(
+            "bar\n",
+            $brace->parseInputString('{{ foo(bar) }}', [], false)->return()
+        );
+    }
+
+    public function testCallableMethodWithParenthesisWithBraces(): void
+    {
+        $brace = new Brace\Parser();
+
+        $brace->registerCallable('foo', fn($content) => $content);
+
+        $this->assertEquals(
+            "bar(foo)\n",
+            $brace->parseInputString('{{ foo(bar(foo)) }}', [], false)->return()
+        );
+    }
+
 }
