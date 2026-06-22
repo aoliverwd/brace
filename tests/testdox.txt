@@ -4,6 +4,11 @@ Callable (ConditionTests\Callable)
  [x] Callable method with arg single quotes
  [x] Callable method with arg no quotes
  [x] Callable method with parenthesis
+ [x] Callable method with braces
+ [x] Callable method with arg double quotes with braces
+ [x] Callable method with arg single quotes with braces
+ [x] Callable method with arg no quotes with braces
+ [x] Callable method with parenthesis with braces
 
 Conditions (ConditionTests\Conditions)
  [x] Equals

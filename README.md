@@ -1,4 +1,6 @@
-![PHPUnit](https://github.com/aoliverwd/brace/actions/workflows/ci.yml/badge.svg) [![Latest Stable Version](https://poser.pugx.org/alexoliverwd/brace/v)](//packagist.org/packages/alexoliverwd/brace) [![License](https://poser.pugx.org/alexoliverwd/brace/license)](//packagist.org/packages/alexoliverwd/brace)
+![PHPUnit](https://github.com/aoliverwd/brace/actions/workflows/ci.yml/badge.svg)
+[![Latest Stable Version](https://poser.pugx.org/alexoliverwd/brace/v)](https://packagist.org/packages/alexoliverwd/brace)
+[![License](https://poser.pugx.org/alexoliverwd/brace/license)](https://packagist.org/packages/alexoliverwd/brace)
 
 <img src="https://github.com/aoliverwd/brace/wiki/branding/brace.svg" alt="Brace Logo" width="100">
 
