@@ -35,6 +35,22 @@ final class CallableTest extends TestCase
         );
     }
 
+    public function testCallableMethodWithDataArg(): void
+    {
+        $brace = new Brace\Parser();
+
+        $brace->registerCallable('foo', fn($content) => $content);
+
+        $this->assertEquals(
+            "baz\n",
+            $brace->parseInputString('foo( foo->bar )', [
+                'foo' => [
+                    'bar' => 'baz'
+                ]
+            ], false)->return()
+        );
+    }
+
     /**
      * callable method with argument
      * @return void
@@ -153,6 +169,22 @@ final class CallableTest extends TestCase
         $this->assertEquals(
             "bar(foo)\n",
             $brace->parseInputString('{{ foo(bar(foo)) }}', [], false)->return()
+        );
+    }
+
+    public function testCallableMethodWithDataArgWithBraces(): void
+    {
+        $brace = new Brace\Parser();
+
+        $brace->registerCallable('foo', fn($content) => $content);
+
+        $this->assertEquals(
+            "baz\n",
+            $brace->parseInputString('{{ foo( foo->bar ) }}', [
+                'foo' => [
+                    'bar' => 'baz'
+                ]
+            ], false)->return()
         );
     }
 
