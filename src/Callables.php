@@ -49,7 +49,7 @@ trait Callables
             $method_arg = preg_replace(['/^"(.*?)"$/', "/^'(.*?)'$/"], '$1', $content);
 
             // Process the data chain and call the method
-            if (is_string($method_arg) && !empty($data)) {
+            if (is_string($method_arg) && $data !== []) {
                 $method_arg = $this->processDataChain(trim($method_arg), $data);
             }
 
