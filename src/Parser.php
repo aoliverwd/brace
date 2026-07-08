@@ -435,7 +435,7 @@ final class Parser
             if ($this->matchCallable($this_line)) {
                 $error_message = sprintf('Callables without {{ }} will be removed in a future release. Use {{ function_name() }} instead. File: %s, Line: %d', $this->current_template, $this->current_line);
                 trigger_error($error_message, E_USER_DEPRECATED);
-                $this_line = $this->processCallables($this_line);
+                $this_line = $this->processCallables($this_line, $dataset);
             }
         }
 

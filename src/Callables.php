@@ -38,12 +38,23 @@ trait Callables
      *
      * @param string $method
      * @param string $content
+     * @param array<mixed> $data
      * @return string
      */
-    private function callables(string $method, string $content): string
+    private function callables(string $method, string $content, array $data = []): string
     {
+        // Check if the method exists
         if (isset($this->callable_methods[$method])) {
-            return $this->callable_methods[$method](preg_replace(['/^"(.*?)"$/', "/^'(.*?)'$/"], '$1', $content));
+            // Replace quotes around the content and call the method
+            $method_arg = preg_replace(['/^"(.*?)"$/', "/^'(.*?)'$/"], '$1', $content);
+
+            // Process the data chain and call the method
+            if (is_string($method_arg) && !empty($data)) {
+                $method_arg = $this->processDataChain(trim($method_arg), $data);
+            }
+
+            // Return the result of the callable method
+            return (string) $this->callable_methods[$method]($method_arg);
         }
 
         return '';
@@ -79,9 +90,10 @@ trait Callables
      * Process callable methods in the content
      *
      * @param string $content
+     * @param array<mixed> $data
      * @return string
      */
-    private function processCallables(string $content): string
+    private function processCallables(string $content, array $data = []): string
     {
         $callables = $this->hasCallables($content);
 
@@ -93,7 +105,7 @@ trait Callables
             if (isset($this->callable_methods[$callableMethod[1]])) {
                 $content = str_replace(
                     $callableMethod[0],
-                    $this->callables(method: $callableMethod[1], content: $callableMethod[2]),
+                    $this->callables(method: $callableMethod[1], content: $callableMethod[2], data: $data),
                     $content,
                 );
             }

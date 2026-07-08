@@ -75,13 +75,13 @@ trait DataProcessing
 
         // Process callables
         if ($this->matchCallable($input)) {
-            return $this->processFilter($filter, $this->processCallables($input));
+            return $this->processFilter($filter, $this->processCallables($input, $dataset));
         }
 
         // Process nested variables
         $return = [];
         foreach (explode('->', $input) as $thisVar) {
-            if (is_array($dataset) && isset($dataset[$thisVar])) {
+            if (isset($dataset[$thisVar])) {
                 $dataset = $dataset[$thisVar];
                 $return = !empty($is_count) ? count($dataset) : $dataset;
             } else {
