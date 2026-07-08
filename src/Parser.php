@@ -698,7 +698,7 @@ final class Parser
                 $process_content = $split_string[1];
             }
 
-            if (isset($return['elseif'])) {
+            if (is_array($return['elseif'])) {
                 $last_key = array_key_last($return['elseif']);
                 $return['elseif'][$last_key]['content'] = rtrim((string) $process_content);
             }
