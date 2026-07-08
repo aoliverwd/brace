@@ -48,7 +48,7 @@ trait Callables
             // Replace quotes around the content and call the method
             $method_arg = preg_replace(['/^"(.*?)"$/', "/^'(.*?)'$/"], '$1', $content);
 
-            // Process the data chain and call the method
+            // Process the data chain
             if (is_string($method_arg) && $data !== []) {
                 $method_arg = $this->processDataChain(trim($method_arg), $data);
             }
