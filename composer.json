@@ -22,7 +22,7 @@
     },
     "prefer-stable": true,
     "require": {
-        "php": ">=8.4.1"
+        "php": ">=8.5"
     },
     "autoload": {
         "psr-4": {
