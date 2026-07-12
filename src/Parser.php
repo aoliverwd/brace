@@ -285,7 +285,7 @@ final class Parser
 
         // Still process variables, in-line conditions and in-line iterators for items in script tag
         if ($this->is_js_script) {
-            $this_line = $this->processVariables((string) $this_line, $dataset);
+            $this_line = $this->processVariables($this_line, $dataset);
         }
 
         // Check if line should be processed
@@ -700,7 +700,7 @@ final class Parser
 
             if (is_array($return['elseif'])) {
                 $last_key = array_key_last($return['elseif']);
-                $return['elseif'][$last_key]['content'] = rtrim((string) $process_content);
+                $return['elseif'][$last_key]['content'] = rtrim($process_content);
             }
         } else {
             // add first if condition to return
@@ -771,7 +771,7 @@ final class Parser
                 }
 
                 // Check if variable is an array and empty, replace with empty string
-                $replace_variable = is_array($replace_variable) && empty($replace_variable)
+                $replace_variable = $replace_variable === []
                     ? ''
                     : (is_array($replace_variable) ? $replace_variable : (string) $replace_variable);
 
@@ -921,7 +921,7 @@ final class Parser
                 $expected = is_string($expected) ? str_replace(['"', '+'], ['', ' '], $expected) : $expected;
             }
 
-            return (bool) match ($challenge) {
+            return match ($challenge) {
                 'EXISTS' => true,
                 '==' => $data == $expected ?: false, // Equal
                 '===' => $data === $expected ?: false, // Identical
