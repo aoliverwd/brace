@@ -168,10 +168,10 @@ final class Parser
         }
 
         /** Get method name from args */
-        $methodName = isset($this->shortcode_methods[$args[1]]) ? $this->shortcode_methods[$args[1]] : false;
+        $methodName = $this->shortcode_methods[$args[1]] ?? false;
 
         // Get attributes from args
-        $args[2] = isset($args[2]) ? $args[2] : '';
+        $args[2] ??= '';
         preg_match_all('/(.*?)="(.*?)"/', $args[2], $attributes, PREG_SET_ORDER);
 
         /** Check for registered functions */
@@ -341,7 +341,7 @@ final class Parser
                 )
             ) {
                 // Check if block is an inline block with {{end}}
-                if (strpos((string) $this_line, '{{end}}') !== false) {
+                if (str_contains((string) $this_line, '{{end}}')) {
                     throw new SyntaxError(
                         message: 'Blocks must not be inline',
                         line: $this->current_line,

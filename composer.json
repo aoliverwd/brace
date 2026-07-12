@@ -58,6 +58,9 @@
         ],
         "local:update": [
             "docker compose run -it php composer update --optimize-autoloader"
+        ],
+        "local:rector": [
+            "docker compose run -it php ./vendor/bin/rector"
         ]
     },
     "config": {
