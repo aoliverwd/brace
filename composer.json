@@ -1,6 +1,7 @@
 {
     "name": "alexoliverwd/brace",
     "description": "A simple template language written in PHP",
+    "version": "1.5.0",
     "keywords": [
         "handlebars",
         "template",
@@ -51,6 +52,12 @@
         ],
         "format": [
             "./vendor/bin/pint src --preset psr12"
+        ],
+        "local:test": [
+            "docker compose run -it php composer test"
+        ],
+        "local:update": [
+            "docker compose run -it php composer update --optimize-autoloader"
         ]
     },
     "config": {
