@@ -1,3 +1,13 @@
+blockcondition (ConditionTests\blockcondition)
+ [x] If block condition
+ [x] If else block condition
+ [x] If and block condition
+ [x] If is true block condition
+ [x] If else condition
+ [x] Multiple if else condition
+ [x] Bool check function call return true
+ [x] Bool check function call return false
+
 Callable (ConditionTests\Callable)
  [x] Callable method
  [x] Callable method with data arg
@@ -52,30 +62,6 @@ Inlinecondition (ConditionTests\Inlinecondition)
  [x] Inline bool check function call with attribute true
  [x] Inline bool check function call with attribute false
 
-Shortcode (ConditionTests\Shortcode)
- [x] Shortcode
- [x] Shortcode include template
- [x] Shortcode include template via variable
- [x] Shortcode arrow function
- [x] Shortcode arrow function year
- [x] Shortcode with data variables
- [x] Shortcode with array data variables
- [x] Shortcode with array data nested variables
-
-Syntax (ConditionTests\Syntax)
- [x] Inline condition block syntax error
- [x] Inline for each block syntax error
-
-blockcondition (ConditionTests\blockcondition)
- [x] If block condition
- [x] If else block condition
- [x] If and block condition
- [x] If is true block condition
- [x] If else condition
- [x] Multiple if else condition
- [x] Bool check function call return true
- [x] Bool check function call return false
-
 iterator (ConditionTests\iterator)
  [x] Nested iteration
  [x] As nested iteration
@@ -95,6 +81,20 @@ iterator (ConditionTests\iterator)
  [x] Loop iteration standard
  [x] Loop iteration ascending
  [x] Loop iteration descending
+
+Shortcode (ConditionTests\Shortcode)
+ [x] Shortcode
+ [x] Shortcode include template
+ [x] Shortcode include template via variable
+ [x] Shortcode arrow function
+ [x] Shortcode arrow function year
+ [x] Shortcode with data variables
+ [x] Shortcode with array data variables
+ [x] Shortcode with array data nested variables
+
+Syntax (ConditionTests\Syntax)
+ [x] Inline condition block syntax error
+ [x] Inline for each block syntax error
 
 variable (ConditionTests\variable)
  [x] Variables
