@@ -2,7 +2,10 @@ name: brace-templating-syntax
 
 services:
     php:
-        # https://serversideup.net/open-source/docker-php/
-        image: serversideup/php:8.5-cli
+        build:
+            context: .
+            dockerfile: ./Dockerfile
+        working_dir: /var/www/html
+        command: tail -f /dev/null
         volumes:
             - ./:/var/www/html

@@ -54,13 +54,13 @@
             "./vendor/bin/pint src --preset psr12"
         ],
         "local:test": [
-            "docker compose run -it php composer test"
+            "docker compose exec php composer test"
         ],
         "local:update": [
-            "docker compose run -it php composer update --optimize-autoloader"
+            "docker compose exec php composer update --optimize-autoloader"
         ],
         "local:rector": [
-            "docker compose run -it php ./vendor/bin/rector"
+            "docker compose exec php ./vendor/bin/rector"
         ]
     },
     "config": {
