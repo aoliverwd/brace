@@ -60,4 +60,20 @@ trait Filters
 
         return call_user_func($this->filters[$filter], $value);
     }
+
+    /**
+     * Register sanitiseation helper filters
+     */
+    private function registerHelperFilters(): void
+    {
+        $this->registerFilter('esc_html', fn ($text) => SanatiseHelpers::esc_html($text));
+        $this->registerFilter('esc_attr', fn ($text) => SanatiseHelpers::esc_attr($text));
+        $this->registerFilter('esc_textarea', fn ($text) => SanatiseHelpers::esc_textarea($text));
+        $this->registerFilter('esc_js', fn ($text) => SanatiseHelpers::esc_js($text));
+        $this->registerFilter('esc_json', fn ($text) => SanatiseHelpers::esc_json($text));
+        $this->registerFilter('esc_url', fn ($text) => SanatiseHelpers::esc_url($text));
+        $this->registerFilter('sanitise_text_field', fn ($text) => SanatiseHelpers::sanitise_text_field($text));
+        $this->registerFilter('sanitise_textarea_field', fn ($text) => SanatiseHelpers::sanitise_textarea_field($text));
+        $this->registerFilter('sanitise_email', fn ($text) => SanatiseHelpers::sanitise_email($text));
+    }
 }

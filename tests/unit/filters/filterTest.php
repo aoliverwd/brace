@@ -99,13 +99,13 @@ final class FilterTest extends TestCase
     {
         $brace = new Brace\Parser();
 
-        $brace->registerFilter('esc_html', fn($content) => strip_tags($content));
+        $brace->registerFilter('strip_tags', fn($content) => strip_tags($content));
 
         $this->assertEquals(
             'Hi Miss Foo Doe' . PHP_EOL,
             $brace
                 ->parseInputString(
-                    'Hi {{names->?first[Jane]->title|esc_html}} {{names->?first[Jane]->last|esc_html}}',
+                    'Hi {{names->?first[Jane]->title|strip_tags}} {{names->?first[Jane]->last|strip_tags}}',
                     [
                         'names' => [
                             0 => [

@@ -61,6 +61,9 @@ final class Parser
     {
         /** Set template_path to current working path of class instance */
         $this->template_path = getcwd() . '/';
+
+        /** Register sanitiseation helper filters */
+        $this->registerHelperFilters();
     }
 
     /**
